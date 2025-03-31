@@ -1,19 +1,13 @@
-FROM node:21
-
-# Set the working directory
-WORKDIR /usr/src/app
-
-# Copy package.json and package-lock.json
-COPY package*.json ./
-
-# Install dependencies
+FROM node:22-alpine AS build-stage
+WORKDIR /app
+COPY package.json .
 RUN npm install
-
-# Copy the rest of the application code
 COPY . .
+RUN npm run build
 
-# Expose the application port
-EXPOSE 2000
-
-# Command to run the application
-CMD ["node", "dist/app.js"]
+FROM busybox:1.35
+RUN adduser -D static
+USER static
+WORKDIR /home/static
+COPY --from=build-stage /app/dist .
+CMD ["busybox", "httpd", "-f", "-v", "-p", "2000"]
