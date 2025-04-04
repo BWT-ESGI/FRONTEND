@@ -4,9 +4,9 @@ import {
   Users,
 } from "lucide-react"
 
-import { NavProjects } from "@/components/nav-projects"
-import { NavUser } from "@/components/nav-user"
-import { PromotionSwitcher } from "@/components/promotion-switcher"
+import { NavProjects } from "@/components/NavProjects"
+import { NavUser } from "@/components/NavUser"
+import { PromotionSwitcher } from "@/components/PromotionSwitcher"
 import {
   Sidebar,
   SidebarContent,
@@ -51,7 +51,7 @@ const data = {
     },
     {
       name: "Gestion des Utilisateurs",
-      url: "/user-manager",
+      url: "/gestion-utilisateurs",
       icon: Users,
     },
   ],
