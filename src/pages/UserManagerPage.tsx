@@ -3,7 +3,7 @@ import { AutoBreadcrumb } from "@/components/header-breadcrumb"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { useBreadcrumb } from "@/hooks/useBreadcrumb"
 
-export default function DashboardPage() {
+export default function UserManagerPage() {
 
     return (
         <SidebarProvider>

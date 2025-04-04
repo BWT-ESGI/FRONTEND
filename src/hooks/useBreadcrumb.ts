@@ -22,15 +22,20 @@ export function useBreadcrumb(): BreadcrumbItemData[] {
     let cumulativePath = "";
     segments.forEach((segment, index) => {
       cumulativePath += `/${segment}`;
+      const formattedLabel = segment
+        .split("-")
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(" ");
+
       if (index === segments.length - 1) {
         items.push({
           type: "page",
-          label: segment.charAt(0).toUpperCase() + segment.slice(1),
+          label: formattedLabel,
         });
       } else {
         items.push({
           type: "link",
-          label: segment.charAt(0).toUpperCase() + segment.slice(1),
+          label: formattedLabel,
           href: cumulativePath,
         });
       }

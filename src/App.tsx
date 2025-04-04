@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginPage from "@/pages/LoginPage";
 import DashboardPage from "@/pages/DashboardPage";
 import ProtectedRoute from "@/middleware/ProtectedRoute";
+import UserManagerPage from "./pages/UserManagerPage";
 
 const App = () => {
   return (
@@ -10,6 +11,7 @@ const App = () => {
         <Route path="/login" element={<LoginPage />} />
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<DashboardPage />} />
+          <Route path="/user-manager" element={<UserManagerPage />} />
         </Route>
       </Routes>
     </BrowserRouter>

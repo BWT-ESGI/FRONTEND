@@ -51,7 +51,7 @@ const data = {
     },
     {
       name: "Gestion des Utilisateurs",
-      url: "#",
+      url: "/user-manager",
       icon: Users,
     },
   ],
