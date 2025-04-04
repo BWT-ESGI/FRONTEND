@@ -1,12 +1,9 @@
 import * as React from "react"
 import {
-  BookOpen,
-  Bot,
   FolderOpenDot,
   Users,
 } from "lucide-react"
 
-import { NavMain } from "@/components/nav-main"
 import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
 import { PromotionSwitcher } from "@/components/promotion-switcher"
@@ -41,51 +38,21 @@ const data = {
       plan: "PPA",
     },
   ],
-  navMain: [
-    {
-      title: "Projets",
-      url: "#",
-      icon: Bot,
-    },
-    {
-      title: "Promotions",
-      url: "#",
-      icon: BookOpen,
-      items: [
-        {
-          title: "Introduction",
-          url: "#",
-        },
-        {
-          title: "Get Started",
-          url: "#",
-        },
-        {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
-        },
-      ],
-    },
-  ],
   projects: [
     {
-      name: "Projet Annuel",
+      name: "Gestion des Projets",
       url: "#",
       icon: FolderOpenDot,
     },
     {
-      name: "JEE",
+      name: "Gestion des Promotions",
       url: "#",
-      icon: FolderOpenDot,
+      icon: Users,
     },
     {
-      name: "Design Patterns",
+      name: "Gestion des Utilisateurs",
       url: "#",
-      icon: FolderOpenDot,
+      icon: Users,
     },
   ],
 }
@@ -97,7 +64,6 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <PromotionSwitcher promotions={data.promotions} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
         <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>

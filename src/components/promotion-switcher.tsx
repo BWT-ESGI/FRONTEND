@@ -79,7 +79,7 @@ export function PromotionSwitcher({
               <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
                 <Plus className="size-4" />
               </div>
-              <div className="text-muted-foreground font-medium">Add Promotion</div>
+              <div className="text-muted-foreground font-medium">Ajouter une Promotion</div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
