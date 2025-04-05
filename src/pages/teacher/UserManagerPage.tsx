@@ -1,19 +1,14 @@
 import FlexibleCard from "@/components/template/FlexibleCard";
 import FlexibleTable from "@/components/template/FlexibleTable";
 import DashboardLayout from "@/layout/dashboard.layout";
+import { User } from "@/types/user.type";
 import { ColumnDef } from "@tanstack/react-table";
 
-type User = {
-  id: string;
-  name: string;
-  email: string;
-  role: string;
-};
 
 const userData: User[] = [
-  { id: "1", name: "Alice Smith", email: "alice@example.com", role: "admin" },
-  { id: "2", name: "Bob Jones", email: "bob@example.com", role: "editor" },
-  { id: "3", name: "Carol Lee", email: "carol@example.com", role: "viewer" },
+  { id: "1", name: "Alice Smith", email: "alice@example.com", role: "student" },
+  { id: "2", name: "Bob Jones", email: "bob@example.com", role: "student" },
+  { id: "3", name: "Carol Lee", email: "carol@example.com", role: "student" },
 ];
 
 const userColumns: ColumnDef<User>[] = [
@@ -28,6 +23,7 @@ const userColumns: ColumnDef<User>[] = [
   {
     accessorKey: "role",
     header: "Role",
+    cell: info => info.getValue() === "student" ? "Student" : info.getValue(),
   },
 ];
 
