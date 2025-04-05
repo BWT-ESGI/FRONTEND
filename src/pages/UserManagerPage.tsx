@@ -1,5 +1,5 @@
-import FlexibleCard from "@/components/FlexibleCard";
-import FlexibleTable from "@/components/FlexibleTable";
+import FlexibleCard from "@/components/template/FlexibleCard";
+import FlexibleTable from "@/components/template/FlexibleTable";
 import DashboardLayout from "@/layout/dashboard.layout";
 import { ColumnDef } from "@tanstack/react-table";
 

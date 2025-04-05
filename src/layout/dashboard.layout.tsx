@@ -1,5 +1,5 @@
-import { AppSidebar } from "@/components/AppSidebar"
-import { AutoBreadcrumb } from "@/components/AutoBreadcrumb"
+import { AppSidebar } from "@/components/layout/AppSidebar"
+import { AutoBreadcrumb } from "@/components/utils/AutoBreadcrumb"
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar"
 import { useBreadcrumb } from "@/hooks/useBreadcrumb"
 

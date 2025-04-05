@@ -4,9 +4,9 @@ import {
   Users,
 } from "lucide-react"
 
-import { NavProjects } from "@/components/NavProjects"
-import { NavUser } from "@/components/NavUser"
-import { PromotionSwitcher } from "@/components/PromotionSwitcher"
+import { NavProjects } from "@/components/layout/NavProjects"
+import { NavUser } from "@/components/layout/NavUser"
+import { PromotionSwitcher } from "@/components/utils/PromotionSwitcher"
 import {
   Sidebar,
   SidebarContent,
