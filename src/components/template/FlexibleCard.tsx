@@ -1,4 +1,3 @@
-
 import {
   Card,
   CardContent,
@@ -11,24 +10,25 @@ interface FlexibleCardProps {
   title: string;
   description?: string;
   children: React.ReactNode;
+  childrenRightEnd?: React.ReactNode;
 }
 
 export default function FlexibleCard({
   title,
   description,
   children,
+  childrenRightEnd,
 }: FlexibleCardProps) {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle>{title}</CardTitle>
-        <CardDescription>
-          {description}
-        </CardDescription>
+      <CardHeader className="flex items-center justify-between">
+        <div>
+          <CardTitle>{title}</CardTitle>
+          {description && <CardDescription>{description}</CardDescription>}
+        </div>
+        {childrenRightEnd && <div>{childrenRightEnd}</div>}
       </CardHeader>
-      <CardContent>
-        {children}
-      </CardContent>
+      <CardContent>{children}</CardContent>
     </Card>
   );
 }

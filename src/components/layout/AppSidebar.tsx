@@ -46,7 +46,7 @@ const data = {
     },
     {
       name: "Gestion des Promotions",
-      url: "#",
+      url: "/gestion-promotions",
       icon: Users,
     },
     {
