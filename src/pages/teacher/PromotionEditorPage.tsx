@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import { FlexibleCircularProgress } from "@/components/template/FlexibleCircularProgress";
 import FlexibleCard from "@/components/template/FlexibleCard";
 import FlexibleTable from "@/components/template/FlexibleTable";
@@ -10,6 +10,7 @@ import PromotionEditorPageSkeleton from "./PromotionEditorPageSkeleton";
 import NotFoundPage from "../global/NotFoundPage";
 import { Project } from "@/types/project.type";
 import { FlexibleBadge } from "@/components/template/FlexibleBadge";
+import { Button } from "@/components/ui/button";
 
 export default function PromotionEditorPage() {
   const { id } = useParams<{ id: string }>();
@@ -24,9 +25,7 @@ export default function PromotionEditorPage() {
   }
 
   if (!promotion) {
-    return (
-      <NotFoundPage />
-    );
+    return <NotFoundPage />;
   }
 
   const userColumns: ColumnDef<User>[] = [
@@ -41,7 +40,7 @@ export default function PromotionEditorPage() {
     {
       accessorKey: "role",
       header: "Role",
-      cell: info =>
+      cell: (info) =>
         info.getValue() === "student" ? "Student" : info.getValue(),
     },
   ];
@@ -57,17 +56,17 @@ export default function PromotionEditorPage() {
     {
       accessorKey: "createdAt",
       header: "Created At",
-      cell: info => new Date(info.getValue() as string).toLocaleDateString(),
+      cell: (info) => new Date(info.getValue() as string).toLocaleDateString(),
     },
     {
       accessorKey: "updatedAt",
       header: "Updated At",
-      cell: info => new Date(info.getValue() as string).toLocaleDateString(),
+      cell: (info) => new Date(info.getValue() as string).toLocaleDateString(),
     },
   ];
   const userData = promotion.students;
   const projectsData = promotion.projects;
-  
+
   return (
     <DashboardLayout>
       <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
@@ -87,9 +86,7 @@ export default function PromotionEditorPage() {
                   labelClassName="text-xl font-bold"
                   progressClassName="stroke-green-500"
                 />
-                <p className="mt-2 text-sm font-medium">
-                  Nombre d'étudiants
-                </p>
+                <p className="mt-2 text-sm font-medium">Nombre d'étudiants</p>
               </div>
               <div className="flex flex-col items-center justify-center w-full">
                 <FlexibleCircularProgress
@@ -100,34 +97,51 @@ export default function PromotionEditorPage() {
                   labelClassName="text-xl font-bold"
                   progressClassName="stroke-orange-500"
                 />
-                <p className="mt-2 text-sm font-medium">
-                  Nombre de projets
-                </p>
+                <p className="mt-2 text-sm font-medium">Nombre de projets</p>
               </div>
             </div>
           </FlexibleCard>
 
           <FlexibleCard
-            title={`Projet: ${promotion.projects[0].name}`} 
+            title={`Projet: ${promotion.projects[0].name}`}
             description={promotion.teacher.name}
-            badge={<FlexibleBadge status='in-progress' />}
+            childrenRightEnd={<FlexibleBadge status="in-progress" />}
           >
             <div className="max-w-xs mx-auto w-full flex items-center">
               <span className="text-sm font-medium">
                 {promotion.projects[0].description}
               </span>
-              
-
-            </div> {/* Closing div for max-w-xs */}
-          </FlexibleCard> {/* Closing FlexibleCard for project */}
-          
-
+            </div>
+          </FlexibleCard>
         </div>
-        <FlexibleCard title="Projets de la promotion" description="Gérer les projets de la promotion">
-          <FlexibleTable<Project> data={projectsData} columns={projectColumns} />
+        <FlexibleCard
+          title="Projets de la promotion"
+          description="Gérer les projets de la promotion"
+          childrenRightEnd={
+            <Button size="sm">
+              <Link to={`/teacher/promotions/${promotion.id}/projects/new`}>
+                Créer un projet
+              </Link>
+            </Button>
+          }
+        >
+          <FlexibleTable<Project>
+            data={projectsData}
+            columns={projectColumns}
+          />
         </FlexibleCard>
 
-        <FlexibleCard title="Etudiants dans la promotion" description="Gérer les étudiants de la promotion">
+        <FlexibleCard
+          title="Etudiants de la promotion"
+          description="Gérer les étudiants de la promotion"
+          childrenRightEnd={
+            <Button size="sm">
+              <Link to={`/gestion-promotions/${promotion.id}/ajouter-etudiant`}>
+                Ajouter des étudiants
+              </Link>
+            </Button>
+          }
+        >
           <FlexibleTable<User> data={userData} columns={userColumns} />
         </FlexibleCard>
       </div>

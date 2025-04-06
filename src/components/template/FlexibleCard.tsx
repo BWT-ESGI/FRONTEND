@@ -10,14 +10,14 @@ interface FlexibleCardProps {
   title: string;
   description?: string;
   children: React.ReactNode;
-  badge?: React.ReactNode; // Badge flexible status optionnel
+  childrenRightEnd?: React.ReactNode;
 }
 
 export default function FlexibleCard({
   title,
   description,
   children,
-  badge,
+  childrenRightEnd,
 }: FlexibleCardProps) {
   return (
     <Card>
@@ -26,7 +26,7 @@ export default function FlexibleCard({
           <CardTitle>{title}</CardTitle>
           {description && <CardDescription>{description}</CardDescription>}
         </div>
-        {badge && <div>{badge}</div>}
+        {childrenRightEnd && <div>{childrenRightEnd}</div>}
       </CardHeader>
       <CardContent>{children}</CardContent>
     </Card>

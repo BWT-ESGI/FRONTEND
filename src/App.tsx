@@ -7,6 +7,7 @@ import { ThemeProvider } from "./hooks/theme-provider";
 import PromotionManagerPage from "./pages/teacher/PromotionManagerPage";
 import PromotionEditorPage from "./pages/teacher/PromotionEditorPage";
 import NotFoundPage from "./pages/global/NotFoundPage";
+import PromotionAddStudentPage from "./pages/teacher/PromotionAddStudentPage";
 
 const App = () => {
   return (
@@ -19,6 +20,7 @@ const App = () => {
             <Route path="/gestion-utilisateurs" element={<UserManagerPage />} />
             <Route path="/gestion-promotions" element={<PromotionManagerPage />} />
             <Route path="/gestion-promotions/:id" element={<PromotionEditorPage />} />
+            <Route path="/gestion-promotions/:id/ajouter-etudiant" element={<PromotionAddStudentPage />} />
           </Route>
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

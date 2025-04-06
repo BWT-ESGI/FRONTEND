@@ -33,7 +33,9 @@ export default function PromotionManagerPage() {
                       labelClassName="text-xl font-bold"
                       progressClassName="stroke-green-500"
                     />
-                    <p className="mt-2 text-sm font-medium">Nombre d'étudiants</p>
+                    <p className="mt-2 text-sm font-medium">
+                      Nombre d'étudiants
+                    </p>
                   </div>
                   <div className="flex flex-col items-center justify-center w-full">
                     <FlexibleCircularProgress
@@ -44,7 +46,9 @@ export default function PromotionManagerPage() {
                       labelClassName="text-xl font-bold"
                       progressClassName="stroke-orange-500"
                     />
-                    <p className="mt-2 text-sm font-medium">Nombre de projets</p>
+                    <p className="mt-2 text-sm font-medium">
+                      Nombre de projets
+                    </p>
                   </div>
                 </div>
                 <div className="flex justify-end mt-8">
