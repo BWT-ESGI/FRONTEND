@@ -9,23 +9,23 @@ export function usePromotions() {
     setTimeout(() => {
       const mockPromotions: Promotion[] = [
         {
-          id: "1",
+          id: 1,
           name: "Promotion 2025",
           teacher: {
-            id: "t1",
+            id: 1,
             name: "Prof. Dupont",
             email: "dupont@gmail.com",
             role: "teacher",
           },
           students: [
             {
-              id: "s1",
+              id: 1,
               name: "Student One",
               email: "studentone@gmail.com",
               role: "student",
             },
             {
-              id: "s2",
+              id: 2,
               name: "Student Two",
               email: "studenttwo@gmail.com",
               role: "student",
@@ -53,10 +53,10 @@ export function usePromotions() {
           ],
         },
         {
-          id: "2",
+          id: 2,
           name: "Promotion 2026",
           teacher: {
-            id: "t2",
+            id: 2,
             name: "Prof. Martin",
             email: "martin@gmail.com",
             role: "teacher",
@@ -65,10 +65,10 @@ export function usePromotions() {
           projects: [],
         },
         {
-          id: "3",
+          id: 3,
           name: "Promotion 2027",
           teacher: {
-            id: "t3",
+            id: 3,
             name: "Prof. Leroy",
             email: "leroy@gmail.com",
             role: "teacher",
@@ -77,10 +77,10 @@ export function usePromotions() {
           projects: [],
         },
         {
-          id: "4",
+          id: 4,
           name: "Promotion 2028",
           teacher: {
-            id: "t4",
+            id: 4,
             name: "Prof. Moreau",
             email: "moreau@gmail.com",
             role: "teacher",

@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 
 export default function PromotionEditorPage() {
   const { id } = useParams<{ id: string }>();
-  const { promotion, loading } = usePromotion(id || "");
+  const { promotion, loading } = usePromotion(Number(id) || 0);
 
   if (loading) {
     return (

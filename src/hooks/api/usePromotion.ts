@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Promotion } from "@/types/promotion.type";
 
-export function usePromotion(promotionId: string) {
+export function usePromotion(promotionId: number) {
   const [promotion, setPromotion] = useState<Promotion | null>(null);
   const [loading, setLoading] = useState(true);
 
