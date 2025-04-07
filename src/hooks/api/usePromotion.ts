@@ -12,15 +12,15 @@ export function usePromotion(promotionId: string) {
         id: promotionId,
         name: "Promotion 2025",
         teacher: {
-          id: "t1",
+          id: 1,
           name: "Prof. Dupont",
           email: "dupont@gmail.com",
           role: "teacher",
         },
         students: [
-          { id: "1", name: "Alice Smith", email: "alice@example.com", role: "student" },
-          { id: "2", name: "Bob Jones", email: "bob@example.com", role: "student" },
-          { id: "3", name: "Carol Lee", email: "carol@example.com", role: "student" },
+          { id: 2, name: "Alice Smith", email: "alice@example.com", role: "student" },
+          { id: 3, name: "Bob Jones", email: "bob@example.com", role: "student" },
+          { id: 4, name: "Carol Lee", email: "carol@example.com", role: "student" },
         ],
         projects: [
           {

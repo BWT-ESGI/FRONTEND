@@ -1,5 +1,4 @@
 import { Group } from "./group.type";
-import { Promotion } from "./promotion.type";
 
 export type Project = {
     id: number;

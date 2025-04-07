@@ -10,12 +10,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  ChevronDown,
-  Columns3,
-  RefreshCcw,
-  SearchIcon,
-} from "lucide-react";
+import { ChevronDown, ChevronUp, Columns3, Filter, FilterIcon, RefreshCcw, SearchIcon } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -37,14 +32,61 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-export default function FlexibleTable<T>({
+function generateColumns<T extends object>(data: T[]): ColumnDef<T>[] {
+  if (!data || data.length === 0) return [];
+  return Object.keys(data[0]).map((key) => {
+    const sampleValue = (data[0] as any)[key];
+    const baseColumn: ColumnDef<T> = {
+      accessorKey: key,
+      header: key.charAt(0).toUpperCase() + key.slice(1),
+    };
+
+    if (
+      sampleValue instanceof Date ||
+      (typeof sampleValue === "string" && !isNaN(Date.parse(sampleValue)))
+    ) {
+      return {
+        ...baseColumn,
+        cell: (info) => {
+          const value = info.getValue();
+          if (
+            typeof value !== "string" &&
+            typeof value !== "number" &&
+            !(value instanceof Date)
+          ) {
+            return value;
+          }
+          const date = new Date(value);
+          if (isNaN(date.getTime())) return value;
+          return date.toLocaleString("fr-FR", {
+            day: "2-digit",
+            month: "2-digit",
+            year: "numeric",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+          });
+        },
+      };
+    }
+
+    return baseColumn;
+  });
+}
+
+export default function FlexibleTable<T extends object>({
   data,
   columns,
 }: {
   data: T[];
-  columns: ColumnDef<T>[];
+  columns?: ColumnDef<T>[];
 }) {
-  const [searchQuery, setSearchQuery] = React.useState<string>();
+  const finalColumns = columns || generateColumns(data);
+
+  // Etat pour le filtre global qui s'applique à toutes les colonnes
+  const [globalFilter, setGlobalFilter] = React.useState<string>("");
+  // Etat pour la recherche dans le menu des colonnes
+  const [searchQuery, setSearchQuery] = React.useState<string>("");
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     []
@@ -55,9 +97,12 @@ export default function FlexibleTable<T>({
 
   const table = useReactTable({
     data,
-    columns,
+    columns: finalColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    // Activation du filtre global
+    globalFilterFn: "includesString",
+    onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -65,6 +110,7 @@ export default function FlexibleTable<T>({
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
+      globalFilter,
       sorting,
       columnFilters,
       columnVisibility,
@@ -75,12 +121,11 @@ export default function FlexibleTable<T>({
   return (
     <div className="w-full">
       <div className="flex items-center gap-2 py-4">
+        {/* Input de filtre global qui s'applique à toutes les colonnes */}
         <Input
-          placeholder="Filter emails..."
-          value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
-          onChange={(event) =>
-            table.getColumn("email")?.setFilterValue(event.target.value)
-          }
+          placeholder="Filter..."
+          value={globalFilter}
+          onChange={(event) => setGlobalFilter(event.target.value)}
           className="max-w-sm"
         />
         <DropdownMenu>
@@ -111,7 +156,6 @@ export default function FlexibleTable<T>({
                 ) {
                   return null;
                 }
-
                 return (
                   <DropdownMenuCheckboxItem
                     key={column.id}
@@ -143,18 +187,30 @@ export default function FlexibleTable<T>({
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id}>
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                    </TableHead>
-                  );
-                })}
+                {headerGroup.headers.map((header) => (
+                  <TableHead
+                    key={header.id}
+                    onClick={() => {
+                      if (header.column.getCanSort()) {
+                        header.column.toggleSorting();
+                      }
+                    }}
+                    className={header.column.getCanSort() ? "cursor-pointer select-none" : ""}
+                  >
+                    {header.isPlaceholder ? null : (
+                      <div className="flex items-center">
+                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        <span>
+                          {header.column.getIsSorted() === "asc"
+                            ? <ChevronUp className="ml-2 text-muted-foreground" />
+                            : header.column.getIsSorted() === "desc"
+                            ? <ChevronDown className="ml-2 text-muted-foreground" />
+                            : ""}
+                        </span>
+                      </div>
+                    )}
+                  </TableHead>
+                ))}
               </TableRow>
             ))}
           </TableHeader>
@@ -178,7 +234,7 @@ export default function FlexibleTable<T>({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
+                  colSpan={finalColumns.length}
                   className="h-24 text-center"
                 >
                   Aucune donnée disponible.
@@ -191,10 +247,9 @@ export default function FlexibleTable<T>({
       <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
           {table.getFilteredSelectedRowModel().rows.length} of{" "}
-          {table.getFilteredRowModel().rows.length} ligne{
-            table.getFilteredRowModel().rows.length === 1 ? ("") : ("s")}{" "}
+          {table.getFilteredRowModel().rows.length} ligne
+          {table.getFilteredRowModel().rows.length === 1 ? "" : "s"}{" "}
           sélectionnée
-            
         </div>
         <div className="space-x-2">
           <Button

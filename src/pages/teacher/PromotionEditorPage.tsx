@@ -3,7 +3,6 @@ import { FlexibleCircularProgress } from "@/components/template/FlexibleCircular
 import FlexibleCard from "@/components/template/FlexibleCard";
 import FlexibleTable from "@/components/template/FlexibleTable";
 import DashboardLayout from "@/layout/dashboard.layout";
-import { ColumnDef } from "@tanstack/react-table";
 import { User } from "@/types/user.type";
 import { usePromotion } from "@/hooks/api/usePromotion";
 import PromotionEditorPageSkeleton from "./PromotionEditorPageSkeleton";
@@ -27,45 +26,6 @@ export default function PromotionEditorPage() {
   if (!promotion) {
     return <NotFoundPage />;
   }
-
-  const userColumns: ColumnDef<User>[] = [
-    {
-      accessorKey: "name",
-      header: "Name",
-    },
-    {
-      accessorKey: "email",
-      header: "Email",
-    },
-    {
-      accessorKey: "role",
-      header: "Role",
-      cell: (info) =>
-        info.getValue() === "student" ? "Student" : info.getValue(),
-    },
-  ];
-  const projectColumns: ColumnDef<Project>[] = [
-    {
-      accessorKey: "name",
-      header: "Name",
-    },
-    {
-      accessorKey: "description",
-      header: "Description",
-    },
-    {
-      accessorKey: "createdAt",
-      header: "Created At",
-      cell: (info) => new Date(info.getValue() as string).toLocaleDateString(),
-    },
-    {
-      accessorKey: "updatedAt",
-      header: "Updated At",
-      cell: (info) => new Date(info.getValue() as string).toLocaleDateString(),
-    },
-  ];
-  const userData = promotion.students;
-  const projectsData = promotion.projects;
 
   return (
     <DashboardLayout>
@@ -125,10 +85,7 @@ export default function PromotionEditorPage() {
             </Button>
           }
         >
-          <FlexibleTable<Project>
-            data={projectsData}
-            columns={projectColumns}
-          />
+          <FlexibleTable<Project> data={promotion.projects} />
         </FlexibleCard>
 
         <FlexibleCard
@@ -142,7 +99,7 @@ export default function PromotionEditorPage() {
             </Button>
           }
         >
-          <FlexibleTable<User> data={userData} columns={userColumns} />
+          <FlexibleTable<User> data={promotion.students} />
         </FlexibleCard>
       </div>
     </DashboardLayout>
