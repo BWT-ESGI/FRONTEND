@@ -4,7 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function PromotionEditorPageSkeleton() {
   return (
-    <div className="p-4 pt-0">
+    <div className="pt-0">
       <div className="grid auto-rows-min gap-4 md:grid-cols-3">
         <FlexibleCardSkeleton>
           <div className="flex items-center justify-around">

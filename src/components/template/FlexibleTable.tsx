@@ -10,7 +10,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { ChevronDown, ChevronUp, Columns3, RefreshCcw, SearchIcon } from "lucide-react";
+import { ArrowDownZA, ArrowUpAZ, ChevronDown, Columns3, RefreshCcw, SearchIcon } from "lucide-react";
 import * as React from "react";
 
 import { Button } from "@/components/ui/button";
@@ -121,7 +121,6 @@ export default function FlexibleTable<T extends object>({
   return (
     <div className="w-full">
       <div className="flex items-center gap-2 py-4">
-        {/* Input de filtre global qui s'applique à toutes les colonnes */}
         <Input
           placeholder="Filter..."
           value={globalFilter}
@@ -195,17 +194,26 @@ export default function FlexibleTable<T extends object>({
                         header.column.toggleSorting();
                       }
                     }}
-                    className={header.column.getCanSort() ? "cursor-pointer select-none" : ""}
+                    className={
+                      header.column.getCanSort()
+                        ? "cursor-pointer select-none"
+                        : ""
+                    }
                   >
                     {header.isPlaceholder ? null : (
                       <div className="flex items-center">
-                        {flexRender(header.column.columnDef.header, header.getContext())}
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                         <span>
-                          {header.column.getIsSorted() === "asc"
-                            ? <ChevronUp className="ml-2 text-muted-foreground" />
-                            : header.column.getIsSorted() === "desc"
-                            ? <ChevronDown className="ml-2 text-muted-foreground" />
-                            : ""}
+                            {header.column.getIsSorted() === "asc" ? (
+                            <ArrowUpAZ className="ml-2 h-4 w-4 text-muted-foreground" />
+                            ) : header.column.getIsSorted() === "desc" ? (
+                            <ArrowDownZA className="ml-2 h-4 w-4 text-muted-foreground" />
+                            ) : (
+                            ""
+                            )}
                         </span>
                       </div>
                     )}

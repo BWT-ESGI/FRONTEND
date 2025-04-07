@@ -5,7 +5,7 @@ import { FlexibleTableSkeleton } from "@/components/template/skeleton/FlexibleTa
 export default function UserManagerPageSkeleton() {
   return (
     <DashboardLayout>
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+      <div className="flex flex-1 flex-col gap-4 pt-0">
         <FlexibleCardSkeleton>
           <FlexibleTableSkeleton />
         </FlexibleCardSkeleton>

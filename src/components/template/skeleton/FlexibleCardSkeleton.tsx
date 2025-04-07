@@ -3,6 +3,7 @@ import {
     Card,
     CardContent,
     CardDescription,
+    CardFooter,
     CardHeader,
     CardTitle,
 } from "@/components/ui/card";
@@ -21,6 +22,9 @@ export function FlexibleCardSkeleton({ children }: { children?: React.ReactNode 
             <CardContent>
                 {children}
             </CardContent>
+            <CardFooter>
+                <Skeleton className="h-4 w-1/3" />
+            </CardFooter>
         </Card>
     );
 }

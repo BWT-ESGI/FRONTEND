@@ -1,9 +1,9 @@
 import { FlexibleCardSkeleton } from "@/components/template/skeleton/FlexibleCardSkeleton";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export function PromotionManagerPageSkeleton() {
+export default function FallBackPageSkeleton() {
   return (
-    <div className="pt-0">
+<div className="p-4 pt-0">
       <div className="grid auto-rows-min gap-4 md:grid-cols-3">
         {Array.from({ length: 3 }).map((_, index) => (
           <FlexibleCardSkeleton key={index}>

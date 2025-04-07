@@ -12,7 +12,7 @@ export default function PromotionManagerPage() {
 
   return (
     <DashboardLayout>
-      <div className="p-4 pt-0">
+      <div className="pt-0">
         {loading ? (
           <PromotionManagerPageSkeleton />
         ) : (
@@ -22,6 +22,15 @@ export default function PromotionManagerPage() {
                 key={promotion.id}
                 title={promotion.name}
                 description={`Enseignant: ${promotion.teacher.name}`}
+                childrenFooter={
+                  <div className="flex justify-end mt-8">
+                    <Link to={`/gestion-promotions/${promotion.id}`}>
+                      <Button className="cursor-pointer">
+                        Voir les détails
+                      </Button>
+                    </Link>
+                  </div>
+                }
               >
                 <div className="max-w-xs mx-auto w-full flex items-center">
                   <div className="flex flex-col items-center justify-center w-full">
@@ -50,11 +59,6 @@ export default function PromotionManagerPage() {
                       Nombre de projets
                     </p>
                   </div>
-                </div>
-                <div className="flex justify-end mt-8">
-                  <Link to={`/gestion-promotions/${promotion.id}`}>
-                    <Button className="cursor-pointer">Voir les détails</Button>
-                  </Link>
                 </div>
               </FlexibleCard>
             ))}

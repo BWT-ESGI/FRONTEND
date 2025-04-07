@@ -8,8 +8,8 @@ import { usePromotion } from "@/hooks/api/usePromotion";
 import PromotionEditorPageSkeleton from "./PromotionEditorPageSkeleton";
 import NotFoundPage from "../global/NotFoundPage";
 import { Project } from "@/types/project.type";
-import { FlexibleBadge } from "@/components/template/FlexibleBadge";
 import { Button } from "@/components/ui/button";
+import ProjectSummaryCard from "@/components/project/ProjectSummaryCard";
 
 export default function PromotionEditorPage() {
   const { id } = useParams<{ id: string }>();
@@ -29,7 +29,7 @@ export default function PromotionEditorPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+      <div className="flex flex-1 flex-col gap-4 pt-0">
         <div className="grid auto-rows-min gap-4 md:grid-cols-3">
           <FlexibleCard
             key={promotion.id}
@@ -62,17 +62,8 @@ export default function PromotionEditorPage() {
             </div>
           </FlexibleCard>
 
-          <FlexibleCard
-            title={`Projet: ${promotion.projects[0].name}`}
-            description={promotion.teacher.name}
-            childrenRightEnd={<FlexibleBadge status="in-progress" />}
-          >
-            <div className="max-w-xs mx-auto w-full flex items-center">
-              <span className="text-sm font-medium">
-                {promotion.projects[0].description}
-              </span>
-            </div>
-          </FlexibleCard>
+          <ProjectSummaryCard project={promotion.projects[0]} />
+
         </div>
         <FlexibleCard
           title="Projets de la promotion"
