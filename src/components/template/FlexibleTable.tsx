@@ -83,9 +83,7 @@ export default function FlexibleTable<T extends object>({
 }) {
   const finalColumns = columns || generateColumns(data);
 
-  // Etat pour le filtre global qui s'applique à toutes les colonnes
   const [globalFilter, setGlobalFilter] = React.useState<string>("");
-  // Etat pour la recherche dans le menu des colonnes
   const [searchQuery, setSearchQuery] = React.useState<string>("");
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -100,7 +98,6 @@ export default function FlexibleTable<T extends object>({
     columns: finalColumns,
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
-    // Activation du filtre global
     globalFilterFn: "includesString",
     onGlobalFilterChange: setGlobalFilter,
     getCoreRowModel: getCoreRowModel(),

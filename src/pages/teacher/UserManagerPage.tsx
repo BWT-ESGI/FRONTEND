@@ -4,6 +4,8 @@ import DashboardLayout from "@/layout/dashboard.layout";
 import { User } from "@/types/user.type";
 import { useUsers } from "@/hooks/api/useUsers";
 import UserManagerPageSkeleton from "./UserManagerPageSkeleton";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 export default function UserManagerPage() {
   const { users, loading } = useUsers();
@@ -20,6 +22,13 @@ export default function UserManagerPage() {
         <FlexibleCard
           title="Gestion des utilisateurs"
           description="Gérer les utilisateurs de l'application"
+          childrenRightEnd={
+            <Link to={"/teacher/user/create"}>
+              <Button>
+                Ajouter un utilisateur
+              </Button>
+            </Link>
+          }
         >
           <FlexibleTable<User> data={users} />
         </FlexibleCard>

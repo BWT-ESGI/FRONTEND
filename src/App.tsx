@@ -10,6 +10,7 @@ import NotFoundPage from "./pages/global/NotFoundPage";
 import PromotionAddStudentPage from "./pages/teacher/PromotionAddStudentPage";
 import ProjectListPage from "./pages/global/ProjectListPage";
 import ProjectDashboardPage from "./pages/teacher/ProjectDashboardPage";
+import UserCreatePage from "./pages/teacher/UserCreatePage";
 
 const App = () => {
   return (
@@ -25,6 +26,7 @@ const App = () => {
             <Route path="/gestion-promotions/:id/ajouter-etudiant" element={<PromotionAddStudentPage />} />
             <Route path="/list-projets" element={<ProjectListPage />} />
             <Route path="/gestion-projets/:id" element={<ProjectDashboardPage />} />
+            <Route path="/teacher/user/create" element={<UserCreatePage />} />
           </Route>
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

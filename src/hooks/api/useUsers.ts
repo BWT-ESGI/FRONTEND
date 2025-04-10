@@ -10,8 +10,8 @@ export function useUsers() {
       const mockUsers: User[] = [
         {
           id: 1,
-          name: "Alice Smith",
-          email: "alice@example.com",
+          name: "Alice Dupont",
+          email: "alice.dupont@bwt-school.com",
           role: "student",
         },
         { id: 2, name: "Bob Jones", email: "bob@example.com", role: "student" },
