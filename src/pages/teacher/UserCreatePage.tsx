@@ -6,45 +6,41 @@ import DashboardLayout from "@/layout/dashboard.layout";
 import FlexibleCard from "@/components/template/FlexibleCard";
 
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Form,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 
 import {
   User2,
-  Trash2,
   Upload,
   PlusCircle,
-  XCircle as XCircleIcon,
   CircleCheckBig,
   ShieldAlert,
 } from "lucide-react";
 import FlexibleRadioGroupCard from "@/components/template/FlexibleRadioGroupCard";
 import FileInput from "@/components/ui/FileInput";
 import Divider from "@/components/layout/Divider";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { parseCSV } from "@/utils/parseCSV";
 import { Alert, AlertTitle } from "@/components/ui/alert";
 import { useUsers } from "@/hooks/api/useUsers";
-
+import UserRow from "@/components/user/UserRow";
 
 const userCreateSchema = z.object({
   method: z.enum(["manual", "file"]),
-  users: z.array(
-    z.object({
-      firstName: z.string().min(2, "Le prénom est requis et doit comporter au moins 2 caractères"),
-      lastName: z.string().min(2, "Le nom est requis et doit comporter au moins 2 caractères"),
-      email: z.string().email("Email invalide"),
-    })
-  ).min(1, "Au moins un utilisateur doit être ajouté"),
+  users: z
+    .array(
+      z.object({
+        firstName: z
+          .string()
+          .min(
+            2,
+            "Le prénom est requis et doit comporter au moins 2 caractères"
+          ),
+        lastName: z
+          .string()
+          .min(2, "Le nom est requis et doit comporter au moins 2 caractères"),
+        email: z.string().email("Email invalide"),
+      })
+    )
+    .min(1, "Au moins un utilisateur doit être ajouté"),
   file: z.instanceof(File).optional(),
 });
 
@@ -69,17 +65,20 @@ export default function UserCreatePage() {
   });
 
   const usersData = useWatch({ control, name: "users" });
-  
-  const formEmails = usersData?.map(user => user.email) || [];
-  const existingEmails = existingUsers?.map(user => user.email) || [];
+
+  const formEmails = usersData?.map((user) => user.email) || [];
+  const existingEmails = existingUsers?.map((user) => user.email) || [];
   const combinedEmails = [...existingEmails, ...formEmails];
-  const duplicateEmails = combinedEmails.reduce<Record<string, number>>((acc, email) => {
-    if (email) {
-      acc[email] = (acc[email] || 0) + 1;
-    }
-    return acc;
-  }, {});
-  
+  const duplicateEmails = combinedEmails.reduce<Record<string, number>>(
+    (acc, email) => {
+      if (email) {
+        acc[email] = (acc[email] || 0) + 1;
+      }
+      return acc;
+    },
+    {}
+  );
+
   const method = form.watch("method");
 
   const onSubmit = () => {
@@ -222,130 +221,17 @@ export default function UserCreatePage() {
                   lastName: "",
                   email: "",
                 };
-
-                const firstNameState = form.getFieldState(
-                  `users.${index}.firstName`,
-                  form.formState
-                );
-                const lastNameState = form.getFieldState(
-                  `users.${index}.lastName`,
-                  form.formState
-                );
-                const emailState = form.getFieldState(
-                  `users.${index}.email`,
-                  form.formState
-                );
-
-                const errorsForRow: string[] = [];
-                if (firstNameState.error) {
-                  errorsForRow.push(`Prénom: ${firstNameState.error.message}`);
-                }
-                if (lastNameState.error) {
-                  errorsForRow.push(`Nom: ${lastNameState.error.message}`);
-                }
-                if (emailState.error) {
-                  errorsForRow.push(`Email: ${emailState.error.message}`);
-                }
-
-                const currentEmail = currentUser.email;
-                const isDuplicate =
-                  currentEmail && duplicateEmails[currentEmail] > 1;
-                if (isDuplicate) {
-                  errorsForRow.push("L'email existe déjà");
-                }
-
-                const isRowEmpty =
-                  !currentUser.firstName &&
-                  !currentUser.lastName &&
-                  !currentUser.email;
-
-                const tooltipMessage =
-                  errorsForRow.length > 0
-                    ? errorsForRow.join(" | ")
-                    : isRowEmpty
-                    ? "Ligne vide"
-                    : isDuplicate
-                    ? "Email déjà utilisé"
-                    : "";
-
-                const icon =
-                  errorsForRow.length > 0 ? (
-                    <XCircleIcon className="h-5 w-5 text-red-500" />
-                  ) : isRowEmpty ? (
-                    <User2 className="h-5 w-5 text-muted-foreground" />
-                  ) : isDuplicate ? (
-                    <XCircleIcon className="h-5 w-5 text-red-500" />
-                  ) : (
-                    <CircleCheckBig className="h-5 w-5 text-green-500" />
-                  );
-
                 return (
-                  <div
+                  <UserRow
                     key={field.id}
-                    className={`w-full flex items-center space-x-4 p-2 border rounded ${
-                      errorsForRow.length ? "border-red-500" : "border-border"
-                    }`}
-                  >
-                    <Tooltip>
-                      <TooltipTrigger>{icon}</TooltipTrigger>
-                      <TooltipContent>
-                        <p className="text-xs">{tooltipMessage}</p>
-                      </TooltipContent>
-                    </Tooltip>
-
-                    <div className="flex-1">
-                      <FormField
-                        control={control}
-                        name={`users.${index}.firstName`}
-                        render={({ field }) => (
-                          <FormItem className="flex items-center m-0">
-                            <Input
-                              placeholder="Prénom"
-                              {...field}
-                              className="w-full"
-                            />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <FormField
-                        control={control}
-                        name={`users.${index}.lastName`}
-                        render={({ field }) => (
-                          <FormItem className="flex items-center m-0">
-                            <Input
-                              placeholder="Nom"
-                              {...field}
-                              className="w-full"
-                            />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <FormField
-                        control={control}
-                        name={`users.${index}.email`}
-                        render={({ field }) => (
-                          <FormItem className="flex items-center m-0">
-                            <Input
-                              placeholder="Email"
-                              {...field}
-                              className="w-full"
-                            />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                    <Button
-                      type="button"
-                      variant="destructive"
-                      onClick={() => remove(index)}
-                    >
-                      <Trash2 size={16} />
-                    </Button>
-                  </div>
+                    index={index}
+                    control={control}
+                    getFieldState={form.getFieldState}
+                    formState={form.formState}
+                    duplicateEmails={duplicateEmails}
+                    user={currentUser}
+                    remove={remove}
+                  />
                 );
               })}
               <Button
@@ -363,7 +249,6 @@ export default function UserCreatePage() {
                 <PlusCircle size={16} className="mr-2" /> Ajouter un étudiant
               </Button>
             </div>
-
             <Button type="submit">Créer</Button>
           </form>
         </Form>

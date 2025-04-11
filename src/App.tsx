@@ -13,6 +13,7 @@ import UserCreatePage from "./pages/teacher/UserCreatePage";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import StudentRegisterPage from "@/pages/global/StudentRegisterPage";
 import HomePage from "./pages/global/HomePage";
+import PromotionCreatePage from "./pages/teacher/PromotionCreatePage";
 
 const App = () => {
   return (
@@ -27,6 +28,7 @@ const App = () => {
             <Route path="/gestion-utilisateurs" element={<UserManagerPage />} />
             <Route path="/gestion-promotions" element={<PromotionManagerPage />} />
             <Route path="/gestion-promotions/:id" element={<PromotionEditorPage />} />
+            <Route path="/gestion-promotions/ajouter" element={<PromotionCreatePage />} />
             <Route path="/gestion-promotions/:id/ajouter-etudiant" element={<PromotionAddStudentPage />} />
             <Route path="/list-projets" element={<ProjectListPage />} />
             <Route path="/gestion-projets/:id" element={<ProjectDashboardPage />} />

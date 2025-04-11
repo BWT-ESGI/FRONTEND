@@ -36,6 +36,11 @@ export default function PromotionManagerPage() {
           <FlexibleSearchBar<Promotion>
             data={promotions}
             placeholder="Rechercher une promotion..."
+            rightChildren={
+              <Link to="/gestion-promotions/ajouter">
+                <Button className="cursor-pointer">Créer une promotion</Button>
+              </Link>
+            }
             render={(filteredPromotions) => (
               <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                 {filteredPromotions.map((promotion) => (
