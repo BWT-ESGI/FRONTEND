@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginPage from "@/pages/global/LoginPage";
-import DashboardPage from "@/pages/DashboardPage";
 import ProtectedRoute from "@/middleware/ProtectedRoute";
 import UserManagerPage from "./pages/teacher/UserManagerPage";
 import { ThemeProvider } from "./hooks/theme-provider";
@@ -13,6 +12,7 @@ import ProjectDashboardPage from "./pages/teacher/ProjectDashboardPage";
 import UserCreatePage from "./pages/teacher/UserCreatePage";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import StudentRegisterPage from "@/pages/global/StudentRegisterPage";
+import HomePage from "./pages/global/HomePage";
 
 const App = () => {
   return (
@@ -20,10 +20,10 @@ const App = () => {
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
           <Route path="/register/:id" element={<StudentRegisterPage />} />
+          <Route path="/auth/login" element={<LoginPage />} />
           <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<DashboardPage />} />
+            <Route path="/" element={<HomePage />} />
             <Route path="/gestion-utilisateurs" element={<UserManagerPage />} />
             <Route path="/gestion-promotions" element={<PromotionManagerPage />} />
             <Route path="/gestion-promotions/:id" element={<PromotionEditorPage />} />
