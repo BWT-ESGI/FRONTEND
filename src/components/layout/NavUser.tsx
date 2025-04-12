@@ -3,7 +3,7 @@ import {
   ChevronsRight,
   LogOut,
 } from "lucide-react"
-
+import { useNavigate } from "react-router-dom";
 import {
   Avatar,
   AvatarFallback,
@@ -34,6 +34,12 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
 
   return (
     <SidebarMenu>
@@ -80,7 +86,7 @@ export function NavUser({
             
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={handleLogout}>
               <LogOut />
               Déconnexion
             </DropdownMenuItem>

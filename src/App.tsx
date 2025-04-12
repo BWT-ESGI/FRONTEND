@@ -11,13 +11,17 @@ import PromotionAddStudentPage from "./pages/teacher/PromotionAddStudentPage";
 import ProjectListPage from "./pages/global/ProjectListPage";
 import ProjectDashboardPage from "./pages/teacher/ProjectDashboardPage";
 import UserCreatePage from "./pages/teacher/UserCreatePage";
+import { GoogleOAuthProvider } from '@react-oauth/google';
+import StudentRegisterPage from "@/pages/global/StudentRegisterPage";
 
 const App = () => {
   return (
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register/:id" element={<StudentRegisterPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<DashboardPage />} />
             <Route path="/gestion-utilisateurs" element={<UserManagerPage />} />
@@ -32,6 +36,7 @@ const App = () => {
         </Routes>
       </BrowserRouter>
     </ThemeProvider>
+    </GoogleOAuthProvider>
 
   );
 };
