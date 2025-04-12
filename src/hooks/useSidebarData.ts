@@ -50,7 +50,7 @@ export function useSidebarData() {
         projects: [
           {
             name: "Gestion des Projets",
-            url: "/list-projets",
+            url: "/gestion-projets",
             icon: FolderOpenDot,
           },
           {

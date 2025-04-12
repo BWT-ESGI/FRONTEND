@@ -19,9 +19,9 @@ import FlexibleRadioGroupCard from "@/components/template/FlexibleRadioGroupCard
 import FileInput from "@/components/ui/FileInput";
 import Divider from "@/components/layout/Divider";
 import { parseCSV } from "@/utils/parseCSV";
-import { Alert, AlertTitle } from "@/components/ui/alert";
 import { useUsers } from "@/hooks/api/useUsers";
 import UserRow from "@/components/user/UserRow";
+import FlexibleAlert from "@/components/template/FlexibleAlert";
 
 const userCreateSchema = z.object({
   method: z.enum(["manual", "file"]),
@@ -192,21 +192,9 @@ export default function UserCreatePage() {
                   <div className="p-4 border-l border-gray-200">
                     <h3 className="text-lg font-bold mb-2">Instructions</h3>
                     <div className="flex flex-col space-y-2">
-                      <Alert className="bg-blue-500/10 dark:bg-blue-600/30 border-none">
-                        <CircleCheckBig className="h-4 w-4 !text-blue-500" />
-                        <AlertTitle>Format : CSV ou JSON</AlertTitle>
-                      </Alert>
-                      <Alert className="bg-blue-500/10 dark:bg-blue-600/30 border-none">
-                        <CircleCheckBig className="h-4 w-4 !text-blue-500" />
-                        <AlertTitle>Poids maximum : 5MB</AlertTitle>
-                      </Alert>
-                      <Alert className="bg-amber-500/10 dark:bg-amber-600/30 border-none">
-                        <ShieldAlert className="h-4 w-4 !text-amber-500" />
-                        <AlertTitle>
-                          Assurez-vous que le fichier contient les colonnes
-                          requises : firstName, lastName, email.
-                        </AlertTitle>
-                      </Alert>
+                      <FlexibleAlert icon={<CircleCheckBig className="h-4 w-4 !text-blue-500" />} title="Format : CSV ou JSON"/>
+                      <FlexibleAlert icon={<CircleCheckBig className="h-4 w-4 !text-blue-500" />} title="Poids maximum : 5MB"/>
+                      <FlexibleAlert variant="warning" icon={<ShieldAlert className="h-4 w-4 !text-amber-500" />} title=" Assurez-vous que le fichier contient les colonnes requises : firstName, lastName, email."/>
                     </div>
                   </div>
                 </div>
