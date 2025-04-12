@@ -44,6 +44,7 @@
     "react-hook-form": "^7.55.0",
     "react-is": "^19.1.0-rc-69d4b800-20241021",
     "react-router-dom": "^7.4.1",
+    "react-select": "^5.10.1",
     "recharts": "^2.15.2",
     "serve": "^14.2.4",
     "tailwind-merge": "^3.0.2",
