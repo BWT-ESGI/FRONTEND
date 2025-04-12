@@ -17,7 +17,7 @@ export async function fetchPromotions(): Promise<Promotion[]> {
   return response.data;
 }
 
-export async function fetchPromotion(id: number): Promise<Promotion> {
+export async function fetchPromotionById(id: string): Promise<Promotion> {
   const response = await api.get<Promotion>(`/promotions/${id}`);
   return response.data;
 }

@@ -9,11 +9,19 @@ import PromotionEditorPageSkeleton from "./PromotionEditorPageSkeleton";
 import NotFoundPage from "../global/NotFoundPage";
 import { Project } from "@/types/project.type";
 import { Button } from "@/components/ui/button";
-import ProjectSummaryCard from "@/components/project/ProjectSummaryCard";
+// import ProjectSummaryCard from "@/components/project/ProjectSummaryCard";
+import ProjectFormModal from "@/components/promotion/ProjectFormModal";
+import { useState } from "react";
 
 export default function PromotionEditorPage() {
   const { id } = useParams<{ id: string }>();
-  const { promotion, loading } = usePromotion(Number(id) || 0);
+  const { promotion, loading, refetch } = usePromotion(id ?? "");
+  const [openModal, setOpenModal] = useState(false);
+
+  const handleCloseModal = () => {
+    setOpenModal(false);
+    refetch();
+  };
 
   if (loading) {
     return (
@@ -29,12 +37,17 @@ export default function PromotionEditorPage() {
 
   return (
     <DashboardLayout>
+      <ProjectFormModal
+        open={openModal}
+        onClose={handleCloseModal}
+        promotionId={promotion.id.toString()}
+      />
       <div className="flex flex-1 flex-col gap-4 pt-0">
         <div className="grid auto-rows-min gap-4 md:grid-cols-3">
           <FlexibleCard
             key={promotion.id}
             title={promotion.name}
-            description={`Enseignant: ${promotion.teacher.name}`}
+            description={`Enseignant: ${promotion.teacher.username}`}
           >
             <div className="max-w-xs mx-auto w-full flex items-center">
               <div className="flex flex-col items-center justify-center w-full">
@@ -62,17 +75,14 @@ export default function PromotionEditorPage() {
             </div>
           </FlexibleCard>
 
-          <ProjectSummaryCard project={promotion.projects[0]} />
-
+          {/* <ProjectSummaryCard project={promotion.projects[0]} /> */}
         </div>
         <FlexibleCard
           title="Projets de la promotion"
           description="Gérer les projets de la promotion"
           childrenRightEnd={
-            <Button size="sm">
-              <Link to={`/teacher/promotions/${promotion.id}/projects/new`}>
-                Créer un projet
-              </Link>
+            <Button size="sm" onClick={() => setOpenModal(true)}>
+              Créer un projet
             </Button>
           }
         >

@@ -1,6 +1,6 @@
 import { Group } from "./group.type";
 
-export type ProjectStatus = "draft" | "published" | "archived";
+export type ProjectStatus = "draft" | "published" | "archived" | "active";
 export type GroupCompositionType = "manual" | "random" | "student_choice";
 
 export type Project = {
