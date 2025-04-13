@@ -26,7 +26,7 @@ export default function ProjectCreatePage() {
   const { id: projectId } = useParams();
   const { project, loading: loadingProject } = useProject(projectId || "");
   const { promotion, loading: loadingPromotion } = usePromotion(
-    project?.promotionId
+    project?.promotionId?.toString() || ""
   );
 
   if (loadingProject || loadingPromotion) {

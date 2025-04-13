@@ -12,4 +12,3 @@ const ProjectDashboardTabs = ({ activeTab, setActiveTab }: any) => {
 };
 
 export default ProjectDashboardTabs;
-}

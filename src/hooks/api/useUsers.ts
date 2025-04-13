@@ -1,31 +1,26 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { User } from "@/types/user.type";
+import { fetchAllUsers } from "@/services/userService";
 
 export function useUsers() {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    setTimeout(() => {
-      const mockUsers: User[] = [
-        {
-          id: 1,
-          name: "Alice Dupont",
-          email: "alice.dupont@bwt-school.com",
-          role: "student",
-        },
-        { id: 2, name: "Bob Jones", email: "bob@example.com", role: "student" },
-        {
-          id: 3,
-          name: "Carol Lee",
-          email: "carol@example.com",
-          role: "student",
-        },
-      ];
-      setUsers(mockUsers);
+  const refetch = useCallback(async () => {
+    setLoading(true);
+    try {
+      const data = await fetchAllUsers();
+      setUsers(data);
+    } catch (error) {
+      console.error("Erreur lors du rafraîchissement des users :", error);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   }, []);
+
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   return { users, loading };
 }

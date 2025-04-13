@@ -1,4 +1,3 @@
-// src/hooks/api/usePromotions.ts
 import { useCallback, useEffect, useState } from "react";
 import { Promotion } from "@/types/promotion.type";
 import { fetchPromotions } from "@/services/promotionService";
