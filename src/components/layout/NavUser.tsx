@@ -38,7 +38,7 @@ export function NavUser({
 
   const handleLogout = () => {
     localStorage.removeItem("token");
-    navigate("/login");
+    navigate("/auth/login");
   };
 
   return (

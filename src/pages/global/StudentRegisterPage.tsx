@@ -69,7 +69,7 @@ const StudentRegisterPage = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="max-w-sm w-full flex flex-col items-center border rounded-lg p-6 shadow-sm text-center">
           <p className="text-lg font-semibold">Invalid or expired registration link.</p>
-          <Button className="mt-6" onClick={() => navigate("/login")}>
+          <Button className="mt-6" onClick={() => navigate("/auth/login")}>
             Go to Login
           </Button>
         </div>
@@ -161,7 +161,7 @@ const StudentRegisterPage = () => {
                   if (credentialResponse.credential) {
                     const response = await finalizeRegistration(email, credentialResponse.credential);
                     if (response.data.accessToken) {
-                      window.location.href = "/list-projets";
+                      window.location.href = "/gestion-projets";
                     } else {
                       console.error("Erreur backend:", response.data);
                     }

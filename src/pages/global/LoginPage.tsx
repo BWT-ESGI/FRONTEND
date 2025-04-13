@@ -19,7 +19,7 @@ const LoginPage = () => {
                 const response = await sendGoogleToken(credentialResponse.credential);
                 if (response.data.accessToken) {
                   localStorage.setItem('token', response.data.accessToken);
-                  window.location.href = "/list-projets";
+                  window.location.href = "/gestion-projets";
                 } else {
                   console.error('Erreur côté backend:', response.data);
                 }
