@@ -12,6 +12,11 @@ import { User } from "@/types/user.type.ts";
 //   }
 // }
 
+export const getUserById = async (id: string): Promise<User> => {
+  const response = await api.get<User>(`/users/${id}`);
+  return response.data;
+};
+
 
 export async function fetchAllUsers(): Promise<User[]> {
   const response = await api.get<User[]>("/users");

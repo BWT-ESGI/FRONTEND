@@ -1,4 +1,5 @@
 import api from "../config/axios";
+import { getUserById } from "./userService";
 
 export const sendGoogleToken = async (credential: string) => {
   try {
@@ -8,6 +9,10 @@ export const sendGoogleToken = async (credential: string) => {
     
     if (response.data.accessToken) {
       localStorage.setItem('token', response.data.accessToken);
+      const userInfo = await getUserById(response.data.userId);
+      localStorage.setItem('userFirstname', userInfo.firstName);
+      localStorage.setItem('userLastname', userInfo.lastName);
+      localStorage.setItem('userEmail', userInfo.email);
       localStorage.setItem('userId', response.data.userId);
       localStorage.setItem('role', response.data.role);
     }

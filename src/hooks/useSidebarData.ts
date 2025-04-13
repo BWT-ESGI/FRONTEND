@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { FolderOpenDot, Users } from "lucide-react";
+import getUserInfoFromLocalStorage from "@/utils/getUserInfoFromLocalStorage";
 
 interface SidebarData {
   user: {
@@ -23,12 +24,14 @@ export function useSidebarData() {
   const [data, setData] = useState<SidebarData | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const userInfo = getUserInfoFromLocalStorage();
+
   useEffect(() => {
       setData({
         user: {
-          firstname: "Thomas",
-          lastname: "Goillot",
-          email: "tgoillot@myges.fr",
+          firstname: userInfo?.userFirstname || "Not",
+          lastname: userInfo?.userLastname || "Found",
+          email: userInfo?.userEmail || "Not Found",
         },
         promotions: [
           {

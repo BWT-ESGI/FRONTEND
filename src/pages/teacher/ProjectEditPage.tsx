@@ -194,7 +194,7 @@ export default function ProjectCreatePage() {
                 </div>
                 <div className="flex flex-col items-center justify-center">
                   <div className="flex items-center justify-center text-2xl text-blue-600">
-                    {promotion?.students.length}{" "}
+                    {promotion && promotion.students.length}{" "}
                   </div>
                   <p className="text-sm text-muted-foreground mt-2">
                     Nombre d'étudiants dans la promotion
