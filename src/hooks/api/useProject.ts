@@ -1,30 +1,28 @@
 import { useState, useEffect } from "react";
 import { Project } from "@/types/project.type";
+import api from "@/config/axios";
 
 export function useProject(projectId: string) {
-  const [project, setProject] = useState<Project>({} as Project);
-  const [loading, setLoading] = useState(true);
+  const [project, setProject] = useState<Project | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
-    setTimeout(() => {
-      const mockProject: Project = {
-          id: 1,
-          name: "Project Alpha",
-          description: "A project about alpha testing.",
-          promotionId: 101,
-          nbStudensMinPerGroup: 3,
-          nbStudentsMaxPerGroup: 5,
-          nbGroups: 11,
-          groupCompositionType: "manual",
-          status: "published",
-          groups: [],
-          createdAt: new Date("2023-01-01"),
-          updatedAt: new Date("2023-01-15"),
-        };
-      setProject(mockProject);
-      setLoading(false);
-    }, 500);
-  }, []);
+    const fetchProject = async () => {
+      try {
+        const { data } = await api.get<Project>(`/projects/${projectId}`);
+        setProject(data);
+      } catch (error) {
+        console.error("Erreur lors du chargement du projet :", error);
+        setProject(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (projectId) {
+      fetchProject();
+    }
+  }, [projectId]);
 
   return { project, loading };
 }

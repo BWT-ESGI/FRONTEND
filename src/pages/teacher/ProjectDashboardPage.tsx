@@ -10,8 +10,8 @@ import SummaryGradesStatsSection from "@/components/project/SummaryGradesStatsSe
 import ProjectGroupsManager from "@/components/group/ProjectGroupsManager";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import GroupBuilder from "@/components/group/ GroupBuilder";
-import NavReport from "@/components/rapport/NavReport.tsx";
-import QuillReport from "@/components/rapport/QuillReport";
+import NavReport from "@/components/report/NavReport";
+import TextEditor from "@/components/report/TextEditor";
 import { Report } from "@/types/report.type";
 import { useParams } from "react-router-dom";
 
@@ -45,7 +45,7 @@ export default function ProjectDashboardPage() {
         <>
           <Divider text="Résumé du projet" className="mt-0" />
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <ProjectSummaryCard project={project} btn={false} />
+            {project && <ProjectSummaryCard project={project} btn={false} />}
           </div>
 
           <SummaryOverviewSection project={project} />
@@ -80,15 +80,15 @@ export default function ProjectDashboardPage() {
       {tab === "rapports" && (
         <>
           <NavReport
-            projectId={String(project.id)}
+            projectId={String(id)}
             onSelect={(report: SetStateAction<Report | null>) => setSelectedRapport(report)} />
           <Divider
-            text={`Rapport : ${selectedRapport?.id ?? "Chargement..."}`}
+            text={`Rapport ${selectedRapport ? "" : "Chargement..."}`}
             className="mt-0"
           />
 
           {selectedRapport ? (
-            <QuillReport rapportId={selectedRapport.id} />
+            <TextEditor rapportId={selectedRapport.id} />
           ) : (
             <div className="text-center text-sm text-muted-foreground mt-4">
               Aucun rapport disponible pour ce projet.
