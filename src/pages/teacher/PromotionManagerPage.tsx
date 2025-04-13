@@ -7,7 +7,6 @@ import { Promotion } from "@/types/promotion.type";
 import { usePromotions } from "@/hooks/api/usePromotions";
 import { PromotionManagerPageSkeleton } from "./PromotionManagerPageSkeleton";
 import { FlexibleSearchBar } from "@/components/template/FlexibleSearchBar";
-import { Plus } from "lucide-react";
 import PromotionFormModal from "@/components/promotion/PromotionFormModal";
 import { useState } from "react";
 
@@ -23,12 +22,6 @@ export default function PromotionManagerPage() {
   return (
     <DashboardLayout>
       <PromotionFormModal open={openModal} onClose={handleClose} />
-      <div className="flex justify-end mb-4">
-        <Button onClick={() => setOpenModal(true)} variant="outline">
-          <Plus className="w-4 h-4 mr-2" />
-          Ajouter une promotion
-        </Button>
-      </div>
       <div className="pt-0 p-4">
         {loading ? (
           <PromotionManagerPageSkeleton />
@@ -36,6 +29,9 @@ export default function PromotionManagerPage() {
           <FlexibleSearchBar<Promotion>
             data={promotions}
             placeholder="Rechercher une promotion..."
+            rightChildren={
+                <Button className="cursor-pointer" onClick={() => setOpenModal(true)} >Créer une promotion</Button>
+            }
             render={(filteredPromotions) => (
               <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                 {filteredPromotions.map((promotion) => (

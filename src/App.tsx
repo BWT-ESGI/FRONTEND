@@ -1,6 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginPage from "@/pages/global/LoginPage";
-import DashboardPage from "@/pages/DashboardPage";
 import ProtectedRoute from "@/middleware/ProtectedRoute";
 import UserManagerPage from "./pages/teacher/UserManagerPage";
 import { ThemeProvider } from "./hooks/theme-provider";
@@ -8,11 +7,14 @@ import PromotionManagerPage from "./pages/teacher/PromotionManagerPage";
 import PromotionEditorPage from "./pages/teacher/PromotionEditorPage";
 import NotFoundPage from "./pages/global/NotFoundPage";
 import PromotionAddStudentPage from "./pages/teacher/PromotionAddStudentPage";
-import ProjectListPage from "./pages/global/ProjectListPage";
+import ProjectManagerPage from "./pages/global/ProjectManagerPage";
 import ProjectDashboardPage from "./pages/teacher/ProjectDashboardPage";
 import UserCreatePage from "./pages/teacher/UserCreatePage";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import StudentRegisterPage from "@/pages/global/StudentRegisterPage";
+import HomePage from "./pages/global/HomePage";
+import ProjectCreatePage from "./pages/teacher/ProjectCreatePage";
+import ProjectEditPage from "./pages/teacher/ProjectEditPage";
 
 const App = () => {
   return (
@@ -20,17 +22,26 @@ const App = () => {
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
       <BrowserRouter>
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
           <Route path="/register/:id" element={<StudentRegisterPage />} />
+          <Route path="/auth/login" element={<LoginPage />} />
           <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<DashboardPage />} />
-            <Route path="/gestion-utilisateurs" element={<UserManagerPage />} />
+            <Route path="/" element={<HomePage />} />
+
+            {/* ============== PROMOTION ============== */}
             <Route path="/gestion-promotions" element={<PromotionManagerPage />} />
             <Route path="/gestion-promotions/:id" element={<PromotionEditorPage />} />
             <Route path="/gestion-promotions/:id/ajouter-etudiant" element={<PromotionAddStudentPage />} />
-            <Route path="/list-projets" element={<ProjectListPage />} />
+
+            {/* ============== PROJET ============== */}
+            <Route path="/gestion-projets" element={<ProjectManagerPage />} />
             <Route path="/gestion-projets/:id" element={<ProjectDashboardPage />} />
-            <Route path="/teacher/user/create" element={<UserCreatePage />} />
+            <Route path="/gestion-projets/ajouter" element={<ProjectCreatePage />} />
+            <Route path="/gestion-projets/:id/editer" element={<ProjectEditPage />} />
+
+            {/* ============== UTILISATEUR ============== */}
+            <Route path="/gestion-utilisateurs/create" element={<UserCreatePage />} />
+            <Route path="/gestion-utilisateurs" element={<UserManagerPage />} />
+
           </Route>
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

@@ -23,7 +23,7 @@ export default function UserManagerPage() {
           title="Gestion des utilisateurs"
           description="Gérer les utilisateurs de l'application"
           childrenRightEnd={
-            <Link to={"/teacher/user/create"}>
+            <Link to={"/gestion-utilisateurs/create"}>
               <Button>
                 Ajouter un utilisateur
               </Button>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Project } from "@/types/project.type";
 
-export function useProject() {
+export function useProject(projectId: string) {
   const [project, setProject] = useState<Project>({} as Project);
   const [loading, setLoading] = useState(true);
 
