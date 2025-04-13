@@ -33,7 +33,7 @@ export const saveGroupsForProject = async (projectId: number, groups: Group[]) =
       memberIds: group.members.map((member) => member.id),
     }));
 
-    await api.post(`/groups/save-for-project/${projectId}`, payload);
+    return await api.post(`/groups/save-for-project/${projectId}`, payload);
   } catch (error) {
     console.error("Erreur lors de la sauvegarde des groupes :", error);
     throw error;
@@ -50,5 +50,5 @@ export const updateProjectConfig = async (
     deadline?: string;
   }
 ) => {
-  await api.patch(`/projects/${projectId}`, payload);
+  return await api.patch(`/projects/${projectId}`, payload);
 };

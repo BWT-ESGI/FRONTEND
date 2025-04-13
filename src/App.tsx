@@ -15,11 +15,13 @@ import StudentRegisterPage from "@/pages/global/StudentRegisterPage";
 import HomePage from "./pages/global/HomePage";
 import ProjectCreatePage from "./pages/teacher/ProjectCreatePage";
 import ProjectEditPage from "./pages/teacher/ProjectEditPage";
+import { Toaster } from "react-hot-toast";
 
 const App = () => {
   return (
     <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
     <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
+    <Toaster position="top-right" />
       <BrowserRouter>
         <Routes>
           <Route path="/register/:id" element={<StudentRegisterPage />} />

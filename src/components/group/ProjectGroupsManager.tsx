@@ -10,11 +10,11 @@ import { Label } from "@/components/ui/label";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 
-type Mode = "manual" | "random" | "free";
+type Mode = "manual" | "random" | "student_choice";
 
 interface Props {
-  mode: "manual" | "random" | "free";
-  setMode: (mode: "manual" | "random" | "free") => void;
+  mode: "manual" | "random" | "student_choice";
+  setMode: (mode: "manual" | "random" | "student_choice") => void;
   minSize: number;
   maxSize: number;
   setMinSize: (n: number) => void;
@@ -68,7 +68,7 @@ export default function ProjectGroupsManager({mode, setMode, minSize, maxSize, s
         </div>
       </div>
       
-      {mode === "free" && (
+      {mode === "manual" && (
         <div className="space-y-2">
           <Label>Date limite pour créer un groupe</Label>
           <Calendar mode="single" selected={deadline} onSelect={setDeadline} />

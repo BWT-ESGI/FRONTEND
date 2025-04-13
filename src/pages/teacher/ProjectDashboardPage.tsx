@@ -13,13 +13,15 @@ import GroupBuilder from "@/components/group/ GroupBuilder";
 import NavReport from "@/components/rapport/NavReport.tsx";
 import QuillReport from "@/components/rapport/QuillReport";
 import { Report } from "@/types/report.type";
+import { useParams } from "react-router-dom";
 
 export default function ProjectDashboardPage() {
-  const { project, loading } = useProject();
+  const { id } = useParams<{ id: string }>();
+  const { project, loading } = useProject(id || "");
   const [tab, setTab] = useState("overview");
 
   //groups
-  const [groupMode, setGroupMode] = useState<"manual" | "random" | "free">(
+  const [groupMode, setGroupMode] = useState<"manual" | "random" | "student_choice">(
     "manual"
   );
   const [minSize, setMinSize] = useState(2);

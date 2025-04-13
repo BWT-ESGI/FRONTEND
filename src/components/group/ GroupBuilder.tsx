@@ -16,6 +16,7 @@ import {
 import { User } from "@/types/user.type";
 import { Group } from "@/types/group.type";
 import { useParams } from "react-router-dom";
+import toast from "react-hot-toast";
 
 interface GroupBuilderProps {
   mode: "manual" | "random" | "student_choice";
@@ -112,20 +113,22 @@ export default function GroupBuilder({
 
   const handleSave = async () => {
     if (!projectId) return;
-
+  
     try {
-      await saveGroupsForProject(Number(projectId), groups);
-
-      await updateProjectConfig(Number(projectId), {
+      const res1 = await saveGroupsForProject(Number(projectId), groups);
+      const res2 = await updateProjectConfig(Number(projectId), {
         nbStudentsMinPerGroup: minSize,
         nbStudentsMaxPerGroup: maxSize,
         groupCompositionType: mode,
         nbGroups: groups.length,
         deadline: deadline?.toISOString(),
       });
-
-      console.log("Groupes et config enregistrés !");
+  
+      if (res1?.status === 201 && res2?.status === 200) {
+        toast.success("Groupes et configuration enregistrés !");
+      }
     } catch (error) {
+      toast.error("Erreur lors de l'enregistrement des groupes.");
       console.error("Erreur lors de l'enregistrement :", error);
     }
   };
