@@ -5,14 +5,20 @@ import {
   useDraggable,
   useDroppable,
 } from "@dnd-kit/core";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { fetchMockGroupBuilderData, User, Group } from "@/services/groupService";
-import { useEffect } from "react";
+import {
+  fetchGroupBuilderDataByProject,
+  saveGroupsForProject,
+  updateProjectConfig,
+} from "@/services/groupService";
+import { User } from "@/types/user.type";
+import { Group } from "@/types/group.type";
+import { useParams } from "react-router-dom";
 
 interface GroupBuilderProps {
-  mode: "manual" | "random" | "free";
+  mode: "manual" | "random" | "student_choice";
   minSize: number;
   maxSize: number;
   deadline?: Date;
@@ -37,7 +43,7 @@ const DraggableUser = ({ user }: { user: User }) => {
           : undefined,
       }}
     >
-      {user.name}
+      {user.firstName} {user.lastName}
     </div>
   );
 };
@@ -49,7 +55,7 @@ const DroppableGroup = ({
   group: Group;
   onRemoveUser: (user: User) => void;
 }) => {
-  const { isOver, setNodeRef } = useDroppable({ id: group.id });
+  const { isOver, setNodeRef } = useDroppable({ id: String(group.id) });
 
   return (
     <div
@@ -66,7 +72,7 @@ const DroppableGroup = ({
             key={member.id}
             className="flex items-center justify-between text-sm text-muted-foreground border px-3 py-1 rounded bg-white dark:bg-background"
           >
-            <span>{member.name}</span>
+            <span>{member.firstName} {member.lastName}</span>
             <button
               onClick={() => onRemoveUser(member)}
               className="text-red-500 hover:text-red-700"
@@ -87,76 +93,82 @@ export default function GroupBuilder({
   maxSize,
   deadline,
 }: GroupBuilderProps) {
+  const { id: projectId } = useParams<{ id: string }>();
   const [users, setUsers] = useState<User[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
+
   useEffect(() => {
     const loadInitialData = async () => {
-      const { users, groups } = await fetchMockGroupBuilderData();
-      setUsers(users);
-      setGroups(groups);
+      if (projectId) {
+        const { users: initialUsers, groups: initialGroups } =
+          await fetchGroupBuilderDataByProject(projectId);
+        setUsers(initialUsers);
+        setGroups(initialGroups);
+      }
     };
-  
-    loadInitialData();
-  }, []);
 
-  const handleSave = () => {
-    console.log({
-      mode,
-      minSize,
-      maxSize,
-      deadline,
-    });
+    loadInitialData();
+  }, [projectId]);
+
+  const handleSave = async () => {
+    if (!projectId) return;
+
+    try {
+      await saveGroupsForProject(Number(projectId), groups);
+
+      await updateProjectConfig(Number(projectId), {
+        nbStudentsMinPerGroup: minSize,
+        nbStudentsMaxPerGroup: maxSize,
+        groupCompositionType: mode,
+        nbGroups: groups.length,
+        deadline: deadline?.toISOString(),
+      });
+
+      console.log("Groupes et config enregistrés !");
+    } catch (error) {
+      console.error("Erreur lors de l'enregistrement :", error);
+    }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-  
+
     const user = users.find((u) => u.id === active.id);
     if (!user) return;
-  
-    // Vérifier si le groupe existe et n'est pas plein
-    const targetGroup = groups.find((g) => g.id === over.id);
+
+    const targetGroup = groups.find((g) => String(g.id) === over.id);
     if (!targetGroup) return;
-  
+
     const isAlreadyInGroup = targetGroup.members.some((m) => m.id === user.id);
     const isGroupFull = targetGroup.members.length >= maxSize;
-  
+
     if (isAlreadyInGroup || isGroupFull) return;
-  
-    // Mettre à jour les groupes
+
     setGroups((prev) =>
-      prev.map((group) => {
-        if (group.id === over.id) {
-          return {
-            ...group,
-            members: [...group.members, user],
-          };
-        } else {
-          return {
-            ...group,
-            members: group.members.filter((m) => m.id !== user.id),
-          };
-        }
-      })
+      prev.map((group) =>
+        group.id === targetGroup.id
+          ? { ...group, members: [...group.members, user] }
+          : { ...group, members: group.members.filter((m) => m.id !== user.id) }
+      )
     );
-  
-    // Supprimer l'étudiant de la liste des utilisateurs disponibles
+
     setUsers((prev) => prev.filter((u) => u.id !== user.id));
   };
 
   const resetGroups = async () => {
-    const { users: initialUsers, groups: initialGroups } = await fetchMockGroupBuilderData();
-  
-    setUsers(initialUsers);
-    setGroups(initialGroups);
+    if (projectId) {
+      const { users: initialUsers, groups: initialGroups } =
+        await fetchGroupBuilderDataByProject(projectId);
+      setUsers(initialUsers);
+      setGroups(initialGroups);
+    }
   };
 
   if (mode === "random") {
     return (
       <div className="text-center text-sm text-muted-foreground">
-        Le mode <strong>aléatoire</strong> est activé. Les groupes seront
-        générés automatiquement.
+        Le mode <strong>aléatoire</strong> est activé. Les groupes seront générés automatiquement.
       </div>
     );
   }
@@ -165,7 +177,6 @@ export default function GroupBuilder({
     <div className="w-full">
       <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <div className="grid gap-6 grid-cols-[minmax(250px,1fr)_minmax(0,3fr)]">
-          {/* Colonne Étudiants */}
           <div className="pr-4">
             <h3 className="text-lg font-bold mb-3">Étudiants disponibles</h3>
             <div className="space-y-2">
@@ -175,7 +186,6 @@ export default function GroupBuilder({
             </div>
           </div>
 
-          {/* Colonne Groupes */}
           <div className="space-y-4 w-full">
             <h3 className="text-lg font-bold">
               Groupes (min: {minSize}, max: {maxSize})
@@ -186,21 +196,16 @@ export default function GroupBuilder({
                   key={group.id}
                   group={group}
                   onRemoveUser={(user) => {
-                    // Supprimer du groupe
                     setGroups((prev) =>
                       prev.map((g) =>
                         g.id === group.id
                           ? {
                               ...g,
-                              members: g.members.filter(
-                                (m) => m.id !== user.id
-                              ),
+                              members: g.members.filter((m) => m.id !== user.id),
                             }
                           : g
                       )
                     );
-
-                    // Ajouter à la liste des utilisateurs
                     setUsers((prev) => [...prev, user]);
                   }}
                 />

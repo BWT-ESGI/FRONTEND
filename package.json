@@ -43,6 +43,7 @@
     "react-dropzone": "^14.3.8",
     "react-hook-form": "^7.55.0",
     "react-is": "^19.1.0-rc-69d4b800-20241021",
+    "react-quill": "^2.0.0",
     "react-router-dom": "^7.4.1",
     "react-select": "^5.10.1",
     "recharts": "^2.15.2",

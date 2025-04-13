@@ -1,39 +1,54 @@
+import api from "../config/axios";
+import { User } from "@/types/user.type";
+import { Group } from "@/types/group.type";
+import { Project } from "@/types/project.type";
 
-export type User = { id: string; name: string };
-export type Group = { id: string; name: string; members: User[] };
+export const fetchGroupBuilderDataByProject = async (
+  projectId: string
+): Promise<{ users: User[]; groups: Group[] }> => {
+  const { data: project } = await api.get<Project>(`/projects/${projectId}`);
+  const allStudents = project.promotion.students;
+  const groups = project.groups;
 
-export const fetchMockGroupBuilderData = async (): Promise<{
-  users: User[];
-  groups: Group[];
-}> => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve({
-        users: [
-          { id: "u1", name: "Alice" },
-          { id: "u2", name: "Bob" },
-          { id: "u3", name: "Charlie" },
-          { id: "u4", name: "David" },
-        ],
-        groups: [
-          { id: "g1", name: "Groupe A", members: [] },
-          { id: "g2", name: "Groupe B", members: [] },
-          { id: "g3", name: "Groupe C", members: [] },
-          { id: "g4", name: "Groupe D", members: [] },
-          { id: "g5", name: "Groupe E", members: [] },
-          { id: "g6", name: "Groupe F", members: [] },
-          { id: "g7", name: "Groupe G", members: [] },
-          { id: "g8", name: "Groupe H", members: [] },
-          { id: "g9", name: "Groupe I", members: [] },
-          { id: "g10", name: "Groupe J", members: [] },
-          { id: "g11", name: "Groupe K", members: [] },
-          { id: "g12", name: "Groupe L", members: [] },
-          { id: "g13", name: "Groupe M", members: [] },
-          { id: "g14", name: "Groupe N", members: [] },
-          { id: "g15", name: "Groupe O", members: [] },
-          { id: "g16", name: "Groupe P", members: [] },
-        ],
-      });
-    }, 500);
-  });
+  const assignedStudentIds = new Set(
+    groups.flatMap((g) => g.members.map((m) => m.id))
+  );
+
+  const unassignedStudents = allStudents.filter(
+    (s) => !assignedStudentIds.has(s.id)
+  );
+
+  return {
+    users: unassignedStudents,
+    groups,
+  };
+};
+
+export const saveGroupsForProject = async (projectId: number, groups: Group[]) => {
+  try {
+    const payload = groups.map((group) => ({
+      id: group.id,
+      name: group.name,
+      projectId,
+      memberIds: group.members.map((member) => member.id),
+    }));
+
+    await api.post(`/groups/save-for-project/${projectId}`, payload);
+  } catch (error) {
+    console.error("Erreur lors de la sauvegarde des groupes :", error);
+    throw error;
+  }
+};
+
+export const updateProjectConfig = async (
+  projectId: number,
+  payload: {
+    nbStudentsMinPerGroup: number;
+    nbStudentsMaxPerGroup: number;
+    groupCompositionType?: "manual" | "random" | "student_choice";
+    nbGroups?: number;
+    deadline?: string;
+  }
+) => {
+  await api.patch(`/projects/${projectId}`, payload);
 };

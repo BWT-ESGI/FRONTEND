@@ -1,4 +1,5 @@
 import { Group } from "./group.type";
+import { Promotion } from "./promotion.type";
 
 export type ProjectStatus = "draft" | "published" | "archived" | "active";
 export type GroupCompositionType = "manual" | "random" | "student_choice";
@@ -16,4 +17,5 @@ export type Project = {
     groups: Group[];
     createdAt: Date;
     updatedAt: Date;
+    promotion: Promotion;
 };
