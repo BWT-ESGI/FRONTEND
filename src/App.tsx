@@ -13,7 +13,6 @@ import UserCreatePage from "./pages/teacher/UserCreatePage";
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import StudentRegisterPage from "@/pages/global/StudentRegisterPage";
 import HomePage from "./pages/global/HomePage";
-import PromotionCreatePage from "./pages/teacher/PromotionCreatePage";
 import ProjectCreatePage from "./pages/teacher/ProjectCreatePage";
 import ProjectEditPage from "./pages/teacher/ProjectEditPage";
 
@@ -31,7 +30,6 @@ const App = () => {
             {/* ============== PROMOTION ============== */}
             <Route path="/gestion-promotions" element={<PromotionManagerPage />} />
             <Route path="/gestion-promotions/:id" element={<PromotionEditorPage />} />
-            <Route path="/gestion-promotions/ajouter" element={<PromotionCreatePage />} />
             <Route path="/gestion-promotions/:id/ajouter-etudiant" element={<PromotionAddStudentPage />} />
 
             {/* ============== PROJET ============== */}

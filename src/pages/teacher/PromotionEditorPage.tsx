@@ -1,4 +1,4 @@
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { FlexibleCircularProgress } from "@/components/template/FlexibleCircularProgress";
 import FlexibleCard from "@/components/template/FlexibleCard";
 import FlexibleTable from "@/components/template/FlexibleTable";
@@ -9,18 +9,36 @@ import PromotionEditorPageSkeleton from "./PromotionEditorPageSkeleton";
 import NotFoundPage from "../global/NotFoundPage";
 import { Project } from "@/types/project.type";
 import { Button } from "@/components/ui/button";
-// import ProjectSummaryCard from "@/components/project/ProjectSummaryCard";
 import ProjectFormModal from "@/components/promotion/ProjectFormModal";
 import { useState } from "react";
+import { deletePromotionById } from "@/services/promotionService";
 
 export default function PromotionEditorPage() {
   const { id } = useParams<{ id: string }>();
+  const navigate = useNavigate();
   const { promotion, loading, refetch } = usePromotion(id ?? "");
   const [openModal, setOpenModal] = useState(false);
 
   const handleCloseModal = () => {
     setOpenModal(false);
     refetch();
+  };
+
+  const handleDeletePromotion = async () => {
+    if (!id) return;
+
+    const confirmed = window.confirm(
+      "Es-tu sûr de vouloir supprimer cette promotion ? Cette action est irréversible."
+    );
+
+    if (confirmed) {
+      try {
+        await deletePromotionById(id);
+        navigate("/gestion-promotions");
+      } catch (error) {
+        console.error("Erreur lors de la suppression :", error);
+      }
+    }
   };
 
   if (loading) {
@@ -48,6 +66,15 @@ export default function PromotionEditorPage() {
             key={promotion.id}
             title={promotion.name}
             description={`Enseignant: ${promotion.teacher.username}`}
+            childrenRightEnd={
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleDeletePromotion}
+              >
+                Supprimer
+              </Button>
+            }
           >
             <div className="max-w-xs mx-auto w-full flex items-center">
               <div className="flex flex-col items-center justify-center w-full">
@@ -74,9 +101,8 @@ export default function PromotionEditorPage() {
               </div>
             </div>
           </FlexibleCard>
-
-          {/* <ProjectSummaryCard project={promotion.projects[0]} /> */}
         </div>
+
         <FlexibleCard
           title="Projets de la promotion"
           description="Gérer les projets de la promotion"
