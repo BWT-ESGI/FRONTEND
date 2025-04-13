@@ -1,6 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 
-export type BadgeType = "draft" | "published" | "archived" | "manual" | "random" | "student_choice" | "custom" | "active";
+export type BadgeType = "draft" | "published" | "archived" | "manual" | "random" | "student_choice" | "custom" | "active" | "inactive";
 
 const statusStyles: Record<BadgeType, {
     label: string;
@@ -59,12 +59,20 @@ const statusStyles: Record<BadgeType, {
         dot: "bg-gray-500",
     },
     active: {
-        label: "",
-        bg: "",
-        text: "",
-        border: "",
-        dot: ""
-    }
+        label: "Actif",
+        bg: "bg-green-600/10 dark:bg-green-600/20 hover:bg-green-600/10",
+        text: "text-green-500",
+        border: "border-green-600/60",
+        dot: "bg-green-500",
+    },
+    inactive: {
+        label: "Inactif",
+        bg: "bg-red-600/10 dark:bg-red-600/20 hover:bg-red-600/10",
+        text: "text-red-500",
+        border: "border-red-600/60",
+        dot: "bg-red-500",
+    },
+        
 };
 
 export interface FlexibleBadgeProps {
