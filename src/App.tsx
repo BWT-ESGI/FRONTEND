@@ -24,7 +24,7 @@ const App = () => {
     <Toaster position="top-right" />
       <BrowserRouter>
         <Routes>
-          <Route path="/register/:id" element={<StudentRegisterPage />} />
+          <Route path="/auth/register/:id" element={<StudentRegisterPage />} />
           <Route path="/auth/login" element={<LoginPage />} />
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<HomePage />} />
