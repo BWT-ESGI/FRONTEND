@@ -2,7 +2,6 @@ import { GoogleLogin } from '@react-oauth/google';
 import { APP_NAME } from "@/config";
 import { Separator } from "@/components/ui/separator";
 import { sendGoogleToken } from "@/services/authentification";
-import { getUserById } from '@/services/userService';
 
 const LoginPage = () => {
   return (
