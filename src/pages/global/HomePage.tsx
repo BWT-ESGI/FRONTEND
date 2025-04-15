@@ -1,8 +1,6 @@
 import { ThreeDMarquee } from '@/components/ui/3d-marquee';
 import { AuroraBackground } from '@/components/ui/aurora-background';
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MacbookScroll } from '@/components/ui/macbook-scroll';
 import { TypewriterEffect } from '@/components/ui/typewriter-effect';
 import { APP_NAME, APP_SLOGAN } from '@/config';
 import { useTheme } from '@/hooks/theme-provider';
