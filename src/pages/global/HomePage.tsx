@@ -133,28 +133,6 @@ export default function Home() {
       <div className="mx-auto my-10 max-w-7xl rounded-3xl bg-gray-950/5 p-2 ring-1 ring-neutral-700/10 dark:bg-neutral-800">
         <ThreeDMarquee images={theme === 'dark' ? imagesDark : images} />
       </div>
-      <div className="dark:bg-[#0B0B0F] bg-white w-full py-8">
-        <MacbookScroll
-          title={
-            <span>
-              Gestion complète de vos projets
-              <span className="text-emerald-500">.</span>
-              <br />
-              <span className="text-gray-500 text-sm">
-                Un outil fait pour vous
-                <span className="text-emerald-500">.</span>
-              </span>
-            </span>
-          }
-          badge={
-            <Link to="/auth/login">
-              <Badge className="h-10 w-10 transform -rotate-12" />
-            </Link>
-          }
-          src={`/demo-3.png`}
-          showGradient={true}
-        />
-      </div>
       <footer className="py-4 bg-gray-800 text-center">
         <p className="text-sm text-gray-400">
           © {new Date().getFullYear()} {APP_NAME}. Tous droits réservés.
