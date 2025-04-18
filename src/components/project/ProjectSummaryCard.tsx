@@ -1,11 +1,14 @@
-import { Link } from "react-router-dom";
 import { FlexibleBadge } from "../template/FlexibleBadge";
 import FlexibleCard from "../template/FlexibleCard";
-import { Button } from "../ui/button";
 import { Project } from "@/types/project.type";
 import { Progress } from "../ui/progress";
 
-export default function ProjectSummaryCard({ project, btn = true } : { project: Project, btn?: boolean }) {
+interface ProjectSummaryCardProps {
+  project: Project;
+  btn?: React.ReactNode;
+}
+
+export default function ProjectSummaryCard({ project, btn = (<></>) } : ProjectSummaryCardProps) {
     if (!project) return null;
     return (
       <FlexibleCard
@@ -25,11 +28,7 @@ export default function ProjectSummaryCard({ project, btn = true } : { project: 
                 minute: "2-digit",
               })}
             </span>
-            {btn && (
-              <Link to={`/gestion-projets/${project.id}`}>
-                <Button className="cursor-pointer">Voir les détails</Button>
-              </Link>
-            )}
+            {btn && (btn)}
           </div>
         }
       >
@@ -37,13 +36,17 @@ export default function ProjectSummaryCard({ project, btn = true } : { project: 
           <div className="flex items-center gap-2">
             <strong>Étudiants par groupe : </strong>
             <FlexibleBadge status={project.groupCompositionType} noDot />
-            <FlexibleBadge
-              status="custom"
-              noDot
-              label={`${project.nbGroups} groupe${
-                project.nbGroups > 1 ? "s" : ""
-              }`}
-            />
+            {
+              project.nbGroups > 0 && (
+                <FlexibleBadge
+                  status="custom"
+                  noDot
+                  label={`${project.nbGroups} groupe${
+                    project.nbGroups > 1 ? "s" : ""
+                  }`}
+                />
+              )
+            }
           </div>
           <div className="flex items-center gap-2 mt-1">
             <span>{project.nbStudensMinPerGroup}</span>

@@ -6,13 +6,15 @@ import { Promotion } from "@/types/promotion.type";
 import Divider from "../layout/Divider";
 import { Input } from "../ui/input";
 
+interface GroupEditComponentProps {
+    project: Project;
+    promotion: Promotion | null;
+}
+
 export default function GroupEditComponent({
     project,
     promotion,
-    }: {
-    project: Project;
-    promotion: Promotion | null;
-}) {
+    }: GroupEditComponentProps) {
     return (
       <>
         <h2 className="text-lg font-semibold mb-4">
@@ -86,7 +88,7 @@ export default function GroupEditComponent({
           </div>
           <div className="flex flex-col items-center justify-center">
             <div className="flex items-center justify-center text-2xl text-blue-600">
-              {promotion && promotion.students.length}{" "}
+              {promotion?.students && promotion.students.length}{" "}
             </div>
             <p className="text-sm text-muted-foreground mt-2">
               Nombre d'étudiants dans la promotion

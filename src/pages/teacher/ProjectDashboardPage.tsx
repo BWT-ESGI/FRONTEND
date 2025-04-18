@@ -1,4 +1,3 @@
-import { SetStateAction, useState } from "react";
 import DashboardLayout from "@/layout/dashboard.layout";
 import { useProject } from "@/hooks/api/useProject";
 import ProjectSummaryCard from "@/components/project/ProjectSummaryCard";
@@ -7,53 +6,58 @@ import FallBackPageSkeleton from "../global/FallBackPageSkeleton";
 import SummaryOverviewSection from "@/components/project/SummaryOverviewSection";
 import SummaryGradesChartSection from "@/components/project/SummaryGradesChartSection";
 import SummaryGradesStatsSection from "@/components/project/SummaryGradesStatsSection";
-import ProjectGroupsManager from "@/components/group/ProjectGroupsManager";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import GroupBuilder from "@/components/group/ GroupBuilder";
-import NavReport from "@/components/report/NavReport";
-import TextEditor from "@/components/report/TextEditor";
-import { Report } from "@/types/report.type";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
+import { FlexibleCardSkeleton } from "@/components/template/skeleton/FlexibleCardSkeleton";
+import { Button } from "@/components/ui/button";
 
 export default function ProjectDashboardPage() {
   const { id } = useParams<{ id: string }>();
   const { project, loading } = useProject(id || "");
-  const [tab, setTab] = useState("overview");
-
-  //groups
-  const [groupMode, setGroupMode] = useState<"manual" | "random" | "student_choice">(
-    "manual"
-  );
-  const [minSize, setMinSize] = useState(2);
-  const [maxSize, setMaxSize] = useState(5);
-  const [deadline, setDeadline] = useState<Date | undefined>(undefined);
-  const [selectedRapport, setSelectedRapport] = useState<Report | null>(null);
 
   if (loading) return <FallBackPageSkeleton />;
 
   return (
     <DashboardLayout>
-      <Tabs value={tab} onValueChange={setTab} className="mb-4">
-        <TabsList>
-          <TabsTrigger value="overview">Vue d'ensemble</TabsTrigger>
-          <TabsTrigger value="groups">Groupes</TabsTrigger>
-          <TabsTrigger value="rapports">Rapports</TabsTrigger>
-        </TabsList>
-      </Tabs>
+      <Divider text="Résumé du projet" className="mt-0" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {project && (
+          <ProjectSummaryCard
+            project={project}
+            btn={
+              <Link to={`/gestion-projets/${project.id}/editer`}>
+                <Button className="cursor-pointer">Modifier</Button>
+              </Link>
+            }
+          />
+        )}
+      </div>
 
-      {tab === "overview" && (
-        <>
-          <Divider text="Résumé du projet" className="mt-0" />
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {project && <ProjectSummaryCard project={project} btn={false} />}
-          </div>
+      <Divider text="Plagiat" className="mt-0" />
 
-          <SummaryOverviewSection project={project} />
-          <SummaryGradesChartSection />
-          <SummaryGradesStatsSection />
-        </>
-      )}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <FlexibleCardSkeleton />
+        <FlexibleCardSkeleton />
+        <FlexibleCardSkeleton />
+      </div>
 
+      <Divider text="Groupes" className="mt-0" />
+      <SummaryOverviewSection project={project} />
+
+      <Divider text="Notes" className="mt-0" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <SummaryGradesChartSection />
+        <div className="flex flex-col gap-4">
+          <SummaryGradesStatsSection
+            median={11}
+            average={10.5}
+            max={20}
+            min={0}
+          />
+          <FlexibleCardSkeleton />
+        </div>
+      </div>
+
+      {/* 
       {tab === "groups" && (
         <>
           <Divider text="Groupes" />
@@ -75,9 +79,9 @@ export default function ProjectDashboardPage() {
             deadline={deadline}
           />
         </>
-      )}
+      )} */}
 
-      {tab === "rapports" && (
+      {/*       {tab === "rapports" && (
         <>
           <NavReport
             projectId={String(id)}
@@ -95,7 +99,7 @@ export default function ProjectDashboardPage() {
             </div>
           )}
         </>
-      )}
+      )} */}
     </DashboardLayout>
   );
 }

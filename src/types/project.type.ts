@@ -1,14 +1,18 @@
 import { Group } from "./group.type";
 import { Promotion } from "./promotion.type";
 
-export type ProjectStatus = "draft" | "published" | "archived" | "active";
+export enum ProjectStatus {
+    DRAFT = "draft",
+    PUBLISHED = "published",
+    ARCHIVED = "archived",
+    ACTIVE = "active",
+};
 export type GroupCompositionType = "manual" | "random" | "student_choice";
 
 export type Project = {
     id: number;
     name: string;
     description?: string | null;
-    promotionId: number;
     nbStudensMinPerGroup: number;
     nbStudentsMaxPerGroup: number;
     nbGroups: number;
@@ -17,5 +21,6 @@ export type Project = {
     groups: Group[];
     createdAt: Date;
     updatedAt: Date;
+    deadline: Date;
     promotion: Promotion;
 };

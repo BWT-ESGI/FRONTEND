@@ -27,7 +27,11 @@ export default function ProjectListPage() {
             render={(filteredProjects) => (
               <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                 {filteredProjects.map((project) => (
-                  <ProjectSummaryCard key={project.id} project={project} />
+                  <ProjectSummaryCard key={project.id} project={project} btn={
+                    <Link to={`/gestion-projets/${project.id}`}>
+                      <Button className="cursor-pointer">Voir les détails</Button>
+                    </Link>
+                  } />
                 ))}
               </div>
             )}

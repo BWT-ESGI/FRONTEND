@@ -94,7 +94,7 @@ export default function PromotionFormModal({ open, onClose }: PromotionFormModal
               onChange={(selected) => setSelectedStudents(selected as Option[])}
               onCreateOption={handleCreateOption}
               placeholder="Sélectionner ou ajouter un étudiant..."
-              className="react-select-container"
+              className="react-select-container w-full"
               classNamePrefix="react-select"
               theme={(theme) => ({
                 ...theme,
