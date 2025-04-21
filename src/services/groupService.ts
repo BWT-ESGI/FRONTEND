@@ -52,3 +52,12 @@ export const updateProjectConfig = async (
 ) => {
   return await api.patch(`/projects/${projectId}`, payload);
 };
+
+export async function fetchGroupsWithMembers(
+  projectId: string,
+): Promise<Group[]> {
+  const response = await api.get<Group[]>(
+    `/groups/by-user/${projectId}`,
+  );
+  return response.data;
+}

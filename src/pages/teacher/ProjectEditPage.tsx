@@ -12,6 +12,7 @@ import GradingRubricForm from "@/components/project/GradingRubricForm";
 import GroupEditComponent from "@/components/group/GroupEditComponent";
 import GroupBuilder from "@/components/group/ GroupBuilder";
 import ProjectGlobalEditComponent from "@/components/project/ProjectGlobalEditComponent";
+import DefenseScheduler from "@/components/defense/DefenseScheduler";
 
 export default function ProjectCreatePage() {
   const { id: projectId } = useParams();
@@ -65,7 +66,9 @@ export default function ProjectCreatePage() {
             </TabsContent>
             <TabsContent value="livrables">Test2</TabsContent>
             <TabsContent value="rapports">Test3</TabsContent>
-            <TabsContent value="soutenances">Test4</TabsContent>
+            <TabsContent value="soutenances">
+              <DefenseScheduler project={project}/>
+            </TabsContent>
           </div>
         </Tabs>
       </FlexibleCard>
