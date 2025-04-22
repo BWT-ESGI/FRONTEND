@@ -59,7 +59,7 @@ export default function ProjectEditPage() {
             <TabsContent value="livrables">Test2</TabsContent>
             <TabsContent value="rapports">Test3</TabsContent>
             <TabsContent value="soutenances">
-              <DefenseScheduler project={project} />
+              <DefenseScheduler />
             </TabsContent>
           </div>
         </Tabs>
