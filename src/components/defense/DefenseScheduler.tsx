@@ -19,6 +19,8 @@ import { generatePdf } from "@/services/pdfService";
 import { Project } from "@/types/project.type";
 import { Group } from "@/types/group.type";
 import { User } from "@/types/user.type";
+import FlexibleAlert from "../template/FlexibleAlert";
+import { Info } from "lucide-react";
 
 interface Props {
   project: Project;
@@ -74,19 +76,9 @@ export default function SoutenanceScheduler({ project }: Props) {
       .catch(console.error);
   }, [project.id]);
 
-  // Si aucun groupe avec membres, afficher message d'avertissement
   if (groups.length === 0) {
     return (
-      <div className="p-6">
-        <Card>
-          <CardHeader title="Aucun groupe disponible" />
-          <CardContent>
-            <p className="text-sm">
-              Aucun groupe avec des membres n’est pour l’instant généré. Veuillez d’abord créer et peupler des groupes.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+        <FlexibleAlert title="Aucun groupe avec des membres n’est pour l’instant généré. Veuillez d’abord créer et peupler des groupes." icon={<Info className="!text-blue-500 text-center" />} variant="info" />
     );
   }
 
