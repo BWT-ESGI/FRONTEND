@@ -1,4 +1,3 @@
-// src/pages/ProjectDashboardWrapper.tsx
 import { useParams } from "react-router-dom";
 import { ProjectProvider } from "@/contexts/ProjectContext";
 import ProjectDashboardPage from "@/pages/teacher/ProjectDashboardPage";

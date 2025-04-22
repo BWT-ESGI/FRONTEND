@@ -28,7 +28,7 @@ export default function ProjectSummaryCard({ project, btn = (<></>) } : ProjectS
                 minute: "2-digit",
               })}
             </span>
-            {btn && (btn)}
+            {btn && btn}
           </div>
         }
       >
@@ -36,23 +36,21 @@ export default function ProjectSummaryCard({ project, btn = (<></>) } : ProjectS
           <div className="flex items-center gap-2">
             <strong>Étudiants par groupe : </strong>
             <FlexibleBadge status={project.groupCompositionType} noDot />
-            {
-              project.nbGroups > 0 && (
-                <FlexibleBadge
-                  status="custom"
-                  noDot
-                  label={`${project.nbGroups} groupe${
-                    project.nbGroups > 1 ? "s" : ""
-                  }`}
-                />
-              )
-            }
+            {project.nbGroups > 0 && (
+              <FlexibleBadge
+                status="custom"
+                noDot
+                label={`${project.nbGroups} groupe${
+                  project.nbGroups > 1 ? "s" : ""
+                }`}
+              />
+            )}
           </div>
           <div className="flex items-center gap-2 mt-1">
-            <span>{project.nbStudensMinPerGroup}</span>
+            <span>{project.nbStudentsMinPerGroup}</span>
             <Progress
               value={
-                (project.nbStudensMinPerGroup / project.nbStudentsMaxPerGroup) *
+                (project.nbStudentsMinPerGroup / project.nbStudentsMaxPerGroup) *
                 100
               }
               className="w-full"

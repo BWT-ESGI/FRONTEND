@@ -6,7 +6,7 @@ import PromotionManagerPage from "./pages/global/promotion/PromotionManagerPage"
 import PromotionEditorPage from "./pages/global/promotion/PromotionEditorPage";
 import NotFoundPage from "./pages/global/NotFoundPage";
 import PromotionAddStudentPage from "./pages/teacher/PromotionAddStudentPage";
-import ProjectManagerPage from "./pages/global/ProjectManagerPage";
+import ProjectManagerPage from "./pages/global/project/ProjectManagerPage";
 import UserCreatePage from "./pages/teacher/UserCreatePage";
 import StudentRegisterPage from "@/pages/global/StudentRegisterPage";
 import HomePage from "./pages/global/HomePage";
@@ -39,6 +39,10 @@ const App = () => {
               <Route path="/promotions/:id" element={<PromotionEditorPage />} />
 
 
+              {/* ============== PROJET ============== */}
+              <Route path="/projets" element={<ProjectManagerPage />} />
+
+
               {/* ============== TEACHER ============== */}
               <Route element={<IsTeacherWall />}>
 
@@ -46,7 +50,6 @@ const App = () => {
                 <Route path="/promotions/:id/ajouter-etudiant" element={<PromotionAddStudentPage />} />
 
                 {/* ============== PROJET ============== */}
-                <Route path="/projets" element={<ProjectManagerPage />} />
                 <Route path="/projets/:id" element={<ProjectDashboardWrapper />}/>              
                 <Route path="/projets/ajouter" element={<ProjectCreatePage />} />
                 <Route path="/projets/:id/editer" element={<ProjectEditWrapper />} />

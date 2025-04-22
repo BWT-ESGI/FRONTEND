@@ -6,6 +6,7 @@ import { FlexibleSearchBar } from "@/components/template/FlexibleSearchBar";
 import { Project } from "@/types/project.type";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import isStudent from "@/utils/isStudent";
 
 export default function ProjectListPage() {
   const { projects, loading } = useProjects();
@@ -20,9 +21,11 @@ export default function ProjectListPage() {
             data={projects.filter(Boolean) as Project[]}
             placeholder="Rechercher un projet..."
             rightChildren={
-              <Link to="/projets/ajouter">
-                <Button>Créer un projet</Button>
-              </Link>
+              isStudent() ? undefined : (
+                <Link to="/projets/ajouter">
+                  <Button>Créer un projet</Button>
+                </Link>
+              )
             }
             render={(filteredProjects) => (
               <div className="grid auto-rows-min gap-4 md:grid-cols-3">
