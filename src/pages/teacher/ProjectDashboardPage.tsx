@@ -19,7 +19,6 @@ export default function ProjectDashboardPage() {
   return (
     <DashboardLayout>
       <Divider text="Résumé du projet" className="mt-0" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {project && (
           <ProjectSummaryCard
             project={project}
@@ -30,9 +29,7 @@ export default function ProjectDashboardPage() {
             }
           />
         )}
-      </div>
-
-      <Divider text="Plagiat" className="mt-0" />
+      <Divider text="Plagiat" className="mt-8" />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <FlexibleCardSkeleton />
@@ -40,7 +37,7 @@ export default function ProjectDashboardPage() {
         <FlexibleCardSkeleton />
       </div>
 
-      <Divider text="Groupes" className="mt-0" />
+      <Divider text="Groupes" className="mt-8" />
       <SummaryOverviewSection project={project} />
 
       <Divider text="Notes" className="mt-0" />

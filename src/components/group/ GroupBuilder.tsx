@@ -22,10 +22,9 @@ import { Shuffle } from "lucide-react";
 import { useProjectContext } from "@/contexts/ProjectContext";
 
 export default function GroupBuilder() {
-  const { project, reload } = useProjectContext();
+  const { project } = useProjectContext();
   const { id: projectId } = useParams<{ id: string }>();
 
-  // Configuration réactive
   const mode = project?.groupCompositionType ?? "manual";
   const minSize = project?.nbStudentsMinPerGroup ?? 0;
   const maxSize = project?.nbStudentsMaxPerGroup ?? 0;
@@ -47,14 +46,12 @@ export default function GroupBuilder() {
     })();
   }, [projectId]);
 
-  // Réinitialise tous les groupes : remet tous les utilisateurs (assignés et non) dans la liste
   const resetGroups = () => {
     const assignedMembers = initialGroups.flatMap(g => g.members);
     setUsers([...initialUsers, ...assignedMembers]);
     setGroups(initialGroups.map(g => ({ ...g, members: [] })));
   };
 
-  // Génération aléatoire côté front
   const handleGenerateRandom = () => {
     const shuffled = [...initialUsers, ...initialGroups.flatMap(g => g.members)]
       .sort(() => Math.random() - 0.5);
@@ -83,7 +80,6 @@ export default function GroupBuilder() {
         deadline: deadline?.toISOString(),
       });
       toast.success("Groupes et configuration enregistrés !");
-      reload();
     } catch {
       toast.error("Erreur lors de l'enregistrement des groupes.");
     }
@@ -177,13 +173,24 @@ export default function GroupBuilder() {
   };
 
   return (
-    <div className="space-y-6 p-6">
+    <div className="space-y-6">
+      <div className="flex justify-center space-x-4 ">
+        {mode === "random" && (
+          <Button onClick={handleGenerateRandom} variant="outline">
+            <Shuffle className="inline-block mr-2" /> Générer aléatoirement
+          </Button>
+        )}
+        <Button onClick={resetGroups} variant="outline">
+          Réinitialiser
+        </Button>
+        <Button onClick={handleSave}>Enregistrer</Button>
+      </div>
       <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <div className="grid gap-6 grid-cols-[minmax(250px,1fr)_minmax(0,3fr)]">
           <div className="pr-4">
             <h3 className="text-lg font-bold mb-3">Étudiants disponibles</h3>
             <div className="space-y-2">
-              {users.map(user => (
+              {users.map((user) => (
                 <DraggableUser key={user.id} user={user} />
               ))}
             </div>
@@ -193,19 +200,24 @@ export default function GroupBuilder() {
               Groupes (min : {minSize}, max : {maxSize})
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
-              {groups.map(g => (
+              {groups.map((g) => (
                 <DroppableGroup
                   key={g.id}
                   group={g}
-                  onRemoveUser={member => {
-                    setGroups(prev =>
-                      prev.map(gr =>
+                  onRemoveUser={(member) => {
+                    setGroups((prev) =>
+                      prev.map((gr) =>
                         gr.id === g.id
-                          ? { ...gr, members: gr.members.filter(m => m.id !== member.id) }
+                          ? {
+                              ...gr,
+                              members: gr.members.filter(
+                                (m) => m.id !== member.id
+                              ),
+                            }
                           : gr
                       )
                     );
-                    setUsers(prev => [...prev, member]);
+                    setUsers((prev) => [...prev, member]);
                   }}
                 />
               ))}
@@ -217,10 +229,12 @@ export default function GroupBuilder() {
       <div className="flex justify-center space-x-4 mt-6">
         {mode === "random" && (
           <Button onClick={handleGenerateRandom} variant="outline">
-            <Shuffle className="inline-block mr-2"/> Générer aléatoirement
+            <Shuffle className="inline-block mr-2" /> Générer aléatoirement
           </Button>
         )}
-        <Button onClick={resetGroups} variant="outline">Réinitialiser</Button>
+        <Button onClick={resetGroups} variant="outline">
+          Réinitialiser
+        </Button>
         <Button onClick={handleSave}>Enregistrer</Button>
       </div>
     </div>

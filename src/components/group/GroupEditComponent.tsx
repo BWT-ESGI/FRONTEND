@@ -21,7 +21,7 @@ export default function GroupEditComponent({
 }: GroupEditComponentProps) {
   const { project, setProject } = useProjectContext();
 
-  if (!project) return (<NotFoundPage />)
+  if (!project) return <NotFoundPage />;
 
   const updateConfig = (
     changes: Partial<{
@@ -80,39 +80,46 @@ export default function GroupEditComponent({
       </p>
 
       <Divider className="my-4" />
-      <h4 className="text-sm mb-2">Nombre de groupes :</h4>
+      
+      <div className="flex items-center w-full justify-between gap-4">
+        <div className="flex flex-col w-full">
+          <h4 className="text-sm mb-2">Nombre de groupes :</h4>
+          <Input
+            type="number"
+            defaultValue={project.nbGroups}
+            onBlur={(e) => updateConfig({ nbGroups: Number(e.target.value) })}
+            min={1}
+            max={100}
+            disabled={true}
+          />
+        </div>
 
-      <Input
-        type="number"
-        defaultValue={project.nbGroups}
-        onBlur={(e) => updateConfig({ nbGroups: Number(e.target.value) })}
-        className="w-24"
-        min={1}
-        max={100}
-        disabled={true}
-      />
+        <div className="flex flex-col w-full">
+          <h4 className="text-sm mb-2">Étudiants min par groupe :</h4>
+          <Input
+            type="number"
+            defaultValue={project.nbStudentsMinPerGroup}
+            onBlur={(e) =>
+              updateConfig({ nbStudentsMinPerGroup: Number(e.target.value) })
+            }
+            min={1}
+            max={promotion?.students?.length || 1}
+          />
+        </div>
 
-      <h4 className="text-sm mb-2 mt-4">Étudiants min par groupe :</h4>
-      <Input
-        type="number"
-        defaultValue={project.nbStudentsMinPerGroup}
-        onBlur={(e) =>
-          updateConfig({ nbStudentsMinPerGroup: Number(e.target.value) })
-        }
-        min={1}
-        max={promotion?.students?.length || 1}
-      />
-
-      <h4 className="text-sm mb-2 mt-4">Étudiants max par groupe :</h4>
-      <Input
-        type="number"
-        defaultValue={project.nbStudentsMaxPerGroup}
-        onBlur={(e) =>
-          updateConfig({ nbStudentsMaxPerGroup: Number(e.target.value) })
-        }
-        min={project.nbStudentsMinPerGroup!}
-        max={promotion?.students?.length || 1}
-      />
+        <div className="flex flex-col w-full">
+          <h4 className="text-sm mb-2">Étudiants max par groupe :</h4>
+          <Input
+            type="number"
+            defaultValue={project.nbStudentsMaxPerGroup}
+            onBlur={(e) =>
+              updateConfig({ nbStudentsMaxPerGroup: Number(e.target.value) })
+            }
+            min={project.nbStudentsMinPerGroup!}
+            max={promotion?.students?.length || 1}
+          />
+        </div>
+      </div>
 
       <Divider className="my-4" />
     </>

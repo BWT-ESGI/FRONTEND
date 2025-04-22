@@ -15,6 +15,7 @@ export default function ProjectSummaryCard({ project, btn = (<></>) } : ProjectS
         key={project.id}
         title={project.name}
         description={project.description || "Aucune description"}
+        className="w-full"
         childrenRightEnd={<FlexibleBadge status={project.status} />}
         childrenFooter={
           <div className="flex justify-between mt-4 items-center">
