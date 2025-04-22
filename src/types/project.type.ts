@@ -13,7 +13,7 @@ export type Project = {
     id: number;
     name: string;
     description?: string | null;
-    nbStudensMinPerGroup: number;
+    nbStudentsMinPerGroup: number;
     nbStudentsMaxPerGroup: number;
     nbGroups: number;
     groupCompositionType: GroupCompositionType;

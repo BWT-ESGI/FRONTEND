@@ -8,14 +8,14 @@ import PromotionEditorPage from "./pages/teacher/PromotionEditorPage";
 import NotFoundPage from "./pages/global/NotFoundPage";
 import PromotionAddStudentPage from "./pages/teacher/PromotionAddStudentPage";
 import ProjectManagerPage from "./pages/global/ProjectManagerPage";
-import ProjectDashboardPage from "./pages/teacher/ProjectDashboardPage";
 import UserCreatePage from "./pages/teacher/UserCreatePage";
 import StudentRegisterPage from "@/pages/global/StudentRegisterPage";
 import HomePage from "./pages/global/HomePage";
 import ProjectCreatePage from "./pages/teacher/ProjectCreatePage";
-import ProjectEditPage from "./pages/teacher/ProjectEditPage";
 import { Toaster } from "react-hot-toast";
 import { QueryClient, QueryClientProvider } from "react-query";
+import ProjectDashboardWrapper from "./pages/teacher/ProjectDashboardWrapper";
+import ProjectEditWrapper from "./pages/teacher/ProjectEditWrapper";
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -37,9 +37,15 @@ const App = () => {
 
               {/* ============== PROJET ============== */}
               <Route path="/gestion-projets" element={<ProjectManagerPage />} />
-              <Route path="/gestion-projets/:id" element={<ProjectDashboardPage />} />
+              <Route
+                path="/gestion-projets/:id"
+                element={<ProjectDashboardWrapper />}
+              />              
               <Route path="/gestion-projets/ajouter" element={<ProjectCreatePage />} />
-              <Route path="/gestion-projets/:id/editer" element={<ProjectEditPage />} />
+              <Route
+                path="/gestion-projets/:id/editer"
+                element={<ProjectEditWrapper />}
+              />
 
               {/* ============== UTILISATEUR ============== */}
               <Route path="/gestion-utilisateurs/create" element={<UserCreatePage />} />

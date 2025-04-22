@@ -1,9 +1,7 @@
 import FlexibleCard from "@/components/template/FlexibleCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { useProject } from "@/hooks/api/useProject";
 import DashboardLayout from "@/layout/dashboard.layout";
 import { CircleCheckBig } from "lucide-react";
-import { useParams } from "react-router-dom";
 import FallBackPageSkeleton from "../global/FallBackPageSkeleton";
 import { usePromotion } from "@/hooks/api/usePromotion";
 import NotFoundPage from "../global/NotFoundPage";
@@ -13,20 +11,20 @@ import GroupEditComponent from "@/components/group/GroupEditComponent";
 import GroupBuilder from "@/components/group/ GroupBuilder";
 import ProjectGlobalEditComponent from "@/components/project/ProjectGlobalEditComponent";
 import DefenseScheduler from "@/components/defense/DefenseScheduler";
+import { useProjectContext } from "@/contexts/ProjectContext";
 
-export default function ProjectCreatePage() {
-  const { id: projectId } = useParams();
-  const { project, loading: loadingProject } = useProject(projectId || "");
-  const { promotion, loading: loadingPromotion } = usePromotion(project?.promotion.id?.toString() || "");
+export default function ProjectEditPage() {
+  const { project, loading } = useProjectContext();
+  const { promotion, loading: loadingPromotion } = usePromotion(
+    project?.promotion.id?.toString() || ""
+  );
 
-  if (loadingProject || loadingPromotion) {
-    return <FallBackPageSkeleton />;
-  }
+  if (loading || loadingPromotion) return <FallBackPageSkeleton />;
+  if (!project) return <NotFoundPage />;
 
   if (!project) {
     return <NotFoundPage />;
   }
-
 
   return (
     <DashboardLayout>
@@ -54,13 +52,8 @@ export default function ProjectCreatePage() {
               />
             </TabsContent>
             <TabsContent value="groupes">
-              <GroupEditComponent project={project} promotion={promotion} />
-              <GroupBuilder
-                mode={project.groupCompositionType}
-                minSize={project.nbStudensMinPerGroup}
-                maxSize={project.nbStudentsMaxPerGroup}
-                deadline={project.deadline}
-              />
+              <GroupEditComponent promotion={promotion}/>
+              <GroupBuilder/>
             </TabsContent>
             <TabsContent value="notation">
               <GradingRubricForm />
