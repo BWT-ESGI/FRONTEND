@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { FolderOpenDot, Users } from "lucide-react";
 import getUserInfoFromLocalStorage from "@/utils/getUserInfoFromLocalStorage";
+import isStudent from "@/utils/isStudent";
 
 interface SidebarData {
   user: {
@@ -26,6 +27,31 @@ export function useSidebarData() {
 
   const userInfo = getUserInfoFromLocalStorage();
 
+  const baseNavData = [
+    {
+      name: "Projets",
+      url: "/projets",
+      icon: FolderOpenDot,
+    },
+    {
+      name: "Promotions",
+      url: "/promotions",
+      icon: Users,
+    },
+    
+  ]
+  const teacherNavData = [
+    {
+      name: "Utilisateurs",
+      url: "/gestion-utilisateurs",
+      icon: Users,
+    },
+  ];
+
+  const navData = isStudent() ? baseNavData : [...baseNavData, ...teacherNavData];
+
+
+
   useEffect(() => {
       setData({
         user: {
@@ -50,23 +76,7 @@ export function useSidebarData() {
             plan: "PPA",
           },
         ],
-        projects: [
-          {
-            name: "Projets",
-            url: "/projets",
-            icon: FolderOpenDot,
-          },
-          {
-            name: "Promotions",
-            url: "/promotions",
-            icon: Users,
-          },
-          {
-            name: "Utilisateurs",
-            url: "/gestion-utilisateurs",
-            icon: Users,
-          },
-        ],
+        projects: navData,
       });
       setLoading(false);
   }, []);
