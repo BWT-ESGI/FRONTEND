@@ -30,7 +30,33 @@ export default function UserManagerPage() {
             </Link>
           }
         >
-          <FlexibleTable<User> data={users} />
+          <FlexibleTable<User> data={users} columns={[
+            {
+              accessorKey: "id",
+              header: "ID",
+              size: 50,
+            },
+            {
+              accessorKey: "firstName",
+              header: "Prénom",
+            },
+            {
+              accessorKey: "lastName",
+              header: "Nom",
+            },
+            {
+              accessorKey: "username",
+              header: "Nom d'utilisateur",
+            },
+            {
+              accessorKey: "email",
+              header: "Email",
+            },
+            {
+              accessorKey: "role",
+              header: "Rôle",
+            },
+          ]} />
         </FlexibleCard>
       </div>
     </DashboardLayout>
