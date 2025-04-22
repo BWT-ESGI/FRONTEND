@@ -1,7 +1,7 @@
 import FlexibleCard from "@/components/template/FlexibleCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DashboardLayout from "@/layout/dashboard.layout";
-import { CircleCheckBig } from "lucide-react";
+import { Info } from "lucide-react";
 import FallBackPageSkeleton from "../global/FallBackPageSkeleton";
 import { usePromotion } from "@/hooks/api/usePromotion";
 import NotFoundPage from "../global/NotFoundPage";
@@ -30,9 +30,9 @@ export default function ProjectEditPage() {
     <DashboardLayout>
       <FlexibleCard title={`${project.name}`}>
         <FlexibleAlert
-          variant="success"
-          icon={<CircleCheckBig className="h-4 w-4 !text-emerald-500" />}
-          title="Bonne nouvelle! Toutes vos modifications sont sauvegardé en temps réel."
+          variant="warning"
+          icon={<Info className="!text-orange-500 text-center" />}
+          title="N'oubliez pas de sauvegarder vos modifications !"
         />
 
         <Tabs defaultValue="general" className="mt-4 w-full">
@@ -47,9 +47,7 @@ export default function ProjectEditPage() {
 
           <div className="mt-2 p-4 border rounded-md">
             <TabsContent value="general">
-              <ProjectGlobalEditComponent
-                project={project}
-              />
+              <ProjectGlobalEditComponent />
             </TabsContent>
             <TabsContent value="groupes">
               <GroupEditComponent promotion={promotion}/>

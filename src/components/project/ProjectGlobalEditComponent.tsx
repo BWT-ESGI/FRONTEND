@@ -1,26 +1,20 @@
-import { Info } from "lucide-react";
-import FlexibleAlert from "../template/FlexibleAlert";
-import { Input } from "../ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "../ui/select";
-import { Button } from "../ui/button";
+import { Info, Save } from "lucide-react";
+import FlexibleAlert from "@/components/template/FlexibleAlert";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Project, ProjectStatus } from "@/types/project.type";
 import { useState } from "react";
 import { updateProject } from "@/services/projectService";
 import toast from "react-hot-toast";
+import { useProjectContext } from "@/contexts/ProjectContext";
+import NotFoundPage from "@/pages/global/NotFoundPage";
+import { Textarea } from "@/components/ui/textarea";
+import ProjectStatusSelector from "@/components/project/ProjectStatusSelector";
 
-interface ProjectGlobalEditComponentProps {
-  project: Project;
-}
+export default function ProjectGlobalEditComponent() {
+  const { project, setProject } = useProjectContext();
+  if (!project) return <NotFoundPage />;
 
-export default function ProjectGlobalEditComponent({
-  project,
-}: ProjectGlobalEditComponentProps) {
   const [name, setName] = useState(project.name);
   const [description, setDescription] = useState(project.description || "");
   const [status, setStatus] = useState<ProjectStatus>(project.status);
@@ -47,6 +41,10 @@ export default function ProjectGlobalEditComponent({
           : undefined,
       };
       await updateProject(String(project.id), payload);
+      setProject({
+        ...project,
+        ...payload,
+      });
       toast.success("Modifications sauvegardées avec succès");
     } catch (e: any) {
       toast.error("Erreur lors de la sauvegarde");
@@ -56,18 +54,19 @@ export default function ProjectGlobalEditComponent({
 
   return (
     <>
-      <h2 className="text-lg font-semibold mb-4">
-        <Info className="inline-block mr-2" />
-        Informations générales
-      </h2>
-      <div className="mb-4">
-        <FlexibleAlert
-          icon={<Info className="h-4 w-4 !text-blue-500" />}
-          title="Les informations générales du projet sont essentielles pour la gestion et le suivi du projet."
-        />
+      <div className="flex items-center justify-between mb-4">
+        <h2 className="text-lg font-semibold mb-4">
+          <Info className="inline-block mr-2" />
+          Informations générales
+        </h2>
+        <Button onClick={handleSave} disabled={loading}>
+          {loading ? "Enregistrement..." : "Sauvegarder"}
+        </Button>
       </div>
 
       <div className="grid grid-cols-1 gap-4">
+        <ProjectStatusSelector status={status} setStatus={setStatus} />
+
         <div>
           <h4 className="text-sm mb-2">Nom du projet:</h4>
           <Input
@@ -79,61 +78,43 @@ export default function ProjectGlobalEditComponent({
 
         <div>
           <h4 className="text-sm mb-2">Description:</h4>
-          <Input
+          <Textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             placeholder="Description du projet"
-            type="text"
           />
         </div>
 
-        <div>
-          <h4 className="text-sm mb-2">Statut:</h4>
-          <Select
-            value={status}
-            onValueChange={(val) => setStatus(val as ProjectStatus)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Statut du projet" />
-            </SelectTrigger>
-            <SelectContent>
-              {Object.values(ProjectStatus).map((s) => (
-                <SelectItem key={s} value={s}>
-                  {s.charAt(0).toUpperCase() + s.slice(1)}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+        <div className="flex flex-row gap-4 w-full">
+          <div className="w-full">
+            <h4 className="text-sm mb-2">Date de début:</h4>
+            <Input
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              placeholder="Date de début"
+              type="date"
+            />
+          </div>
+
+          <div className="w-full">
+            <h4 className="text-sm mb-2">Date de fin:</h4>
+            <Input
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              placeholder="Date de fin"
+              type="date"
+            />
+          </div>
         </div>
 
-        <div>
-          <h4 className="text-sm mb-2">Date de début:</h4>
-          <Input
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            placeholder="Date de début"
-            type="date"
-          />
-        </div>
-
-        <div>
-          <h4 className="text-sm mb-2">Date de fin:</h4>
-          <Input
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            placeholder="Date de fin"
-            type="date"
-          />
-        </div>
-
-        <div>
+        {/*         <div>
           <h4 className="text-sm mb-2">Promotion:</h4>
           <Input
             value={promotion}
             onChange={(e) => setPromotion(e.target.value)}
             placeholder="Promotion"
           />
-        </div>
+        </div> */}
       </div>
 
       <div className="mt-6 flex justify-end">

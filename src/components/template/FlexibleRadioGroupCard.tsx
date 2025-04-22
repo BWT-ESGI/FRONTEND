@@ -2,16 +2,10 @@ import React from "react";
 import * as RadioGroup from "@radix-ui/react-radio-group";
 import { CircleCheck, CpuIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-export interface Option {
-  value: string;
-  label: string;
-  description?: string;
-  icon?: React.ReactNode;
-}
+import { OptionGroupe } from "@/types/optionGroupe.type";
 
 export interface FlexibleRadioGroupCardProps {
-  options: Option[];
+  options: OptionGroupe[];
   defaultValue?: string;
   onValueChange?: (value: string) => void;
   className?: string;
@@ -31,7 +25,8 @@ const FlexibleRadioGroupCard: React.FC<FlexibleRadioGroupCardProps> = ({
         defaultValue || (options.length > 0 ? options[0].value : undefined)
       }
       onValueChange={onValueChange}
-      className={cn(`w-full grid auto-rows-min gap-4 md:grid-cols-${gridCols}`, className)}
+      className={cn("w-full grid auto-rows-min gap-4", className)}
+      style={{ gridTemplateColumns: `repeat(${gridCols}, minmax(0, 1fr))` }}
     >
       {options.map((option) => (
         <RadioGroup.Item
@@ -39,7 +34,7 @@ const FlexibleRadioGroupCard: React.FC<FlexibleRadioGroupCardProps> = ({
           value={option.value}
           className={cn(
             "relative group ring-[1px] ring-border rounded py-2 px-3 text-start",
-            "data-[state=checked]:ring-2 data-[state=checked]:ring-blue-500 col-span-1",
+            "data-[state=checked]:ring-2 data-[state=checked]:ring-blue-500 col-span-1"
           )}
         >
           <CircleCheck className="absolute top-0 right-0 -translate-y-1/2 translate-x-1/2 h-6 w-6 text-primary fill-blue-500 stroke-white group-data-[state=unchecked]:hidden" />

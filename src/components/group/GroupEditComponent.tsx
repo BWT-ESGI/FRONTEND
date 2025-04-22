@@ -12,6 +12,7 @@ import Divider from "../layout/Divider";
 import { Input } from "../ui/input";
 import { useProjectContext } from "@/contexts/ProjectContext";
 import { Promotion } from "@/types/promotion.type";
+import NotFoundPage from "@/pages/global/NotFoundPage";
 
 interface GroupEditComponentProps {
   promotion: Promotion | null;
@@ -22,9 +23,8 @@ export default function GroupEditComponent({
 }: GroupEditComponentProps) {
   const { project, setProject } = useProjectContext();
 
-  if (!project) return null;
+  if (!project) return (<NotFoundPage />)
 
-  // Fonction unique pour mise à jour et rafraîchissement
   const updateConfig = (
     changes: Partial<{
       groupCompositionType: typeof project.groupCompositionType;
@@ -74,6 +74,7 @@ export default function GroupEditComponent({
         onValueChange={(mode) =>
           updateConfig({ groupCompositionType: mode as any })
         }
+        className="mt-4"
       />
 
       <p className="text-sm text-muted-foreground mt-4">
