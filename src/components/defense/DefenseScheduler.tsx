@@ -74,13 +74,6 @@ export default function SoutenanceScheduler() {
       .catch(console.error);
   }, [project.id]);
 
-  // Charger l'ordre existant (si applicable)
-  useEffect(() => {
-    fetchDefenses(project.id.toString())
-      .then(setOrder)
-      .catch(console.error);
-  }, [project.id]);
-
   // Si aucun groupe avec membres, afficher message d'avertissement
   if (groups.length === 0) {
     return (
