@@ -2,15 +2,8 @@ import { GoogleLogin } from '@react-oauth/google';
 import { APP_NAME } from "@/config";
 import { Separator } from "@/components/ui/separator";
 import { sendGoogleToken } from "@/services/authentification";
-import isAuthenticated from '@/utils/isAuthenticated';
-import { Navigate } from 'react-router-dom';
 
 const LoginPage = () => {
-  if(isAuthenticated()){
-    return (<Navigate to="/dashboard" />);
-  }
-
-
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="max-w-sm w-full flex flex-col items-center border rounded-lg p-6 shadow-sm">
