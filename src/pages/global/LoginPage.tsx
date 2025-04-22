@@ -1,7 +1,8 @@
-import { GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin } from "@react-oauth/google";
 import { APP_NAME } from "@/config";
 import { Separator } from "@/components/ui/separator";
 import { sendGoogleToken } from "@/services/authentification";
+import AskSchoolModal from "@/components/auth/askSchoolModal";
 
 const LoginPage = () => {
   return (
@@ -10,31 +11,31 @@ const LoginPage = () => {
         <p className="mt-4 text-xl font-bold tracking-tight">
           Log in to {APP_NAME}
         </p>
-
-        <div className="mt-8 w-full flex justify-center">
+        <div className="mt-8 w-full flex flex-col justify-center gap-4">
+          <AskSchoolModal />
           <GoogleLogin
-            width="300px"
+            width="100%"
             onSuccess={async (credentialResponse) => {
               if (credentialResponse.credential) {
-                const response = await sendGoogleToken(credentialResponse.credential);
+                const response = await sendGoogleToken(
+                  credentialResponse.credential
+                );
                 if (response.data.accessToken) {
-                  localStorage.setItem('token', response.data.accessToken);
+                  localStorage.setItem("token", response.data.accessToken);
                   window.location.href = "/dashboard";
                 } else {
-                  console.error('Erreur côté backend:', response.data);
+                  console.error("Erreur côté backend:", response.data);
                 }
               }
             }}
             onError={() => {
-              console.error('Erreur lors de la connexion Google');
+              console.error("Erreur lors de la connexion Google");
             }}
           />
         </div>
-
         <div className="my-7 w-full flex items-center justify-center overflow-hidden">
           <Separator />
         </div>
-
         <div className="mt-5 space-y-5">
           <p className="text-sm text-center">
             Don't have an account?
