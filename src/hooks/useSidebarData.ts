@@ -52,17 +52,17 @@ export function useSidebarData() {
         ],
         projects: [
           {
-            name: "Gestion des Projets",
-            url: "/gestion-projets",
+            name: "Projets",
+            url: "/projets",
             icon: FolderOpenDot,
           },
           {
-            name: "Gestion des Promotions",
-            url: "/gestion-promotions",
+            name: "Promotions",
+            url: "/promotions",
             icon: Users,
           },
           {
-            name: "Gestion des Utilisateurs",
+            name: "Utilisateurs",
             url: "/gestion-utilisateurs",
             icon: Users,
           },

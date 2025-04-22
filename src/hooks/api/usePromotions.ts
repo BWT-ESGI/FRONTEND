@@ -2,14 +2,14 @@ import { useCallback, useEffect, useState } from "react";
 import { Promotion } from "@/types/promotion.type";
 import { fetchPromotions } from "@/services/promotionService";
 
-export function usePromotions() {
+export function usePromotions(userId: number) {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(true);
 
   const refetch = useCallback(async () => {
     setLoading(true);
     try {
-      const data = await fetchPromotions();
+      const data = await fetchPromotions(userId);
       setPromotions(data);
     } catch (error) {
       console.error("Erreur lors du rafraîchissement des promotions :", error);

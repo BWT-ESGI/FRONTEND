@@ -161,7 +161,7 @@ const StudentRegisterPage = () => {
                   if (credentialResponse.credential) {
                     const response = await finalizeRegistration(email, credentialResponse.credential);
                     if (response.data.accessToken) {
-                      window.location.href = "/gestion-projets";
+                      window.location.href = "/projets";
                     } else {
                       console.error("Erreur backend:", response.data);
                     }

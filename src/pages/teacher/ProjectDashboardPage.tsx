@@ -24,7 +24,7 @@ export default function ProjectDashboardPage() {
           <ProjectSummaryCard
             project={project}
             btn={
-              <Link to={`/gestion-projets/${project.id}/editer`}>
+              <Link to={`/projets/${project.id}/editer`}>
                 <Button className="cursor-pointer">Modifier</Button>
               </Link>
             }

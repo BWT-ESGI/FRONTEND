@@ -9,9 +9,12 @@ import { PromotionManagerPageSkeleton } from "./PromotionManagerPageSkeleton";
 import { FlexibleSearchBar } from "@/components/template/FlexibleSearchBar";
 import PromotionFormModal from "@/components/promotion/PromotionFormModal";
 import { useState } from "react";
+import getUserInfoFromLocalStorage from "@/utils/getUserInfoFromLocalStorage";
+import isStudent from "@/utils/isStudent";
 
 export default function PromotionManagerPage() {
-  const { promotions, loading, refetch } = usePromotions();
+  const userInfo = getUserInfoFromLocalStorage();
+  const { promotions, loading, refetch } = usePromotions(Number(userInfo?.userId));
   const [openModal, setOpenModal] = useState(false);
 
   const handleClose = () => {
@@ -30,7 +33,9 @@ export default function PromotionManagerPage() {
             data={promotions}
             placeholder="Rechercher une promotion..."
             rightChildren={
+              isStudent() ? undefined : (
                 <Button className="cursor-pointer" onClick={() => setOpenModal(true)} >Créer une promotion</Button>
+              )
             }
             render={(filteredPromotions) => (
               <div className="grid auto-rows-min gap-4 md:grid-cols-3">
@@ -41,7 +46,7 @@ export default function PromotionManagerPage() {
                     description={`Enseignant: ${promotion.teacher.firstName} ${promotion.teacher.lastName}`}
                     childrenFooter={
                       <div className="flex justify-end mt-8">
-                        <Link to={`/gestion-promotions/${promotion.id}`}>
+                        <Link to={`/promotions/${promotion.id}`}>
                           <Button className="cursor-pointer">
                             Voir les détails
                           </Button>

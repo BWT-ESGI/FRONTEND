@@ -6,12 +6,13 @@ import DashboardLayout from "@/layout/dashboard.layout";
 import { User } from "@/types/user.type";
 import { usePromotion } from "@/hooks/api/usePromotion";
 import PromotionEditorPageSkeleton from "./PromotionEditorPageSkeleton";
-import NotFoundPage from "../global/NotFoundPage";
+import NotFoundPage from "../NotFoundPage";
 import { Project } from "@/types/project.type";
 import { Button } from "@/components/ui/button";
 import ProjectFormModal from "@/components/promotion/ProjectFormModal";
 import { useState } from "react";
 import { deletePromotionById } from "@/services/promotionService";
+import isStudent from "@/utils/isStudent";
 
 export default function PromotionEditorPage() {
   const { id } = useParams<{ id: string }>();
@@ -34,7 +35,7 @@ export default function PromotionEditorPage() {
     if (confirmed) {
       try {
         await deletePromotionById(id);
-        navigate("/gestion-promotions");
+        navigate("/promotions");
       } catch (error) {
         console.error("Erreur lors de la suppression :", error);
       }
@@ -67,13 +68,15 @@ export default function PromotionEditorPage() {
             title={promotion.name}
             description={`Enseignant: ${promotion.teacher.username}`}
             childrenRightEnd={
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleDeletePromotion}
-              >
-                Supprimer
-              </Button>
+              isStudent() ? undefined : (
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleDeletePromotion}
+                >
+                  Supprimer
+                </Button>
+              )
             }
           >
             <div className="max-w-xs mx-auto w-full flex items-center">
@@ -107,26 +110,70 @@ export default function PromotionEditorPage() {
           title="Projets de la promotion"
           description="Gérer les projets de la promotion"
           childrenRightEnd={
-            <Button size="sm" onClick={() => setOpenModal(true)}>
-              Créer un projet
-            </Button>
+            isStudent() ? undefined : (
+              <Button size="sm" onClick={() => setOpenModal(true)}>
+                Créer un projet
+              </Button>
+            )
           }
         >
-          <FlexibleTable<Project> data={promotion.projects} />
+          <FlexibleTable<Project>
+            data={promotion.projects}
+            columns={[
+              {
+                accessorKey: "name",
+                header: "Nom",
+              },
+              {
+                accessorKey: "description",
+                header: "Description",
+              },
+              {
+                accessorKey: "createdAt",
+                header: "Créer le",
+              },
+              {
+                accessorKey: "deadline",
+                header: "Se termine le"
+              },
+            ]}
+          />
         </FlexibleCard>
 
         <FlexibleCard
           title="Etudiants de la promotion"
           description="Gérer les étudiants de la promotion"
           childrenRightEnd={
-            <Button size="sm">
-              <Link to={`/gestion-promotions/${promotion.id}/ajouter-etudiant`}>
-                Ajouter des étudiants
-              </Link>
-            </Button>
+            isStudent() ? undefined : (
+              <Button size="sm">
+                <Link to={`/promotions/${promotion.id}/ajouter-etudiant`}>
+                  Ajouter des étudiants
+                </Link>
+              </Button>
+            )
           }
         >
-          <FlexibleTable<User> data={promotion.students} />
+          <FlexibleTable<User>
+            data={promotion.students}
+            columns={[
+              {
+                accessorKey: "username",
+                header: "Nom d'utilisateur",
+              },
+              {
+                accessorKey: "firstName",
+                header: "Prénom",
+              },
+              {
+                accessorKey: "lastName",
+                header: "Nom de famille",
+              },
+              {
+                accessorKey: "email",
+                header: "Email",
+              },
+            ]}
+          />
         </FlexibleCard>
       </div>
     </DashboardLayout>
