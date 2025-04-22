@@ -13,21 +13,22 @@ import GroupEditComponent from "@/components/group/GroupEditComponent";
 import GroupBuilder from "@/components/group/ GroupBuilder";
 import ProjectGlobalEditComponent from "@/components/project/ProjectGlobalEditComponent";
 import DefenseScheduler from "@/components/defense/DefenseScheduler";
-import { ProjectProvider, useProjectContext } from "@/context/ProjectProvider";
 
 export default function ProjectCreatePage() {
   const { id: projectId } = useParams();
-  
-  const { project, promotionName, loading } = useProjectContext();
+  const { project, loading: loadingProject } = useProject(projectId || "");
   const { promotion, loading: loadingPromotion } = usePromotion(project?.promotion.id?.toString() || "");
 
-  if (loading) return <FallBackPageSkeleton />;
-  if (!project) return <NotFoundPage />;
+  if (loadingProject || loadingPromotion) {
+    return <FallBackPageSkeleton />;
+  }
 
+  if (!project) {
+    return <NotFoundPage />;
+  }
 
 
   return (
-    <ProjectProvider projectId={projectId || ""}>
     <DashboardLayout>
       <FlexibleCard title={`${project.name}`}>
         <FlexibleAlert
@@ -73,6 +74,5 @@ export default function ProjectCreatePage() {
         </Tabs>
       </FlexibleCard>
     </DashboardLayout>
-    </ProjectProvider>
   );
 }
