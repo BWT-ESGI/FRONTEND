@@ -94,7 +94,7 @@ const GradingRubricForm: React.FC = () => {
         <FlexibleCard title="Créer une grille de notation">
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-700">
+              <label className="block text-sm font-medium ">
                 Nom de la grille
               </label>
               <Input
@@ -105,11 +105,11 @@ const GradingRubricForm: React.FC = () => {
               />
             </div>
 
-            <div className="border p-4 rounded bg-gray-50">
+            <div className="border p-4 rounded">
               <h3 className="text-md font-semibold mb-2">Ajouter un critère</h3>
               <div className="flex space-x-4">
                 <div className="flex-1">
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium ">
                     Nom du critère
                   </label>
                   <Input
@@ -120,7 +120,7 @@ const GradingRubricForm: React.FC = () => {
                   />
                 </div>
                 <div className="w-32">
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium">
                     Poids
                   </label>
                   <div className="flex items-center mt-1">
@@ -138,7 +138,7 @@ const GradingRubricForm: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => setCriterionWeight(criterionWeight + 1)}
-                        className="p-1 hover:bg-gray-200"
+                        className="p-1"
                       >
                         ▲
                       </button>
@@ -149,7 +149,7 @@ const GradingRubricForm: React.FC = () => {
                             criterionWeight > 0 ? criterionWeight - 1 : 0
                           )
                         }
-                        className="p-1 hover:bg-gray-200"
+                        className="p-1"
                       >
                         ▼
                       </button>

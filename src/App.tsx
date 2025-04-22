@@ -18,6 +18,7 @@ import ProjectEditWrapper from "./pages/teacher/ProjectEditWrapper";
 import HomeDashboardPage from "./pages/global/HomeDashboardPage";
 import IsAuthenticatedWall from "./middleware/IsAuthenticatedWall";
 import IsTeacherWall from "./middleware/IsTeacherWall";
+import ScoringGridPage from "./pages/teacher/ScoringGridPage";
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -41,12 +42,13 @@ const App = () => {
               {/* ============== PROJET ============== */}
               <Route path="/projets" element={<ProjectManagerPage />} />
 
-
               {/* ============== TEACHER ============== */}
               <Route element={<IsTeacherWall />}>
 
                 {/* ============== PROMOTION ============== */}
                 <Route path="/promotions/:id/ajouter-etudiant" element={<PromotionAddStudentPage />} />
+
+                <Route path="/grille-notation" element={<ScoringGridPage />} />
 
                 {/* ============== PROJET ============== */}
                 <Route path="/projets/:id" element={<ProjectDashboardWrapper />}/>              

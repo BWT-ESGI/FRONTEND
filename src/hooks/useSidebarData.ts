@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FolderOpenDot, Users } from "lucide-react";
+import { FolderOpenDot, Table, Users } from "lucide-react";
 import getUserInfoFromLocalStorage from "@/utils/getUserInfoFromLocalStorage";
 import isStudent from "@/utils/isStudent";
 
@@ -46,6 +46,11 @@ export function useSidebarData() {
       url: "/gestion-utilisateurs",
       icon: Users,
     },
+    {
+      name: "Grille de notation",
+      url: "/grille-notation",
+      icon: Table,
+    }
   ];
 
   const navData = isStudent() ? baseNavData : [...baseNavData, ...teacherNavData];

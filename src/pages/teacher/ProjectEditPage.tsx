@@ -6,7 +6,6 @@ import FallBackPageSkeleton from "../global/FallBackPageSkeleton";
 import { usePromotion } from "@/hooks/api/usePromotion";
 import NotFoundPage from "../global/NotFoundPage";
 import FlexibleAlert from "@/components/template/FlexibleAlert";
-import GradingRubricForm from "@/components/project/GradingRubricForm";
 import GroupEditComponent from "@/components/group/GroupEditComponent";
 import GroupBuilder from "@/components/group/ GroupBuilder";
 import ProjectGlobalEditComponent from "@/components/project/ProjectGlobalEditComponent";
@@ -36,10 +35,9 @@ export default function ProjectEditPage() {
         />
 
         <Tabs defaultValue="general" className="mt-4 w-full">
-          <TabsList className="w-full grid grid-cols-6">
+          <TabsList className="w-full grid grid-cols-5">
             <TabsTrigger value="general">Information Général</TabsTrigger>
             <TabsTrigger value="groupes">Groupes</TabsTrigger>
-            <TabsTrigger value="notation">Grilles de Notation</TabsTrigger>
             <TabsTrigger value="livrables">Livrables</TabsTrigger>
             <TabsTrigger value="rapports">Rapports</TabsTrigger>
             <TabsTrigger value="soutenances">Soutenances</TabsTrigger>
@@ -53,11 +51,10 @@ export default function ProjectEditPage() {
               <GroupEditComponent promotion={promotion}/>
               <GroupBuilder/>
             </TabsContent>
-            <TabsContent value="notation">
-              <GradingRubricForm />
+            <TabsContent value="livrables"></TabsContent>
+            <TabsContent value="rapports">
+              Grille de notation des rapports a selectionner
             </TabsContent>
-            <TabsContent value="livrables">Test2</TabsContent>
-            <TabsContent value="rapports">Test3</TabsContent>
             <TabsContent value="soutenances">
               <DefenseScheduler />
             </TabsContent>
