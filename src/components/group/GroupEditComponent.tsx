@@ -4,7 +4,6 @@ import {
   ListTodo,
   Shuffle,
   SquareDashedMousePointer,
-  SquarePi,
   UserCheck,
 } from "lucide-react";
 import FlexibleAlert from "@/components/template/FlexibleAlert";
@@ -18,7 +17,9 @@ interface GroupEditComponentProps {
   promotion: Promotion | null;
 }
 
-export default function GroupEditComponent({ promotion }: GroupEditComponentProps) {
+export default function GroupEditComponent({
+  promotion,
+}: GroupEditComponentProps) {
   const { project, setProject } = useProjectContext();
 
   if (!project) return null;
@@ -38,8 +39,6 @@ export default function GroupEditComponent({ promotion }: GroupEditComponentProp
     });
   };
 
-  const isRandom = project.groupCompositionType === "random";
-
   return (
     <>
       <h2 className="text-lg font-semibold mb-4">
@@ -53,12 +52,28 @@ export default function GroupEditComponent({ promotion }: GroupEditComponentProp
 
       <FlexibleRadioGroupCard
         options={[
-          { label: "Libre", value: "student_choice", icon: <UserCheck className="mb-2.5 text-muted-foreground" /> },
-          { label: "Manuelle", value: "manual", icon: <SquareDashedMousePointer className="mb-2.5 text-muted-foreground" /> },
-          { label: "Aléatoire", value: "random", icon: <Shuffle className="mb-2.5 text-muted-foreground" /> },
+          {
+            label: "Libre",
+            value: "student_choice",
+            icon: <UserCheck className="mb-2.5 text-muted-foreground" />,
+          },
+          {
+            label: "Manuelle",
+            value: "manual",
+            icon: (
+              <SquareDashedMousePointer className="mb-2.5 text-muted-foreground" />
+            ),
+          },
+          {
+            label: "Aléatoire",
+            value: "random",
+            icon: <Shuffle className="mb-2.5 text-muted-foreground" />,
+          },
         ]}
         defaultValue={project.groupCompositionType}
-        onValueChange={(mode) => updateConfig({ groupCompositionType: mode as any })}
+        onValueChange={(mode) =>
+          updateConfig({ groupCompositionType: mode as any })
+        }
       />
 
       <p className="text-sm text-muted-foreground mt-4">
@@ -71,30 +86,25 @@ export default function GroupEditComponent({ promotion }: GroupEditComponentProp
       </p>
 
       <Divider className="my-4" />
+      <h4 className="text-sm mb-2">Nombre de groupes :</h4>
 
-      {!isRandom && (
-        <>
-          <h2 className="text-lg font-semibold mb-4">
-            <SquarePi className="inline-block mr-2" /> Nombre de groupes
-          </h2>
-          <Input
-            type="number"
-            defaultValue={project.nbGroups}
-            onBlur={(e) => updateConfig({ nbGroups: Number(e.target.value) })}
-            className="w-24"
-            min={1}
-            max={100}
-          />
-        </>
-      )}
+      <Input
+        type="number"
+        defaultValue={project.nbGroups}
+        onBlur={(e) => updateConfig({ nbGroups: Number(e.target.value) })}
+        className="w-24"
+        min={1}
+        max={100}
+        disabled={true}
+      />
 
-      <Divider className="my-4" />
-
-      <h4 className="text-sm mb-2">Étudiants min par groupe :</h4>
+      <h4 className="text-sm mb-2 mt-4">Étudiants min par groupe :</h4>
       <Input
         type="number"
         defaultValue={project.nbStudentsMinPerGroup}
-        onBlur={(e) => updateConfig({ nbStudentsMinPerGroup: Number(e.target.value) })}
+        onBlur={(e) =>
+          updateConfig({ nbStudentsMinPerGroup: Number(e.target.value) })
+        }
         min={1}
         max={promotion?.students?.length || 1}
       />
@@ -103,10 +113,14 @@ export default function GroupEditComponent({ promotion }: GroupEditComponentProp
       <Input
         type="number"
         defaultValue={project.nbStudentsMaxPerGroup}
-        onBlur={(e) => updateConfig({ nbStudentsMaxPerGroup: Number(e.target.value) })}
+        onBlur={(e) =>
+          updateConfig({ nbStudentsMaxPerGroup: Number(e.target.value) })
+        }
         min={project.nbStudentsMinPerGroup!}
         max={promotion?.students?.length || 1}
       />
+
+      <Divider className="my-4" />
     </>
   );
 }

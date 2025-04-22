@@ -25,7 +25,7 @@ export default function GroupBuilder() {
   const { project, reload } = useProjectContext();
   const { id: projectId } = useParams<{ id: string }>();
 
-  // reactive mode & config
+  // Configuration réactive
   const mode = project?.groupCompositionType ?? "manual";
   const minSize = project?.nbStudentsMinPerGroup ?? 0;
   const maxSize = project?.nbStudentsMaxPerGroup ?? 0;
@@ -47,13 +47,17 @@ export default function GroupBuilder() {
     })();
   }, [projectId]);
 
+  // Réinitialise tous les groupes : remet tous les utilisateurs (assignés et non) dans la liste
   const resetGroups = () => {
-    setUsers(initialUsers);
-    setGroups(initialGroups.map(g => ({ ...g, members: [] as User[] })));
+    const assignedMembers = initialGroups.flatMap(g => g.members);
+    setUsers([...initialUsers, ...assignedMembers]);
+    setGroups(initialGroups.map(g => ({ ...g, members: [] })));
   };
 
+  // Génération aléatoire côté front
   const handleGenerateRandom = () => {
-    const shuffled = [...initialUsers].sort(() => Math.random() - 0.5);
+    const shuffled = [...initialUsers, ...initialGroups.flatMap(g => g.members)]
+      .sort(() => Math.random() - 0.5);
     const newGroups = initialGroups.map(g => ({ ...g, members: [] as User[] }));
     shuffled.forEach((user, idx) => {
       const target = newGroups[idx % newGroups.length];
@@ -168,20 +172,20 @@ export default function GroupBuilder() {
 
   return (
     <div className="space-y-6 p-6">
-      <p className="text-center text-sm text-muted-foreground">
-        Mode : <strong>{mode === 'random' ? 'aléatoire' : mode === 'manual' ? 'manuel' : 'choix libre'}</strong>
-      </p>
-
       <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <div className="grid gap-6 grid-cols-[minmax(250px,1fr)_minmax(0,3fr)]">
           <div className="pr-4">
             <h3 className="text-lg font-bold mb-3">Étudiants disponibles</h3>
             <div className="space-y-2">
-              {users.map(user => <DraggableUser key={user.id} user={user}/>)}
+              {users.map(user => (
+                <DraggableUser key={user.id} user={user} />
+              ))}
             </div>
           </div>
           <div className="space-y-4 w-full">
-            <h3 className="text-lg font-bold">Groupes (min : {minSize}, max : {maxSize})</h3>
+            <h3 className="text-lg font-bold">
+              Groupes (min : {minSize}, max : {maxSize})
+            </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
               {groups.map(g => (
                 <DroppableGroup
@@ -189,9 +193,10 @@ export default function GroupBuilder() {
                   group={g}
                   onRemoveUser={member => {
                     setGroups(prev =>
-                      prev.map(gr => gr.id === g.id
-                        ? { ...gr, members: gr.members.filter(m => m.id !== member.id) }
-                        : gr
+                      prev.map(gr =>
+                        gr.id === g.id
+                          ? { ...gr, members: gr.members.filter(m => m.id !== member.id) }
+                          : gr
                       )
                     );
                     setUsers(prev => [...prev, member]);
