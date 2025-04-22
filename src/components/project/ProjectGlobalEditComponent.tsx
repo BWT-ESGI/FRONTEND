@@ -1,5 +1,4 @@
-import { Info, Save } from "lucide-react";
-import FlexibleAlert from "@/components/template/FlexibleAlert";
+import { Info } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Project, ProjectStatus } from "@/types/project.type";
@@ -24,7 +23,7 @@ export default function ProjectGlobalEditComponent() {
   const [endDate, setEndDate] = useState(
     project.updatedAt.toString().slice(0, 10)
   );
-  const [promotion, setPromotion] = useState(project.promotion?.name || "");
+  const [promotion] = useState(project.promotion?.name || "");
   const [loading, setLoading] = useState(false);
 
   const handleSave = async () => {
