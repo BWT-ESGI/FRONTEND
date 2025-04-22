@@ -45,11 +45,6 @@ export default function GroupEditComponent({
         <ListTodo className="inline-block mr-2" /> Composition des groupes
       </h2>
 
-      <FlexibleAlert
-        icon={<Info className="h-4 w-4 !text-blue-500" />}
-        title="Choisissez le mode de composition des groupes."
-      />
-
       <FlexibleRadioGroupCard
         options={[
           {
@@ -78,7 +73,7 @@ export default function GroupEditComponent({
       />
 
       <p className="text-sm text-muted-foreground mt-4">
-        <Info className="inline-block mr-1" />
+        <Info className="inline-block mr-1 w-4 h-4" />
         {project.groupCompositionType === "student_choice"
           ? "Choix libre par les étudiants."
           : project.groupCompositionType === "manual"

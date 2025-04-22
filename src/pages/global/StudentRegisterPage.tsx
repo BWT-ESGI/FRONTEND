@@ -10,6 +10,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateUserProfile, finalizeRegistration, checkRegistrationId } from "@/services/authentification"; // <-- ajout updateUserProfile
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import FlexibleErrorPage from "./FlexibleErrorPage";
 
 const formSchema = z.object({
   username: z.string().min(2),
@@ -66,14 +67,7 @@ const StudentRegisterPage = () => {
 
   if (invalidId) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="max-w-sm w-full flex flex-col items-center border rounded-lg p-6 shadow-sm text-center">
-          <p className="text-lg font-semibold">Invalid or expired registration link.</p>
-          <Button className="mt-6" onClick={() => navigate("/auth/login")}>
-            Go to Login
-          </Button>
-        </div>
-      </div>
+      <FlexibleErrorPage errorCode={401} errorMessage="Lien d'inscription invalide" userFriendlyMessage={"Merci de vérifier le lien d'inscription que vous avez reçu par email."} />
     );
   }
 
