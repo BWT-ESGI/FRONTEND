@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { GoogleLogin } from '@react-oauth/google';
 import { APP_NAME } from "@/config";
 import { Separator } from "@/components/ui/separator";
@@ -25,7 +25,6 @@ const StudentRegisterPage = () => {
   const [submitted, setSubmitted] = useState(false);
   const [invalidId, setInvalidId] = useState(false);
   const [email, setEmail] = useState("");
-  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),

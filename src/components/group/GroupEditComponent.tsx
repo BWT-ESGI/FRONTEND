@@ -1,4 +1,3 @@
-// src/components/group/GroupEditComponent.tsx
 import {
   Info,
   ListTodo,
@@ -6,7 +5,6 @@ import {
   SquareDashedMousePointer,
   UserCheck,
 } from "lucide-react";
-import FlexibleAlert from "@/components/template/FlexibleAlert";
 import FlexibleRadioGroupCard from "../template/FlexibleRadioGroupCard";
 import Divider from "../layout/Divider";
 import { Input } from "../ui/input";

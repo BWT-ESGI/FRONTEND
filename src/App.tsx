@@ -17,7 +17,6 @@ import ProjectDashboardWrapper from "./pages/teacher/ProjectDashboardWrapper";
 import ProjectEditWrapper from "./pages/teacher/ProjectEditWrapper";
 import HomeDashboardPage from "./pages/global/HomeDashboardPage";
 import IsAuthenticatedWall from "./middleware/IsAuthenticatedWall";
-import IsStudentWall from "./middleware/IsStudentWall";
 import IsTeacherWall from "./middleware/IsTeacherWall";
 
 const App = () => {
