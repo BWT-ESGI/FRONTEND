@@ -16,3 +16,11 @@ export async function fetchAllProjects(): Promise<Project[]> {
   const response = await api.get("/projects");
   return response.data;
 }
+
+export async function updateProject(
+  projectId: string,
+  payload: Partial<Project>
+): Promise<Project> {
+  const response = await api.patch(`/projects/${projectId}`, payload);
+  return response.data;
+}
