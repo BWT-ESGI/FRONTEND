@@ -74,8 +74,8 @@ export default function GroupBuilder() {
   const handleSave = async () => {
     if (!projectId) return;
     try {
-      await saveGroupsForProject(Number(projectId), groups);
-      await updateProjectConfig(Number(projectId), {
+      await saveGroupsForProject(projectId, groups);
+      await updateProjectConfig(projectId, {
         nbStudentsMinPerGroup: minSize,
         nbStudentsMaxPerGroup: maxSize,
         groupCompositionType: mode,
@@ -91,10 +91,16 @@ export default function GroupBuilder() {
 
   const handleDragEnd = (event: DragEndEvent) => {
     if (mode !== "manual") return;
+
+    if (minSize <= 0 || maxSize <= 0) {
+      toast.error("Veuillez définir le nombre mini/maxi d'étudiants par groupe avant de déplacer.");
+      return;
+    }
+
     const { active, over } = event;
     if (!over || active.id === over.id) return;
     const user = users.find(u => u.id === active.id);
-    const targetGroup = groups.find(g => String(g.id) === over.id);
+    const targetGroup = groups.find(g => g.id === over.id);
     if (!user || !targetGroup || targetGroup.members.length >= maxSize) return;
 
     setGroups(prev =>
@@ -137,7 +143,7 @@ export default function GroupBuilder() {
     group: Group;
     onRemoveUser: (user: User) => void;
   }) => {
-    const { isOver, setNodeRef } = useDroppable({ id: String(group.id) });
+    const { isOver, setNodeRef } = useDroppable({ id: group.id });
     return (
       <div
         ref={setNodeRef}

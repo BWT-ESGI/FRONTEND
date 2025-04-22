@@ -24,7 +24,10 @@ export const fetchGroupBuilderDataByProject = async (
   };
 };
 
-export const saveGroupsForProject = async (projectId: number, groups: Group[]) => {
+export const saveGroupsForProject = async (
+  projectId: string,
+  groups: Group[]
+) => {
   try {
     const payload = groups.map((group) => ({
       id: group.id,
@@ -41,7 +44,7 @@ export const saveGroupsForProject = async (projectId: number, groups: Group[]) =
 };
 
 export const updateProjectConfig = async (
-  projectId: number,
+  projectId: string,
   payload: {
     nbStudentsMinPerGroup: number;
     nbStudentsMaxPerGroup: number;
@@ -54,10 +57,8 @@ export const updateProjectConfig = async (
 };
 
 export async function fetchGroupsWithMembers(
-  projectId: string,
+  projectId: string
 ): Promise<Group[]> {
-  const response = await api.get<Group[]>(
-    `/groups/by-user/${projectId}`,
-  );
+  const response = await api.get<Group[]>(`/groups/by-project/${projectId}`);
   return response.data;
 }

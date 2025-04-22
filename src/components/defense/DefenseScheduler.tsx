@@ -1,4 +1,5 @@
-import { useEffect, useState, useMemo } from "react";
+// src/components/defense/SoutenanceScheduler.tsx
+import { useEffect, useState } from "react";
 import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
 import {
   SortableContext,
@@ -13,27 +14,22 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 
-import { PassageGroup, fetchDefenses } from "@/services/defenseService";
 import { fetchGroupsWithMembers } from "@/services/groupService";
 import { generatePdf } from "@/services/pdfService";
-import { Project } from "@/types/project.type";
 import { Group } from "@/types/group.type";
 import { User } from "@/types/user.type";
 import FlexibleAlert from "../template/FlexibleAlert";
 import { Info } from "lucide-react";
-
-interface Props {
-  project: Project;
-}
+import { useProjectContext } from "@/contexts/ProjectContext";
 
 function SortableItem({
-  item,
-  members,
+  group,
 }: {
-  item: PassageGroup;
-  members: User[];
+  group: Group;
 }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: item.id });
+  const defense = group.defense[0]; // on suppose 1 seul passage par groupe
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    useSortable({ id: group.id.toString() });
   const style = { transform: CSS.Transform.toString(transform), transition };
 
   return (
@@ -44,28 +40,37 @@ function SortableItem({
       {...listeners}
       className="p-4 bg-white rounded-2xl shadow"
     >
-      <div className="font-bold text-lg">{item.name}</div>
-      <div className="text-sm mb-2">
-        {new Date(item.start).toLocaleString()} — {new Date(item.end).toLocaleString()}
-      </div>
+      <div className="font-bold text-lg">{group.name}</div>
+      {defense && (
+        <div className="text-sm mb-2">
+          {new Date(defense.start).toLocaleString()} —{" "}
+          {new Date(defense.end).toLocaleString()}
+        </div>
+      )}
       <div className="text-xs text-gray-600">
-        Membres : {members.map(m => m.firstName).join(', ')}
+        Membres : {group.members.map((m: User) => m.firstName).join(", ")}
       </div>
     </li>
   );
 }
 
-export default function SoutenanceScheduler({ project }: Props) {
+export default function SoutenanceScheduler() {
+  const { project } = useProjectContext();
   const [groups, setGroups] = useState<Group[]>([]);
-  const [order, setOrder] = useState<PassageGroup[]>([]);
-  const [start, setStart] = useState<string>("");
-  const [end, setEnd] = useState<string>("");
-  const [duration, setDuration] = useState<number>(30);
+  const [order, setOrder] = useState<Group[]>([]);
+  const [start, setStart] = useState("");
+  const [end, setEnd] = useState("");
+  const [duration, setDuration] = useState(30);
 
-  // Charger les groupes avec membres
+  if (!project) return null;
+
   useEffect(() => {
     fetchGroupsWithMembers(project.id.toString())
-      .then(allGroups => setGroups(allGroups.filter(g => g.members?.length > 0)))
+      .then((all) => {
+        const withMembers = all.filter((g) => g.members.length > 0);
+        setGroups(withMembers);
+        setOrder(withMembers); // ordre initial = tel quel
+      })
       .catch(console.error);
   }, [project.id]);
 
@@ -76,46 +81,38 @@ export default function SoutenanceScheduler({ project }: Props) {
       .catch(console.error);
   }, [project.id]);
 
+  // Si aucun groupe avec membres, afficher message d'avertissement
   if (groups.length === 0) {
     return (
         <FlexibleAlert title="Aucun groupe avec des membres n’est pour l’instant généré. Veuillez d’abord créer et peupler des groupes." icon={<Info className="!text-blue-500 text-center" />} variant="info" />
     );
   }
 
-  const generateByDuration = (
-    startIso: string,
-    dur: number,
-    items: Array<{ id: string; name: string }>
-  ): PassageGroup[] => {
-    const result: PassageGroup[] = [];
-    let current = new Date(startIso);
-    items.forEach((g) => {
-      const s = new Date(current);
-      const e = new Date(current.getTime() + dur * 60000);
-      result.push({ id: g.id, name: g.name, start: s.toISOString(), end: e.toISOString() });
-      current = e;
-    });
-    return result;
-  };
+  // Calcule start/end dynamiques d'après l'ordre
+  const computeSchedule = (grps: Group[]) => {
+    if (!start) return grps;
+    const items = grps.map((g) => ({ id: g.id.toString(), name: g.name }));
+    const s = new Date(start).getTime();
+    const e = end ? new Date(end).getTime() : null;
+    const totalMin = e ? (e - s) / 60000 : null;
+    const each = totalMin ? totalMin / items.length : null;
 
-  const generateByRange = (
-    startIso: string,
-    endIso: string,
-    items: Array<{ id: string; name: string }>
-  ): PassageGroup[] => {
-    const result: PassageGroup[] = [];
-    const sDate = new Date(startIso);
-    const eDate = new Date(endIso);
-    const totalMin = (eDate.getTime() - sDate.getTime()) / 60000;
-    const each = totalMin / items.length;
-    let current = sDate;
-    items.forEach((g) => {
-      const s = new Date(current);
-      const e = new Date(current.getTime() + each * 60000);
-      result.push({ id: g.id, name: g.name, start: s.toISOString(), end: e.toISOString() });
-      current = e;
+    let current = s;
+    return grps.map((g) => {
+      const st = new Date(current);
+      const en = new Date(current + (each ?? duration * 60000));
+      current = en.getTime();
+      return {
+        ...g,
+        defense: [
+          {
+            ...g.defense[0],
+            start: st.toISOString(),
+            end: en.toISOString(),
+          },
+        ],
+      };
     });
-    return result;
   };
 
   const handleGenerate = () => {
@@ -123,48 +120,36 @@ export default function SoutenanceScheduler({ project }: Props) {
       alert("Veuillez saisir une date de début valide !");
       return;
     }
-    if (end && new Date(end).toString() === "Invalid Date") {
+    if (end && isNaN(new Date(end).getTime())) {
       alert("La date de fin n’est pas valide !");
       return;
     }
-    const items = groups.map((g) => ({ id: g.id.toString(), name: g.name }));
-    const res = end
-      ? generateByRange(start, end, items)
-      : generateByDuration(start, duration, items);
-    setOrder(res);
+    const scheduled = computeSchedule(order);
+    setOrder(scheduled);
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (over && active.id !== over.id) {
       setOrder((prev) => {
-        const oldIndex = prev.findIndex((i) => i.id === active.id);
-        const newIndex = prev.findIndex((i) => i.id === over.id);
+        const oldIndex = prev.findIndex((g) => g.id.toString() === active.id);
+        const newIndex = prev.findIndex((g) => g.id.toString() === over.id);
         const reordered = arrayMove(prev, oldIndex, newIndex);
-        const items = reordered.map((g) => ({ id: g.id, name: g.name }));
-        return end
-          ? generateByRange(start, end, items)
-          : generateByDuration(start, duration, items);
+        return computeSchedule(reordered);
       });
     }
   };
-
-  // Map pour retrouver facilement les membres par groupe
-  const membersByGroup = useMemo(
-    () => new Map(groups.map(g => [g.id.toString(), g.members])),
-    [groups]
-  );
 
   return (
     <div className="space-y-6 p-6">
       <Card>
         <CardHeader title="Sélection des groupes actifs" />
         <CardContent>
-          {groups.map(g => (
+          {groups.map((g) => (
             <div key={g.id} className="mb-4">
               <div className="font-semibold">{g.name}</div>
               <div className="text-sm text-gray-600">
-                Membres : {g.members.map(m => m.firstName).join(', ')}
+                Membres : {g.members.map((m) => m.firstName).join(", ")}
               </div>
             </div>
           ))}
@@ -209,37 +194,46 @@ export default function SoutenanceScheduler({ project }: Props) {
         </CardContent>
       </Card>
 
-      {order.length > 0 && (
-        <Card>
-          <CardHeader title="Ordre de passage" />
-          <CardContent>
-            <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
-              <SortableContext
-                items={order.map((i) => i.id)}
-                strategy={verticalListSortingStrategy}
-              >
-                <ul className="space-y-2">
-                  {order.map((item) => (
-                    <SortableItem
-                      key={item.id}
-                      item={item}
-                      members={membersByGroup.get(item.id) || []}
-                    />
-                  ))}
-                </ul>
-              </SortableContext>
-            </DndContext>
-            <div className="flex space-x-4 mt-4">
-              <Button variant="outline" onClick={() => generatePdf("schedule", order)}>
-                PDF - Ordre
-              </Button>
-              <Button onClick={() => generatePdf("attendance", order)}>
-                PDF - Émargement
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      <Card>
+        <CardHeader title="Ordre de passage" />
+        <CardContent>
+          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext
+              items={order.map((g) => g.id.toString())}
+              strategy={verticalListSortingStrategy}
+            >
+              <ul className="space-y-2">
+                {order.map((g) => (
+                  <SortableItem key={g.id} group={g} />
+                ))}
+              </ul>
+            </SortableContext>
+          </DndContext>
+          <div className="flex space-x-4 mt-4">
+            <Button
+              variant="outline"
+              onClick={() =>
+                generatePdf(
+                  "schedule",
+                  order.map((g) => g.defense[0])
+                )
+              }
+            >
+              PDF – Ordre
+            </Button>
+            <Button
+              onClick={() =>
+                generatePdf(
+                  "attendance",
+                  order.map((g) => g.defense[0])
+                )
+              }
+            >
+              PDF – Émargement
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
