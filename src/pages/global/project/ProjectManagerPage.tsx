@@ -31,7 +31,7 @@ export default function ProjectListPage() {
               <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                 {filteredProjects.map((project) => (
                   <ProjectSummaryCard key={project.id} project={project} btn={
-                    <Link to={`/projets/${project.id}`}>
+                    <Link to={isStudent() ? `/students/projets/${project.id}` : `/projets/${project.id}`}>
                       <Button className="cursor-pointer">Voir les détails</Button>
                     </Link>
                   } />

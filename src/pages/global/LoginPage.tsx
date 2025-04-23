@@ -5,6 +5,8 @@ import { APP_NAME } from "@/config";
 import { Separator } from "@/components/ui/separator";
 import { sendGoogleToken } from "@/services/authentification";
 import AskSchoolModal, { School } from "@/components/auth/askSchoolModal";
+import chooseLogoColor from "@/utils/chooseLogoColor";
+import { ModeToggle } from "@/components/utils/ModeToggle";
 
 export default function LoginPage() {
   const [isRegistering, setIsRegistering] = useState(false);
@@ -34,23 +36,25 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center">
+      <div className="absolute top-4 right-4">
+        <ModeToggle />
+      </div>
       <div className="max-w-sm w-full flex flex-col items-center border rounded-lg p-6 shadow-sm">
-        <img src="/logo-no-text.png" alt="Logo" className="h-32 w-32 object-cover" />
+        <img
+          src={chooseLogoColor().logo}
+          alt="Logo"
+          className="w-20 h-20 object-cover"
+        />
         <p className="mt-4 text-xl font-bold tracking-tight">
           {isRegistering ? `Register on ${APP_NAME}` : `Log in to ${APP_NAME}`}
         </p>
 
         <div className="mt-8 w-full flex flex-col justify-center gap-4">
-          {isRegistering && (
-            <AskSchoolModal onSelect={(s) => setSchool(s)} />
-          )}
+          {isRegistering && <AskSchoolModal onSelect={(s) => setSchool(s)} />}
 
-          {/* wrappez GoogleLogin pour « désactiver » si besoin */}
           <div
             className={
-              isRegistering && !school
-                ? "pointer-events-none opacity-50"
-                : ""
+              isRegistering && !school ? "pointer-events-none opacity-50" : ""
             }
           >
             <GoogleLogin
