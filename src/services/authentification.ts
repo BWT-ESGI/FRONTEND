@@ -1,10 +1,11 @@
 import api from "../config/axios";
 import { getUserById } from "./userService";
 
-export const sendGoogleToken = async (credential: string) => {
+export const sendGoogleToken = async (credential: string, schoolName?: string) => {
   try {
     const response = await api.post('/authentication/google', {
       token: credential,
+      schoolName: schoolName,
     });
     
     if (response.data.accessToken) {

@@ -1,59 +1,96 @@
+// src/pages/LoginPage.tsx
+import { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { APP_NAME } from "@/config";
 import { Separator } from "@/components/ui/separator";
 import { sendGoogleToken } from "@/services/authentification";
-import AskSchoolModal from "@/components/auth/askSchoolModal";
+import AskSchoolModal, { School } from "@/components/auth/askSchoolModal";
 
-const LoginPage = () => {
+export default function LoginPage() {
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [school, setSchool] = useState<School | null>(null);
+
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    if (!credentialResponse.credential) return;
+
+    try {
+      let response;
+      if (isRegistering && school) {
+        response = await sendGoogleToken(credentialResponse.credential, school.name);
+      } else {
+        response = await sendGoogleToken(credentialResponse.credential);
+      }
+
+      if (response.data.accessToken) {
+        localStorage.setItem("token", response.data.accessToken);
+        window.location.href = "/dashboard";
+      } else {
+        console.error("Backend error:", response.data);
+      }
+    } catch (err) {
+      console.error("Authentication error:", err);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="max-w-sm w-full flex flex-col items-center border rounded-lg p-6 shadow-sm">
-        <div className="flex items-center justify-center">
-          <img
-            src="/logo-no-text.png"
-            alt="Logo"
-            className="h-32 w-32 object-cover"
-          />
-        </div>
+        <img src="/logo-no-text.png" alt="Logo" className="h-32 w-32 object-cover" />
         <p className="mt-4 text-xl font-bold tracking-tight">
-          Log in to {APP_NAME}
+          {isRegistering ? `Register on ${APP_NAME}` : `Log in to ${APP_NAME}`}
         </p>
+
         <div className="mt-8 w-full flex flex-col justify-center gap-4">
-          <AskSchoolModal />
-          <GoogleLogin
-            width="100%"
-            onSuccess={async (credentialResponse) => {
-              if (credentialResponse.credential) {
-                const response = await sendGoogleToken(
-                  credentialResponse.credential
-                );
-                if (response.data.accessToken) {
-                  localStorage.setItem("token", response.data.accessToken);
-                  window.location.href = "/dashboard";
-                } else {
-                  console.error("Erreur côté backend:", response.data);
-                }
-              }
-            }}
-            onError={() => {
-              console.error("Erreur lors de la connexion Google");
-            }}
-          />
+          {isRegistering && (
+            <AskSchoolModal onSelect={(s) => setSchool(s)} />
+          )}
+
+          {/* wrappez GoogleLogin pour « désactiver » si besoin */}
+          <div
+            className={
+              isRegistering && !school
+                ? "pointer-events-none opacity-50"
+                : ""
+            }
+          >
+            <GoogleLogin
+              onSuccess={handleGoogleSuccess}
+              onError={() => console.error("Google login error")}
+            />
+          </div>
         </div>
+
         <div className="my-7 w-full flex items-center justify-center overflow-hidden">
           <Separator />
         </div>
-        <div className="mt-5 space-y-5">
-          <p className="text-sm text-center">
-            Don't have an account?
-            <a href="#" className="ml-1 underline text-muted-foreground">
-              Create account
-            </a>
-          </p>
-        </div>
+
+        <p className="mt-5 text-sm text-center">
+          {isRegistering ? (
+            <>
+              Already have an account?
+              <button
+                onClick={() => {
+                  setIsRegistering(false);
+                  setSchool(null);
+                }}
+                className="ml-1 underline text-muted-foreground"
+              >
+                Log in
+              </button>
+            </>
+          ) : (
+            <>
+              Don't have an account?
+              <button
+                onClick={() => setIsRegistering(true)}
+                className="ml-1 underline text-muted-foreground"
+              >
+                Create account
+              </button>
+            </>
+          )}
+        </p>
       </div>
     </div>
   );
-};
-
-export default LoginPage;
+}

@@ -1,3 +1,4 @@
+// src/components/auth/AskSchoolModal.tsx
 import {
   AlertDialog,
   AlertDialogAction,
@@ -9,7 +10,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { CircleHelp, ExternalLink, School } from "lucide-react";
+import { CircleHelp, ExternalLink, School, SchoolIcon } from "lucide-react";
 import Divider from "@/components/layout/Divider";
 import {
   Select,
@@ -18,11 +19,19 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
+export interface School {
+  id: number;
+  name: string;
+}
 
-export default function AskSchoolModal() {
-  const schools = [
+interface AskSchoolModalProps {
+  onSelect: (school: School) => void;
+}
+
+export default function AskSchoolModal({ onSelect }: AskSchoolModalProps) {
+  const schools: School[] = [
     { id: 1, name: "ESGI" },
     { id: 2, name: "Epitech" },
     { id: 3, name: "PPA" },
@@ -55,41 +64,50 @@ export default function AskSchoolModal() {
     { id: 30, name: "Ecole Supérieure de Génie des Systèmes Complexes" },
   ];
 
-  const continueButtonRef = useRef<HTMLButtonElement>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
+  const continueBtnRef = useRef<HTMLButtonElement>(null);
+  const selectedSchool = schools.find((s) => s.id === selectedId);
+
+  const handleContinue = () => {
+    const school = schools.find((s) => s.id === selectedId);
+    if (school) {
+      onSelect(school);
+    }
+  };
 
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="outline">
-            <School className="mr-2 h-4 w-4" />
-            Votre école
+        <Button variant="outline" className="flex items-center space-x-2">
+          <SchoolIcon className="h-4 w-4" />
+          <span>
+            Votre école{selectedSchool ? ` : ${selectedSchool.name}` : ""}
+          </span>
         </Button>
       </AlertDialogTrigger>
+
       <AlertDialogContent className="overflow-hidden">
         <AlertDialogHeader className="pb-4">
           <AlertDialogTitle>
             <div className="mx-auto sm:mx-0 mb-4 flex h-9 w-9 items-center justify-center rounded-full bg-blue-500 text-blue-100">
-              <CircleHelp className="h-6 w-6 text-blue-100" />
+              <CircleHelp className="h-6 w-6" />
             </div>
             Où enseignez-vous ?
           </AlertDialogTitle>
           <AlertDialogDescription asChild>
             <div className="text-[15px]">
-              Nous avons détecté que vous n'avez pas encore renseigné votre
-              école. Merci de choisir votre école dans la liste ci-dessous.
+              Merci de choisir votre école dans la liste ci-dessous.
               <Divider className="my-4" />
               <Select
-                defaultValue="ecole1"
-                onValueChange={(value) => {
-                  console.log(value);
-                }}
+                value={selectedId?.toString() ?? ""}
+                onValueChange={(val) => setSelectedId(Number(val))}
               >
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Sélectionner une école" />
                 </SelectTrigger>
                 <SelectContent>
                   {schools.map((school) => (
-                    <SelectItem key={school.id} value={`ecole${school.id}`}>
+                    <SelectItem key={school.id} value={school.id.toString()}>
                       {school.name}
                     </SelectItem>
                   ))}
@@ -98,6 +116,7 @@ export default function AskSchoolModal() {
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>
+
         <AlertDialogFooter className="border-t -mx-6 -mb-6 px-6 py-5">
           <Button
             variant="link"
@@ -106,8 +125,9 @@ export default function AskSchoolModal() {
             Pourquoi choisir une école ? <ExternalLink />
           </Button>
           <AlertDialogAction
-            ref={continueButtonRef}
+            ref={continueBtnRef}
             className={buttonVariants()}
+            onClick={handleContinue}
           >
             Continue
           </AlertDialogAction>
