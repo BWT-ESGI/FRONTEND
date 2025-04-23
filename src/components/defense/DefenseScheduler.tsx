@@ -14,22 +14,16 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardHeader, CardContent } from "@/components/ui/card";
 
-import { fetchGroupsWithMembers } from "@/services/groupService";
+import toast from "react-hot-toast";
 import { generatePdf } from "@/services/pdfService";
-import { Group } from "@/types/group.type";
-import { User } from "@/types/user.type";
-import FlexibleAlert from "../template/FlexibleAlert";
-import { Info } from "lucide-react";
+import { fetchActiveDefensesByProject } from "@/services/defenseService";
 import { useProjectContext } from "@/contexts/ProjectContext";
+import { Defense } from "@/types/defense.type";
+import { User } from "@/types/user.type";
 
-function SortableItem({
-  group,
-}: {
-  group: Group;
-}) {
-  const defense = group.defense[0]; // on suppose 1 seul passage par groupe
+function SortableItem({ defense }: { defense: Defense }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
-    useSortable({ id: group.id.toString() });
+    useSortable({ id: defense.id });
   const style = { transform: CSS.Transform.toString(transform), transition };
 
   return (
@@ -40,15 +34,13 @@ function SortableItem({
       {...listeners}
       className="p-4 bg-white rounded-2xl shadow"
     >
-      <div className="font-bold text-lg">{group.name}</div>
-      {defense && (
-        <div className="text-sm mb-2">
-          {new Date(defense.start).toLocaleString()} —{" "}
-          {new Date(defense.end).toLocaleString()}
-        </div>
-      )}
+      <div className="font-bold text-lg">{defense.group.name}</div>
+      <div className="text-sm mb-2">
+        {new Date(defense.start).toLocaleString()} —{" "}
+        {new Date(defense.end).toLocaleString()}
+      </div>
       <div className="text-xs text-gray-600">
-        Membres : {group.members.map((m: User) => m.firstName).join(", ")}
+        Membres: {defense.group.members.map((m: User) => m.firstName).join(", ")}
       </div>
     </li>
   );
@@ -56,99 +48,111 @@ function SortableItem({
 
 export default function SoutenanceScheduler() {
   const { project } = useProjectContext();
-  const [groups, setGroups] = useState<Group[]>([]);
-  const [order, setOrder] = useState<Group[]>([]);
+  const [defenses, setDefenses] = useState<Defense[]>([]);
+  const [order, setOrder] = useState<Defense[]>([]);
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
   const [duration, setDuration] = useState(30);
 
   if (!project) return null;
 
+  // 1) Charger les défenses actives pour ce projet
   useEffect(() => {
-    fetchGroupsWithMembers(project.id.toString())
-      .then((all) => {
-        const withMembers = all.filter((g) => g.members.length > 0);
-        setGroups(withMembers);
-        setOrder(withMembers); // ordre initial = tel quel
+    fetchActiveDefensesByProject(project.id)
+      .then((data) => {
+        setDefenses(data);
+        setOrder(data);
       })
       .catch(console.error);
   }, [project.id]);
 
-  // Si aucun groupe avec membres, afficher message d'avertissement
-  if (groups.length === 0) {
+  if (defenses.length === 0) {
     return (
-        <FlexibleAlert title="Aucun groupe avec des membres n’est pour l’instant généré. Veuillez d’abord créer et peupler des groupes." icon={<Info className="!text-blue-500 text-center" />} variant="info" />
+      <div className="p-6">
+        <Card>
+          <CardHeader title="Aucun groupe disponible" />
+          <CardContent>
+            <p className="text-sm">
+              Aucun groupe avec des membres n’est pour l’instant généré.
+              Veuillez d’abord créer et peupler des groupes.
+            </p>
+          </CardContent>
+        </Card>
+      </div>
     );
   }
 
-  // Calcule start/end dynamiques d'après l'ordre
-  const computeSchedule = (grps: Group[]) => {
-    if (!start) return grps;
-    const items = grps.map((g) => ({ id: g.id.toString(), name: g.name }));
-    const s = new Date(start).getTime();
-    const e = end ? new Date(end).getTime() : null;
-    const totalMin = e ? (e - s) / 60000 : null;
-    const each = totalMin ? totalMin / items.length : null;
+  // 2) Recalcule les dates de chaque defense selon l'ordre
+  const computeSchedule = (list: Defense[]): Defense[] => {
+    const baseStartTs = start
+      ? new Date(start).getTime()
+      : new Date(list[0].start).getTime();
+    const baseEndTs = end ? new Date(end).getTime() : null;
+    const totalMin = baseEndTs !== null ? (baseEndTs - baseStartTs) / 60000 : null;
+    const each = totalMin !== null ? totalMin / list.length : null;
+    let current = baseStartTs;
 
-    let current = s;
-    return grps.map((g) => {
-      const st = new Date(current);
-      const en = new Date(current + (each ?? duration * 60000));
-      current = en.getTime();
-      return {
-        ...g,
-        defense: [
-          {
-            ...g.defense[0],
-            start: st.toISOString(),
-            end: en.toISOString(),
-          },
-        ],
-      };
+    return list.map((d) => {
+      const s = new Date(current);
+      const e = new Date(current + (each !== null ? each * 60000 : duration * 60000));
+      current = e.getTime();
+      return { ...d, start: s.toISOString(), end: e.toISOString() };
     });
   };
 
   const handleGenerate = () => {
-    if (!start) {
-      alert("Veuillez saisir une date de début valide !");
+    if (start && isNaN(new Date(start).getTime())) {
+      toast.error("La date de début n’est pas valide !");
       return;
     }
     if (end && isNaN(new Date(end).getTime())) {
-      alert("La date de fin n’est pas valide !");
+      toast.error("La date de fin n’est pas valide !");
       return;
     }
-    const scheduled = computeSchedule(order);
-    setOrder(scheduled);
+    if (start && end) {
+      const st = new Date(start).getTime();
+      const en = new Date(end).getTime();
+      if (en <= st) {
+        toast.error("La date de fin doit être supérieure à la date de début !");
+        return;
+      }
+    }
+    setOrder(computeSchedule(order));
+    toast.success("Dates recalculées !");
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
-    if (over && active.id !== over.id) {
-      setOrder((prev) => {
-        const oldIndex = prev.findIndex((g) => g.id.toString() === active.id);
-        const newIndex = prev.findIndex((g) => g.id.toString() === over.id);
-        const reordered = arrayMove(prev, oldIndex, newIndex);
-        return computeSchedule(reordered);
-      });
-    }
+    if (!over || active.id === over.id) return;
+
+    setOrder((prev) => {
+      const oldIndex = prev.findIndex((d) => d.id === active.id);
+      const newIndex = prev.findIndex((d) => d.id === over.id);
+      const reordered = arrayMove(prev, oldIndex, newIndex);
+      const updated = computeSchedule(reordered);
+      toast.success("Ordre et dates mis à jour !");
+      return updated;
+    });
   };
 
   return (
     <div className="space-y-6 p-6">
+      {/* 1ère carte : liste des groupes */}
       <Card>
-        <CardHeader title="Sélection des groupes actifs" />
+        <CardHeader title="Groupes actifs" />
         <CardContent>
-          {groups.map((g) => (
-            <div key={g.id} className="mb-4">
-              <div className="font-semibold">{g.name}</div>
+          {defenses.map((d) => (
+            <div key={d.id} className="mb-4">
+              <div className="font-semibold">{d.group.name}</div>
               <div className="text-sm text-gray-600">
-                Membres : {g.members.map((m) => m.firstName).join(", ")}
+                Membres: {d.group.members.map((m) => m.firstName).join(", ")}
               </div>
             </div>
           ))}
         </CardContent>
       </Card>
 
+      {/* Carte de paramétrage */}
       <Card>
         <CardHeader title="Génération de l'ordre de passage" />
         <CardContent className="space-y-4 grid grid-cols-2 gap-4">
@@ -187,17 +191,18 @@ export default function SoutenanceScheduler() {
         </CardContent>
       </Card>
 
+      {/* Drag & Drop pour ordonner */}
       <Card>
         <CardHeader title="Ordre de passage" />
         <CardContent>
           <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
             <SortableContext
-              items={order.map((g) => g.id.toString())}
+              items={order.map((d) => d.id)}
               strategy={verticalListSortingStrategy}
             >
               <ul className="space-y-2">
-                {order.map((g) => (
-                  <SortableItem key={g.id} group={g} />
+                {order.map((d) => (
+                  <SortableItem key={d.id} defense={d} />
                 ))}
               </ul>
             </SortableContext>
@@ -205,24 +210,12 @@ export default function SoutenanceScheduler() {
           <div className="flex space-x-4 mt-4">
             <Button
               variant="outline"
-              onClick={() =>
-                generatePdf(
-                  "schedule",
-                  order.map((g) => g.defense[0])
-                )
-              }
+              onClick={() => generatePdf("schedule", order)}
             >
-              PDF – Ordre
+              PDF – Ordre
             </Button>
-            <Button
-              onClick={() =>
-                generatePdf(
-                  "attendance",
-                  order.map((g) => g.defense[0])
-                )
-              }
-            >
-              PDF – Émargement
+            <Button onClick={() => generatePdf("attendance", order)}>
+              PDF – Émargement
             </Button>
           </div>
         </CardContent>

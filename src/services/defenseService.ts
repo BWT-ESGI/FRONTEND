@@ -10,3 +10,10 @@ export async function saveOrder(order: Defense[]): Promise<void> {
     throw new Error(error.response?.data?.message || "Impossible d'enregistrer l'ordre");
   }
 }
+
+export async function fetchActiveDefensesByProject(projectId: string): Promise<Defense[]> {
+  const { data } = await api.get<Defense[]>(`/defenses/findByActiveGroups/${projectId}`, {
+    params: { projectId }
+  })
+  return data
+}
