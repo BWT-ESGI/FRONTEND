@@ -12,6 +12,9 @@ import {
 } from "@/components/ui/sidebar";
 import { useSidebarData } from "@/hooks/useSidebarData";
 import { LucideIcon } from "lucide-react";
+import isStudent from "@/utils/isStudent";
+import chooseLogoColor from "@/utils/chooseLogoColor";
+import { APP_NAME } from "@/config";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data, loading } = useSidebarData();
@@ -23,7 +26,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <PromotionSwitcher promotions={data.promotions} />
+        {isStudent() ? (
+          <div className="flex items-center justify-center w-full py-2">
+          <img
+            src={chooseLogoColor().logoText}
+            alt={"Logo " + APP_NAME}
+            className="w-1/2"/>
+            </div>
+        ) : (
+          <PromotionSwitcher promotions={data.promotions} />)
+          }
       </SidebarHeader>
       <SidebarContent>
         <NavProjects projects={data.projects.map(project => ({
