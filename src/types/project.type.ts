@@ -20,7 +20,7 @@ export type Project = {
     status: ProjectStatus;
     groups: Group[];
     createdAt: Date;
-    updatedAt: Date;
+    endAt: Date;
     deadline: Date;
     promotion: Promotion;
 };

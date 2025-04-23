@@ -19,6 +19,8 @@ import HomeDashboardPage from "./pages/global/HomeDashboardPage";
 import IsAuthenticatedWall from "./middleware/IsAuthenticatedWall";
 import IsTeacherWall from "./middleware/IsTeacherWall";
 import ScoringGridPage from "./pages/teacher/ScoringGridPage";
+import IsStudentWall from "./middleware/IsStudentWall";
+import ProjectStudentDashboardPage from "./pages/student/ProjectStudentDashboardPage";
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -41,6 +43,10 @@ const App = () => {
 
               {/* ============== PROJET ============== */}
               <Route path="/projets" element={<ProjectManagerPage />} />
+
+              <Route element={<IsStudentWall />}>
+                <Route path="/projets/:id" element={<ProjectStudentDashboardPage />}/>
+              </Route>
 
               {/* ============== TEACHER ============== */}
               <Route element={<IsTeacherWall />}>

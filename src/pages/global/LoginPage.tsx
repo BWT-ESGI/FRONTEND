@@ -8,6 +8,13 @@ const LoginPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="max-w-sm w-full flex flex-col items-center border rounded-lg p-6 shadow-sm">
+        <div className="flex items-center justify-center">
+          <img
+            src="/logo-no-text.png"
+            alt="Logo"
+            className="h-32 w-32 object-cover"
+          />
+        </div>
         <p className="mt-4 text-xl font-bold tracking-tight">
           Log in to {APP_NAME}
         </p>

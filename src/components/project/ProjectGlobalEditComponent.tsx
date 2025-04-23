@@ -21,7 +21,7 @@ export default function ProjectGlobalEditComponent() {
     project.createdAt.toString().slice(0, 10)
   );
   const [endDate, setEndDate] = useState(
-    project.updatedAt.toString().slice(0, 10)
+    project.endAt.toString().slice(0, 10)
   );
   const [promotion] = useState(project.promotion?.name || "");
   const [loading, setLoading] = useState(false);
@@ -34,7 +34,7 @@ export default function ProjectGlobalEditComponent() {
         description,
         status,
         createdAt: new Date(startDate),
-        updatedAt: new Date(endDate),
+        endAt: new Date(endDate),
         promotion: project.promotion
           ? { ...project.promotion, name: promotion }
           : undefined,
