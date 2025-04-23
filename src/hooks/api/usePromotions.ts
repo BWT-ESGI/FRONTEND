@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Promotion } from "@/types/promotion.type";
 import { fetchPromotions } from "@/services/promotionService";
 
-export function usePromotions(userId: number) {
+export function usePromotions(userId: string) {
   const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [loading, setLoading] = useState(true);
 

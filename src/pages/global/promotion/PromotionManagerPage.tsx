@@ -14,7 +14,7 @@ import isStudent from "@/utils/isStudent";
 
 export default function PromotionManagerPage() {
   const userInfo = getUserInfoFromLocalStorage();
-  const { promotions, loading, refetch } = usePromotions(Number(userInfo?.userId));
+  const { promotions, loading, refetch } = usePromotions(userInfo?.userId || "");
   const [openModal, setOpenModal] = useState(false);
 
   const handleClose = () => {

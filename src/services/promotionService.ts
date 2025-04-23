@@ -12,7 +12,7 @@ export async function createPromotion(payload: CreatePromotionPayload) {
   return response.data;
 }
 
-export async function fetchPromotions(id: number): Promise<Promotion[]> {
+export async function fetchPromotions(id: string): Promise<Promotion[]> {
   const response = await api.get<Promotion[]>(`/promotions/user/${id}`);
   return response.data;
 }
