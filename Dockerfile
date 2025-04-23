@@ -1,5 +1,5 @@
 # Étape 1 : Build avec Node
-FROM node:22-alpine
+FROM node:22 AS builder
 
 # Créer le dossier de l'app
 WORKDIR /app
