@@ -7,6 +7,7 @@ import { sendGoogleToken } from "@/services/authentification";
 import AskSchoolModal, { School } from "@/components/auth/askSchoolModal";
 import chooseLogoColor from "@/utils/chooseLogoColor";
 import { ModeToggle } from "@/components/utils/ModeToggle";
+import toast from "react-hot-toast";
 
 export default function LoginPage() {
   const [isRegistering, setIsRegistering] = useState(false);
@@ -27,9 +28,11 @@ export default function LoginPage() {
         localStorage.setItem("token", response.data.accessToken);
         window.location.href = "/dashboard";
       } else {
+        toast.error("Impossible de vous authentifier, réessayez plus tard.");
         console.error("Backend error:", response.data);
       }
     } catch (err) {
+      toast.error("Une erreur est survenue lors de la connexion Google.");
       console.error("Authentication error:", err);
     }
   };
