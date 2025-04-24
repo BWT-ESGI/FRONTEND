@@ -10,7 +10,6 @@ import ProjectManagerPage from "./pages/global/project/ProjectManagerPage";
 import UserCreatePage from "./pages/teacher/UserCreatePage";
 import StudentRegisterPage from "@/pages/global/StudentRegisterPage";
 import HomePage from "./pages/global/HomePage";
-import ProjectCreatePage from "./pages/teacher/ProjectCreatePage";
 import { Toaster } from "react-hot-toast";
 import { QueryClient, QueryClientProvider } from "react-query";
 import ProjectDashboardWrapper from "./pages/teacher/ProjectDashboardWrapper";
@@ -31,10 +30,7 @@ const App = () => {
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<HomePage />} />
-            <Route
-              path="/auth/register/:id"
-              element={<StudentRegisterPage />}
-            />
+            <Route path="/auth/register/:id" element={<StudentRegisterPage />} />
             <Route path="/auth/login" element={<LoginPage />} />
             <Route element={<IsAuthenticatedWall />}>
               <Route path="/dashboard" element={<HomeDashboardPage />} />
@@ -56,37 +52,19 @@ const App = () => {
               {/* ============== TEACHER ============== */}
               <Route element={<IsTeacherWall />}>
                 {/* ============== PROMOTION ============== */}
-                <Route
-                  path="/promotions/:id/ajouter-etudiant"
-                  element={<PromotionAddStudentPage />}
-                />
+                <Route path="/promotions/:id/ajouter-etudiant" element={<PromotionAddStudentPage />} />
 
                 <Route path="/grille-notation" element={<ScoringGridPage />} />
 
                 {/* ============== PROJET ============== */}
-                <Route
-                  path="/projets/:id"
-                  element={<ProjectDashboardWrapper />}
-                />
-                <Route
-                  path="/projets/ajouter"
-                  element={<ProjectCreatePage />}
-                />
-                <Route
-                  path="/projets/:id/editer"
-                  element={<ProjectEditWrapper />}
-                />
+                <Route path="/projets/:id" element={<ProjectDashboardWrapper />} />
+                <Route path="/projets/:id/editer" element={<ProjectEditWrapper />} />
 
                 {/* ============== UTILISATEUR ============== */}
-                <Route
-                  path="/gestion-utilisateurs/create"
-                  element={<UserCreatePage />}
-                />
-                <Route
-                  path="/gestion-utilisateurs"
-                  element={<UserManagerPage />}
-                />
+                <Route path="/gestion-utilisateurs/create" element={<UserCreatePage />} />
+                <Route path="/gestion-utilisateurs" element={<UserManagerPage />} />
               </Route>
+
             </Route>
             <Route path="*" element={<NotFoundPage />} />
           </Routes>

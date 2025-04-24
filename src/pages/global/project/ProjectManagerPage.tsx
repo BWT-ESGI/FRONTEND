@@ -22,7 +22,7 @@ export default function ProjectListPage() {
             placeholder="Rechercher un projet..."
             rightChildren={
               isStudent() ? undefined : (
-                <Link to="/projets/ajouter">
+                <Link to="/promotions">
                   <Button>Créer un projet</Button>
                 </Link>
               )
