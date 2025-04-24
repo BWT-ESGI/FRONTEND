@@ -60,7 +60,6 @@ export default function LoginPage() {
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={() => console.error("Google login error")}
-              ux_mode="redirect"
             />
           </div>
         </div>
@@ -72,7 +71,7 @@ export default function LoginPage() {
         <p className="mt-5 text-sm text-center">
           {isRegistering ? (
             <>
-              Already have an account?
+              Déjà un compte?
               <button
                 onClick={() => {
                   setIsRegistering(false);
@@ -80,17 +79,17 @@ export default function LoginPage() {
                 }}
                 className="ml-1 underline text-muted-foreground"
               >
-                Log in
+                Se connecter
               </button>
             </>
           ) : (
             <>
-              Don't have an account?
+              Pas encore de compte?
               <button
                 onClick={() => setIsRegistering(true)}
                 className="ml-1 underline text-muted-foreground"
               >
-                Create account
+                Créer un compte
               </button>
             </>
           )}
