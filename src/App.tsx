@@ -48,6 +48,9 @@ const App = () => {
 
               <Route element={<IsStudentWall />}>
                 <Route path="/students/projets/:id" element={<ProjectStudentDashboardPage />} />
+                <Route path="/students/projets/:id/livrables" element={<ProjectStudentDashboardPage />} />
+                <Route path="/students/projets/:id/rapports" element={<ProjectStudentDashboardPage />} />
+                <Route path="/students/projets/:id/notes" element={<ProjectStudentDashboardPage />} />
               </Route>
 
               {/* ============== TEACHER ============== */}

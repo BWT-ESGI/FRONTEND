@@ -1,12 +1,11 @@
-// src/pages/LoginPage.tsx
 import { useState } from "react";
 import { GoogleLogin } from "@react-oauth/google";
 import { APP_NAME } from "@/config";
 import { Separator } from "@/components/ui/separator";
 import { sendGoogleToken } from "@/services/authentification";
 import AskSchoolModal, { School } from "@/components/auth/askSchoolModal";
-import chooseLogoColor from "@/utils/chooseLogoColor";
 import { ModeToggle } from "@/components/utils/ModeToggle";
+import getLogo from "@/utils/getLogo";
 import toast from "react-hot-toast";
 
 export default function LoginPage() {
@@ -44,7 +43,7 @@ export default function LoginPage() {
       </div>
       <div className="max-w-sm w-full flex flex-col items-center border rounded-lg p-6 shadow-sm">
         <img
-          src={chooseLogoColor().logo}
+          src={getLogo().logo}
           alt="Logo"
           className="w-20 h-20 object-cover"
         />

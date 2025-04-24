@@ -13,11 +13,12 @@ import {
 import { useSidebarData } from "@/hooks/useSidebarData";
 import { LucideIcon } from "lucide-react";
 import isStudent from "@/utils/isStudent";
-import chooseLogoColor from "@/utils/chooseLogoColor";
 import { APP_NAME } from "@/config";
+import getLogo from "@/utils/getLogo";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data, loading } = useSidebarData();
+  const logo = getLogo();
 
   if (loading || !data) {
     return null;
@@ -29,7 +30,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         {isStudent() ? (
           <div className="flex items-center justify-center w-full py-2">
           <img
-            src={chooseLogoColor().logoText}
+            src={logo.logoText}
             alt={"Logo " + APP_NAME}
             className="w-1/2"/>
             </div>

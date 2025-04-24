@@ -34,9 +34,11 @@ export default function FlexibleCard({
         {childrenRightEnd && <div>{childrenRightEnd}</div>}
       </CardHeader>
       <CardContent className="h-full">{children}</CardContent>
-      <CardFooter className="mt-auto">
-        {childrenFooter && <div className="w-full">{childrenFooter}</div>}
-      </CardFooter>
+      {childrenFooter && (
+        <CardFooter className="mt-auto">
+          {childrenFooter && <div className="w-full">{childrenFooter}</div>}
+        </CardFooter>
+      )}
     </Card>
   );
 }

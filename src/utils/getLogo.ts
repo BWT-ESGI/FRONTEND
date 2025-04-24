@@ -1,6 +1,6 @@
 import { useTheme } from "@/hooks/theme-provider";
 
-export default function chooseRightLogo() {
+export default function getLogo() {
     const { theme } = useTheme();
     const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
     

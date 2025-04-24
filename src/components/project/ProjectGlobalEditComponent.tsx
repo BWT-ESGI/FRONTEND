@@ -20,6 +20,7 @@ export default function ProjectGlobalEditComponent() {
   const [startDate, setStartDate] = useState(
     project.createdAt.toString().slice(0, 10)
   );
+
   const [endDate, setEndDate] = useState(
     project.endAt.toString().slice(0, 10)
   );

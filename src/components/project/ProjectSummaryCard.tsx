@@ -19,7 +19,7 @@ export default function ProjectSummaryCard({ project, btn = (<></>) } : ProjectS
         childrenRightEnd={<FlexibleBadge status={project.status} />}
         childrenFooter={
           <div className="flex justify-between mt-4 items-center">
-            <span className="px-2 py-1 rounded-md bg-gray-100 text-gray-600 dark:bg-gray-600/10 dark:text-gray-300">
+            <p className="text-sm text-gray-500">
               Créer le{" "}
               {new Date(project.createdAt).toLocaleString("fr-FR", {
                 day: "numeric",
@@ -28,7 +28,7 @@ export default function ProjectSummaryCard({ project, btn = (<></>) } : ProjectS
                 hour: "2-digit",
                 minute: "2-digit",
               })}
-            </span>
+            </p>
             {btn && btn}
           </div>
         }
