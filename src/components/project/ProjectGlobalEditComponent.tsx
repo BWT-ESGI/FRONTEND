@@ -18,11 +18,11 @@ export default function ProjectGlobalEditComponent() {
   const [description, setDescription] = useState(project.description || "");
   const [status, setStatus] = useState<ProjectStatus>(project.status);
   const [startDate, setStartDate] = useState(
-    project.createdAt.toString().slice(0, 10)
+    project.createdAt ? project.createdAt.toString().slice(0, 10) : ""
   );
 
   const [endDate, setEndDate] = useState(
-    project.endAt.toString().slice(0, 10)
+    project.endAt ? project.endAt.toString().slice(0, 10): ""
   );
   const [promotion] = useState(project.promotion?.name || "");
   const [loading, setLoading] = useState(false);
