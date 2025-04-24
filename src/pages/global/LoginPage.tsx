@@ -60,6 +60,7 @@ export default function LoginPage() {
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={() => console.error("Google login error")}
+              ux_mode="redirect"
             />
           </div>
         </div>
