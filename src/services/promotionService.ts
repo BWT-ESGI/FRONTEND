@@ -25,3 +25,10 @@ export async function fetchPromotionById(id: string): Promise<Promotion> {
 export async function deletePromotionById(id: string): Promise<void> {
   await api.delete(`/promotions/${id}`);
 }
+
+export async function updateStudentsPromotion(id: string, studentIds: string[]): Promise<Promotion> {
+  const response = await api.patch<Promotion>(`/promotions/${id}/edit-students`, {
+    ids: studentIds,
+  });
+  return response.data;
+}

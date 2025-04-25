@@ -22,8 +22,8 @@ import { parseCSV } from "@/utils/parseCSV";
 import { useUsers } from "@/hooks/api/useUsers";
 import UserRow from "@/components/user/UserRow";
 import FlexibleAlert from "@/components/template/FlexibleAlert";
-import api from "@/config/axios";
 import toast from "react-hot-toast";
+import { addMultipleStudents } from "@/services/userService";
 
 const userCreateSchema = z.object({
   method: z.enum(["manual", "file"]),
@@ -85,15 +85,17 @@ export default function UserCreatePage() {
 
   const onSubmit = () => {
     const usersList = form.getValues("users");
-    console.log("Liste d'étudiants à envoyer :", usersList);
-    api.post("/users/add-multiple-students", usersList)
-      .then((response) => {
-        toast.success("Étudiants ajoutés avec succès !");
-      })
+    addMultipleStudents(usersList)
+      .then(() => {
+        toast.success("Étudiants ajoutés avec succès");
+        form.reset();
+      }
+      )
       .catch((error) => {
-        console.error("Erreur lors de l'ajout des étudiants :", error);
+        console.error("Erreur lors de l'ajout des étudiants:", error);
         toast.error("Erreur lors de l'ajout des étudiants");
-      });
+      }
+      );
   };
 
   const modeOptions = [

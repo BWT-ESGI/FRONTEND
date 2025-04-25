@@ -46,7 +46,7 @@ export default function ProjectStudentDashboardPage() {
 
   const teamMembers: User[] = [
     {
-      id: 1,
+      id: "1",
       username: "johndoe",
       firstName: "John",
       lastName: "Doe",
@@ -54,7 +54,7 @@ export default function ProjectStudentDashboardPage() {
       role: "student",
     },
     {
-      id: 2,
+      id: "2",
       username: "janesmith",
       firstName: "Jane",
       lastName: "Smith",
@@ -62,7 +62,7 @@ export default function ProjectStudentDashboardPage() {
       role: "student",
     },
     {
-      id: 3,
+      id: "3",
       username: "alicejohnson",
       firstName: "Alice",
       lastName: "Johnson",

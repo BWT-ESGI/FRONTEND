@@ -17,9 +17,28 @@ export const getUserById = async (id: string): Promise<User> => {
   return response.data;
 };
 
+export async function fetchAllStudents(): Promise<User[]> {
+  const response = await api.get<User[]>("/users/students");
+  return response.data;
+}
+
 
 export async function fetchAllUsers(): Promise<User[]> {
   const response = await api.get<User[]>("/users");
-  console.log("users", response.data);
   return response.data;
+}
+
+export async function addMultipleStudents(
+  students: {
+    firstName: string;
+    lastName: string;
+    email: string;
+  }[]
+): Promise<void> {
+  try {
+    await api.post("/users/add-multiple-students", students);
+  } catch (error) {
+    console.error("Error adding multiple students:", error);
+    throw error;
+  }
 }

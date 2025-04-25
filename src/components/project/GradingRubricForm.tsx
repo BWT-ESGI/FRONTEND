@@ -57,7 +57,6 @@ const GradingRubricForm: React.FC = () => {
       name: rubricName,
       criteria: criteria,
     };
-    console.log("New Rubric: ", newRubric);
 
     setExistingRubrics([...existingRubrics, newRubric]);
 

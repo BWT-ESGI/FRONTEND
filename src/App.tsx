@@ -5,7 +5,7 @@ import { ThemeProvider } from "./hooks/theme-provider";
 import PromotionManagerPage from "./pages/global/promotion/PromotionManagerPage";
 import PromotionEditorPage from "./pages/global/promotion/PromotionEditorPage";
 import NotFoundPage from "./pages/global/NotFoundPage";
-import PromotionAddStudentPage from "./pages/teacher/PromotionAddStudentPage";
+import PromotionEditStudentPage from "./pages/teacher/PromotionEditStudentPage";
 import ProjectManagerPage from "./pages/global/project/ProjectManagerPage";
 import UserCreatePage from "./pages/teacher/UserCreatePage";
 import StudentRegisterPage from "@/pages/global/StudentRegisterPage";
@@ -52,7 +52,7 @@ const App = () => {
               {/* ============== TEACHER ============== */}
               <Route element={<IsTeacherWall />}>
                 {/* ============== PROMOTION ============== */}
-                <Route path="/promotions/:id/ajouter-etudiant" element={<PromotionAddStudentPage />} />
+                <Route path="/promotions/:id/ajouter-etudiant" element={<PromotionEditStudentPage />} />
 
                 <Route path="/grille-notation" element={<ScoringGridPage />} />
 

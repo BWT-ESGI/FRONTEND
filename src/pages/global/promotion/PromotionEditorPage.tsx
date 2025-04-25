@@ -134,7 +134,7 @@ export default function PromotionEditorPage() {
               },
               {
                 accessorKey: "deadline",
-                header: "Se termine le"
+                header: "Se termine le",
               },
             ]}
           />
@@ -147,7 +147,7 @@ export default function PromotionEditorPage() {
             isStudent() ? undefined : (
               <Button size="sm">
                 <Link to={`/promotions/${promotion.id}/ajouter-etudiant`}>
-                  Ajouter des étudiants
+                  Modifier la liste des étudiants
                 </Link>
               </Button>
             )
@@ -157,16 +157,16 @@ export default function PromotionEditorPage() {
             data={promotion.students}
             columns={[
               {
-                accessorKey: "username",
-                header: "Nom d'utilisateur",
-              },
-              {
                 accessorKey: "firstName",
                 header: "Prénom",
               },
               {
                 accessorKey: "lastName",
                 header: "Nom de famille",
+              },
+              {
+                accessorKey: "username",
+                header: "Nom d'utilisateur",
               },
               {
                 accessorKey: "email",

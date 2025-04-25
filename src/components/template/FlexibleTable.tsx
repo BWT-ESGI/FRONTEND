@@ -82,7 +82,6 @@ export default function FlexibleTable<T extends object>({
   columns?: ColumnDef<T>[];
 }) {
   const finalColumns = columns || generateColumns(data);
-  console.log("Final columns", finalColumns); 
 
   const [globalFilter, setGlobalFilter] = React.useState<string>("");
   const [searchQuery, setSearchQuery] = React.useState<string>("");
