@@ -53,17 +53,44 @@ export default function GroupBuilder() {
   };
 
   const handleGenerateRandom = () => {
-    const shuffled = [...initialUsers, ...initialGroups.flatMap(g => g.members)]
-      .sort(() => Math.random() - 0.5);
+    // Vérification des bornes
+    if (minSize <= 0 || maxSize <= 0) {
+      toast.error("Veuillez définir des tailles minimales et maximales correctes.");
+      return;
+    }
+    if (minSize > maxSize) {
+      toast.error("La taille minimale ne peut pas être supérieure à la taille maximale.");
+      return;
+    }
+  
+    // Mélange aléatoire de tous les utilisateurs
+    const all = [...initialUsers, ...initialGroups.flatMap(g => g.members)];
+    const shuffled = all.sort(() => Math.random() - 0.5);
+  
+    // Prépare les groupes vides
     const newGroups = initialGroups.map(g => ({ ...g, members: [] as User[] }));
-    shuffled.forEach((user, idx) => {
-      const target = newGroups[idx % newGroups.length];
-      if (target.members.length < maxSize) target.members.push(user);
-      else {
-        const next = newGroups.find(gr => gr.members.length < maxSize);
-        next?.members.push(user);
+  
+    let idx = 0;
+    // 1) Attribution du minimum à chaque groupe
+    for (let g of newGroups) {
+      for (let i = 0; i < minSize && idx < shuffled.length; i++) {
+        g.members.push(shuffled[idx++]);
       }
-    });
+    }
+  
+    // 2) Répartition du reste sans dépasser maxSize
+    while (idx < shuffled.length) {
+      let somethingAssigned = false;
+      for (let g of newGroups) {
+        if (idx >= shuffled.length) break;
+        if (g.members.length < maxSize) {
+          g.members.push(shuffled[idx++]);
+          somethingAssigned = true;
+        }
+      }
+      if (!somethingAssigned) break;
+    }
+  
     setGroups(newGroups);
     setUsers([]);
   };
