@@ -1,5 +1,5 @@
 import { cn } from "@/lib/utils";
-import { IconLayoutNavbarCollapse } from "@tabler/icons-react";
+/* import { ArrowUp } from "lucide-react"; */
 import {
   AnimatePresence,
   motion,
@@ -13,7 +13,7 @@ import { useRef, useState } from "react";
 export const FloatingDock = ({
   items,
   desktopClassName,
-  mobileClassName,
+/*   mobileClassName, */
 }: {
   items: {
     title: string;
@@ -27,12 +27,12 @@ export const FloatingDock = ({
   return (
     <>
       <FloatingDockDesktop items={items} className={desktopClassName} />
-      <FloatingDockMobile items={items} className={mobileClassName} />
+      {/* <FloatingDockMobile items={items} className={mobileClassName} /> */}
     </>
   );
 };
 
-const FloatingDockMobile = ({
+/* const FloatingDockMobile = ({
   items,
   className,
 }: {
@@ -89,11 +89,11 @@ const FloatingDockMobile = ({
         onClick={() => setOpen(!open)}
         className="flex h-10 w-10 items-center justify-center rounded-full bg-gray-50 dark:bg-neutral-800"
       >
-        <IconLayoutNavbarCollapse className="h-5 w-5 text-neutral-500 dark:text-neutral-400" />
+        <ArrowUp />
       </button>
     </div>
   );
-};
+}; */
 
 const FloatingDockDesktop = ({
   items,

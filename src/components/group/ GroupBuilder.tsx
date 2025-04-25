@@ -3,6 +3,8 @@ import {
   DndContext,
   closestCenter,
   DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
   useDraggable,
   useDroppable,
 } from "@dnd-kit/core";
@@ -18,8 +20,11 @@ import { User } from "@/types/user.type";
 import { Group } from "@/types/group.type";
 import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
-import { Shuffle } from "lucide-react";
+import { ArrowDown, ArrowUp, OctagonX, Shuffle } from "lucide-react";
 import { useProjectContext } from "@/contexts/ProjectContext";
+import { Avatar, AvatarFallback } from "../ui/avatar";
+import Divider from "../layout/Divider";
+import FlexibleAlert from "../template/FlexibleAlert";
 
 export default function GroupBuilder() {
   const { project } = useProjectContext();
@@ -35,10 +40,17 @@ export default function GroupBuilder() {
   const [initialUsers, setInitialUsers] = useState<User[]>([]);
   const [initialGroups, setInitialGroups] = useState<Group[]>([]);
 
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const activeUser = users.find(u => u.id === activeId);
+
+  const totalSlots = groups.length * maxSize;
+  const assignedCount = initialGroups.reduce((sum, g) => sum + g.members.length, 0);
+  const totalStudents = initialUsers.length + assignedCount;
+
   useEffect(() => {
     (async () => {
       if (!projectId) return;
-      const data = await fetchGroupBuilderDataByProject(projectId);
+  const data = await fetchGroupBuilderDataByProject(projectId);
       setUsers(data.users);
       setGroups(data.groups);
       setInitialUsers(data.users);
@@ -53,7 +65,6 @@ export default function GroupBuilder() {
   };
 
   const handleGenerateRandom = () => {
-    // Vérification des bornes
     if (minSize <= 0 || maxSize <= 0) {
       toast.error("Veuillez définir des tailles minimales et maximales correctes.");
       return;
@@ -63,22 +74,18 @@ export default function GroupBuilder() {
       return;
     }
   
-    // Mélange aléatoire de tous les utilisateurs
     const all = [...initialUsers, ...initialGroups.flatMap(g => g.members)];
     const shuffled = all.sort(() => Math.random() - 0.5);
   
-    // Prépare les groupes vides
     const newGroups = initialGroups.map(g => ({ ...g, members: [] as User[] }));
   
     let idx = 0;
-    // 1) Attribution du minimum à chaque groupe
     for (let g of newGroups) {
       for (let i = 0; i < minSize && idx < shuffled.length; i++) {
         g.members.push(shuffled[idx++]);
       }
     }
   
-    // 2) Répartition du reste sans dépasser maxSize
     while (idx < shuffled.length) {
       let somethingAssigned = false;
       for (let g of newGroups) {
@@ -134,6 +141,7 @@ export default function GroupBuilder() {
       )
     );
     setUsers(prev => prev.filter(u => u.id !== user.id));
+    setActiveId(null);
   };
 
   const DraggableUser = ({ user }: { user: User }) => {
@@ -145,7 +153,7 @@ export default function GroupBuilder() {
         {...listeners}
         {...attributes}
         className={cn(
-          "p-2 border rounded cursor-move bg-white dark:bg-muted",
+          "flex flex-row items-center p-2 border rounded-lg shadow-sm cursor-move bg-white dark:bg-muted gap-2",
           isDragging && "opacity-50"
         )}
         style={{
@@ -154,7 +162,15 @@ export default function GroupBuilder() {
             : undefined,
         }}
       >
-        {user.firstName} {user.lastName}
+        <Avatar className="h-6 w-6 rounded-md">
+          <AvatarFallback className="rounded text-sm">
+            {user.firstName[0]}
+            {user.lastName[0]}
+          </AvatarFallback>
+        </Avatar>
+        <p className="text-sm">
+          {user.firstName} {user.lastName}
+        </p>
       </div>
     );
   };
@@ -171,23 +187,29 @@ export default function GroupBuilder() {
       <div
         ref={setNodeRef}
         className={cn(
-          "w-full min-h-[220px] border rounded p-5 text-base bg-muted transition-colors duration-200",
+          "w-full min-h-[220px] border rounded p-5 text-base transition-colors duration-200",
           isOver ? "bg-blue-100 dark:bg-blue-900/30" : ""
         )}
       >
         <h4 className="font-semibold mb-3">{group.name}</h4>
-        <div className="space-y-2">
-          {group.members.map(member => (
+        <div className="space-y-1">
+          {group.members.map((member) => (
             <div
               key={member.id}
-              className="flex items-center justify-between text-sm text-muted-foreground border px-3 py-1 rounded bg-white dark:bg-background"
+              className="flex flex-row items-center p-2 border rounded-lg shadow-sm cursor-move bg-white dark:bg-muted gap-2"
             >
-              <span>
+              <Avatar className="h-6 w-6 rounded-md">
+                <AvatarFallback className="rounded text-sm">
+                  {member.firstName[0]}
+                  {member.lastName[0]}
+                </AvatarFallback>
+              </Avatar>
+              <p className="text-sm">
                 {member.firstName} {member.lastName}
-              </span>
+              </p>
               <button
                 onClick={() => onRemoveUser(member)}
-                className="text-red-500 hover:text-red-700"
+                className="text-red-500 hover:text-red-700 ml-auto"
                 title="Retirer du groupe"
               >
                 ✕
@@ -201,6 +223,13 @@ export default function GroupBuilder() {
 
   return (
     <div className="space-y-6">
+      {totalStudents > totalSlots && (
+        <FlexibleAlert
+          variant="error"
+          title={`Il y a ${totalStudents} étudiants au total, mais seulement ${totalSlots} places disponibles dans les groupes.`}
+          icon={<OctagonX className="!text-red-500 text-center" />}
+        />
+      )}
       <div className="flex justify-center space-x-4 ">
         {mode === "random" && (
           <Button onClick={handleGenerateRandom} variant="outline">
@@ -210,13 +239,31 @@ export default function GroupBuilder() {
         <Button onClick={resetGroups} variant="outline">
           Réinitialiser
         </Button>
-        <Button onClick={handleSave}>Enregistrer</Button>
+        <Button onClick={() => handleSave()}>Enregistrer</Button>
       </div>
-      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <DndContext
+        collisionDetection={closestCenter}
+        autoScroll={{
+          threshold: { x: 0, y: 0.1 },
+          layoutShiftCompensation: false,
+        }}
+        onDragStart={(event: DragStartEvent) =>
+          setActiveId(event.active.id as string)
+        }
+        onDragEnd={handleDragEnd}
+        onDragCancel={() => setActiveId(null)}
+      >
+        <DragOverlay>
+          {activeUser ? <DraggableUser user={activeUser} /> : null}
+        </DragOverlay>
         <div className="grid gap-6 grid-cols-[minmax(250px,1fr)_minmax(0,3fr)]">
           <div className="pr-4">
             <h3 className="text-lg font-bold mb-3">Étudiants disponibles</h3>
-            <div className="space-y-2">
+            <p className="text-sm text-muted-foreground mb-2">
+              Nombre d'étudiants: {users.length}
+            </p>
+            <Divider className="my-2 mt-0" />
+            <div className="space-y-1 max-h-[600px] overflow-y-auto">
               {users.map((user) => (
                 <DraggableUser key={user.id} user={user} />
               ))}
@@ -224,7 +271,11 @@ export default function GroupBuilder() {
           </div>
           <div className="space-y-4 w-full">
             <h3 className="text-lg font-bold">
-              Groupes (min : {minSize}, max : {maxSize})
+              Groupes{" "}
+              <ArrowDown className="text-red-500 inline-block text-xs" />{" "}
+              {minSize} Minimum -{" "}
+              <ArrowUp className="text-green-500 inline-block text-xs" />{" "}
+              {maxSize} Maximum
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
               {groups.map((g) => (
@@ -262,7 +313,7 @@ export default function GroupBuilder() {
         <Button onClick={resetGroups} variant="outline">
           Réinitialiser
         </Button>
-        <Button onClick={handleSave}>Enregistrer</Button>
+        <Button onClick={() => handleSave()}>Enregistrer</Button>
       </div>
     </div>
   );
