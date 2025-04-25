@@ -17,3 +17,11 @@ export async function fetchActiveDefensesByProject(projectId: string): Promise<D
   })
   return data
 }
+
+export async function updateDefense(
+  defenseId: string,
+  payload: { start: string; end: string }
+): Promise<Defense> {
+  const { data } = await api.patch<Defense>(`/defenses/${defenseId}`, payload);
+  return data;
+}

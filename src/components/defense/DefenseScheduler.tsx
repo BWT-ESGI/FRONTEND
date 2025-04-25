@@ -1,4 +1,3 @@
-// src/components/defense/SoutenanceScheduler.tsx
 import { useEffect, useState } from "react";
 import { DndContext, closestCenter, DragEndEvent } from "@dnd-kit/core";
 import {
@@ -16,7 +15,10 @@ import { Card, CardHeader, CardContent } from "@/components/ui/card";
 
 import toast from "react-hot-toast";
 import { generatePdf } from "@/services/pdfService";
-import { fetchActiveDefensesByProject } from "@/services/defenseService";
+import {
+  fetchActiveDefensesByProject,
+  updateDefense,
+} from "@/services/defenseService";
 import { useProjectContext } from "@/contexts/ProjectContext";
 import { Defense } from "@/types/defense.type";
 import { User } from "@/types/user.type";
@@ -40,7 +42,8 @@ function SortableItem({ defense }: { defense: Defense }) {
         {new Date(defense.end).toLocaleString()}
       </div>
       <div className="text-xs text-gray-600">
-        Membres: {defense.group.members.map((m: User) => m.firstName).join(", ")}
+        Membres:{" "}
+        {defense.group.members.map((m: User) => m.firstName).join(", ")}
       </div>
     </li>
   );
@@ -62,6 +65,18 @@ export default function SoutenanceScheduler() {
       .then((data) => {
         setDefenses(data);
         setOrder(data);
+
+        if (data.length > 0) {
+          // Préremplir les inputs à partir des dates existantes
+          const first = new Date(data[0].start);
+          const last = new Date(data[data.length - 1].end);
+          setStart(first.toISOString().slice(0, 16));
+          setEnd(last.toISOString().slice(0, 16));
+
+          // Calculer duration si besoin
+          const totalMin = (last.getTime() - first.getTime()) / 60000;
+          setDuration(Math.round(totalMin / data.length));
+        }
       })
       .catch(console.error);
   }, [project.id]);
@@ -82,19 +97,22 @@ export default function SoutenanceScheduler() {
     );
   }
 
-  // 2) Recalcule les dates de chaque defense selon l'ordre
+  // 2) Recalcule les dates selon l'ordre
   const computeSchedule = (list: Defense[]): Defense[] => {
     const baseStartTs = start
       ? new Date(start).getTime()
       : new Date(list[0].start).getTime();
     const baseEndTs = end ? new Date(end).getTime() : null;
-    const totalMin = baseEndTs !== null ? (baseEndTs - baseStartTs) / 60000 : null;
+    const totalMin =
+      baseEndTs !== null ? (baseEndTs - baseStartTs) / 60000 : null;
     const each = totalMin !== null ? totalMin / list.length : null;
     let current = baseStartTs;
 
     return list.map((d) => {
       const s = new Date(current);
-      const e = new Date(current + (each !== null ? each * 60000 : duration * 60000));
+      const e = new Date(
+        current + (each !== null ? each * 60000 : duration * 60000)
+      );
       current = e.getTime();
       return { ...d, start: s.toISOString(), end: e.toISOString() };
     });
@@ -124,20 +142,38 @@ export default function SoutenanceScheduler() {
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-
     setOrder((prev) => {
       const oldIndex = prev.findIndex((d) => d.id === active.id);
       const newIndex = prev.findIndex((d) => d.id === over.id);
-      const reordered = arrayMove(prev, oldIndex, newIndex);
-      const updated = computeSchedule(reordered);
-      toast.success("Ordre et dates mis à jour !");
-      return updated;
+      return computeSchedule(arrayMove(prev, oldIndex, newIndex));
     });
+  };
+
+  const handleSave = async () => {
+    try {
+      // 3) Mettre à jour chaque défense côté backend,
+      // puis merger le `group` / `members` d'origine
+      const updated = await Promise.all(
+        order.map((d) =>
+          updateDefense(d.id, { start: d.start, end: d.end })
+        )
+      );
+      const merged = updated.map((u) => {
+        const orig = order.find((d) => d.id === u.id)!;
+        return { ...u, group: orig.group };
+      });
+      setOrder(merged);
+      setDefenses(merged);
+      toast.success("Dates et ordre enregistrés !");
+    } catch (err) {
+      console.error(err);
+      toast.error("Erreur lors de l'enregistrement des soutenances.");
+    }
   };
 
   return (
     <div className="space-y-6 p-6">
-      {/* 1ère carte : liste des groupes */}
+      {/* Carte 1 : Groupes actifs */}
       <Card>
         <CardHeader title="Groupes actifs" />
         <CardContent>
@@ -145,14 +181,14 @@ export default function SoutenanceScheduler() {
             <div key={d.id} className="mb-4">
               <div className="font-semibold">{d.group.name}</div>
               <div className="text-sm text-gray-600">
-                Membres: {d.group.members.map((m) => m.firstName).join(", ")}
+                Membres : {d.group.members.map((m) => m.firstName).join(", ")}
               </div>
             </div>
           ))}
         </CardContent>
       </Card>
 
-      {/* Carte de paramétrage */}
+      {/* Carte 2 : Paramétrage */}
       <Card>
         <CardHeader title="Génération de l'ordre de passage" />
         <CardContent className="space-y-4 grid grid-cols-2 gap-4">
@@ -166,7 +202,7 @@ export default function SoutenanceScheduler() {
             />
           </div>
           <div>
-            <Label htmlFor="end">Date et heure de fin (optionnel)</Label>
+            <Label htmlFor="end">Date et heure de fin</Label>
             <Input
               id="end"
               type="datetime-local"
@@ -191,7 +227,7 @@ export default function SoutenanceScheduler() {
         </CardContent>
       </Card>
 
-      {/* Drag & Drop pour ordonner */}
+      {/* Carte 3 : Ordre, DnD, PDF, Enregistrer */}
       <Card>
         <CardHeader title="Ordre de passage" />
         <CardContent>
@@ -217,6 +253,7 @@ export default function SoutenanceScheduler() {
             <Button onClick={() => generatePdf("attendance", order)}>
               PDF – Émargement
             </Button>
+            <Button onClick={handleSave}>Enregistrer</Button>
           </div>
         </CardContent>
       </Card>
