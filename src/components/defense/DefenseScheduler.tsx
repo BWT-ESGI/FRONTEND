@@ -22,9 +22,8 @@ import {
 import { useProjectContext } from "@/contexts/ProjectContext";
 import { Defense } from "@/types/defense.type";
 import { User } from "@/types/user.type";
-import { Avatar } from "../ui/avatar";
-import { AvatarFallback } from "@radix-ui/react-avatar";
 import FlexibleCard from "../template/FlexibleCard";
+import { FileSpreadsheet } from "lucide-react";
 
 function SortableItem({ defense }: { defense: Defense }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -174,12 +173,13 @@ export default function SoutenanceScheduler() {
 
   return (
     <div className="space-y-4">
-      <FlexibleCard title="Génération de l'ordre de passage"
-      childrenFooter={
-        <div className="flex">
-          <Button onClick={handleGenerate}>Générer</Button>
-        </div>
-      }
+      <FlexibleCard
+        title="Génération de l'ordre de passage"
+        childrenFooter={
+          <div className="flex">
+            <Button onClick={handleGenerate}>Générer</Button>
+          </div>
+        }
       >
         <div className="space-y-4 grid grid-cols-2 gap-4">
           <div>
@@ -218,6 +218,20 @@ export default function SoutenanceScheduler() {
 
       <FlexibleCard title="Ordre de passage">
         <div>
+          <div className="flex space-x-4 mb-4">
+            <Button
+              variant="outline"
+              onClick={() => generatePdf("schedule", order)}
+            >
+              <FileSpreadsheet className="h-4 w-4" />
+              PDF – Ordre
+            </Button>
+            <Button onClick={() => generatePdf("attendance", order)}>
+              <FileSpreadsheet className="h-4 w-4" />
+              PDF – Émargement
+            </Button>
+            <Button onClick={handleSave}>Enregistrer</Button>
+          </div>
           <DndContext
             collisionDetection={closestCenter}
             onDragEnd={handleDragEnd}
@@ -238,9 +252,11 @@ export default function SoutenanceScheduler() {
               variant="outline"
               onClick={() => generatePdf("schedule", order)}
             >
+              <FileSpreadsheet className="h-4 w-4" />
               PDF – Ordre
             </Button>
             <Button onClick={() => generatePdf("attendance", order)}>
+              <FileSpreadsheet className="h-4 w-4" />
               PDF – Émargement
             </Button>
             <Button onClick={handleSave}>Enregistrer</Button>

@@ -35,9 +35,9 @@ export default function ProjectSummaryCard({ project, btn = (<></>) } : ProjectS
       >
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <strong>Étudiants par groupe : </strong>
+            <strong>Groupe : </strong>
             <FlexibleBadge status={project.groupCompositionType} noDot />
-            {project.nbGroups > 0 && (
+            {/* {project.nbGroups > 0 && (
               <FlexibleBadge
                 status="custom"
                 noDot
@@ -45,7 +45,7 @@ export default function ProjectSummaryCard({ project, btn = (<></>) } : ProjectS
                   project.nbGroups > 1 ? "s" : ""
                 }`}
               />
-            )}
+            )} */}
           </div>
           <div className="flex items-center gap-2 mt-1">
             <span>{project.nbStudentsMinPerGroup}</span>

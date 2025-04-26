@@ -7,9 +7,13 @@ import { Project } from "@/types/project.type";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import isStudent from "@/utils/isStudent";
+import getUserInfoFromLocalStorage from "@/utils/getUserInfoFromLocalStorage";
 
 export default function ProjectListPage() {
   const { projects, loading } = useProjects();
+  const userInfo = getUserInfoFromLocalStorage();
+  const userId = userInfo?.userId;
+  const isStudentUser = isStudent();
 
   return (
     <DashboardLayout>
@@ -21,7 +25,7 @@ export default function ProjectListPage() {
             data={projects.filter(Boolean) as Project[]}
             placeholder="Rechercher un projet..."
             rightChildren={
-              isStudent() ? undefined : (
+              isStudentUser ? undefined : (
                 <Link to="/promotions">
                   <Button>Créer un projet</Button>
                 </Link>
@@ -29,13 +33,23 @@ export default function ProjectListPage() {
             }
             render={(filteredProjects) => (
               <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-                {filteredProjects.map((project) => (
-                  <ProjectSummaryCard key={project.id} project={project} btn={
-                    <Link to={isStudent() ? `/students/projets/${project.id}` : `/projets/${project.id}`}>
-                      <Button className="cursor-pointer">Voir les détails</Button>
-                    </Link>
-                  } />
-                ))}
+                {filteredProjects.map((project) => {
+                  const hasGroup = project.groups?.some(g =>
+                    g.members.some(m => m.id === userId)
+                  );
+                  return (
+                    <ProjectSummaryCard key={project.id} project={project} btn={
+                      isStudentUser && project.groupCompositionType === "student_choice" && !hasGroup ? (
+                        <Link to={`/students/projets/${project.id}/rejoindre`}>
+                          <Button className="cursor-pointer">Rejoindre un groupe</Button>
+                        </Link>
+                      ) :  (
+                        <Link to={isStudentUser ? `/students/projets/${project.id}` : `/projets/${project.id}`}>
+                          <Button className="cursor-pointer">Voir les détails</Button>
+                        </Link>)
+                    } />
+                  );
+                })}
               </div>
             )}
           />

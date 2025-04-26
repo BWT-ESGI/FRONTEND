@@ -1,25 +1,26 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import LoginPage from "@/pages/global/LoginPage";
-import UserManagerPage from "./pages/teacher/UserManagerPage";
-import { ThemeProvider } from "./hooks/theme-provider";
-import PromotionManagerPage from "./pages/global/promotion/PromotionManagerPage";
-import PromotionEditorPage from "./pages/global/promotion/PromotionEditorPage";
-import NotFoundPage from "./pages/global/NotFoundPage";
-import PromotionEditStudentPage from "./pages/teacher/PromotionEditStudentPage";
-import ProjectManagerPage from "./pages/global/project/ProjectManagerPage";
-import UserCreatePage from "./pages/teacher/UserCreatePage";
-import StudentRegisterPage from "@/pages/global/StudentRegisterPage";
-import HomePage from "./pages/global/HomePage";
 import { Toaster } from "react-hot-toast";
+import LoginPage from "@/pages/global/LoginPage";
+import UserManagerPage from "@/pages/teacher/UserManagerPage";
+import { ThemeProvider } from "./hooks/theme-provider";
+import PromotionManagerPage from "@/pages/global/promotion/PromotionManagerPage";
+import PromotionEditorPage from "@/pages/global/promotion/PromotionEditorPage";
+import NotFoundPage from "@/pages/global/NotFoundPage";
+import PromotionEditStudentPage from "@/pages/teacher/PromotionEditStudentPage";
+import ProjectListPage from "@/pages/global/project/ProjectListPage";
+import UserCreatePage from "@/pages/teacher/UserCreatePage";
+import StudentRegisterPage from "@/pages/global/StudentRegisterPage";
+import HomePage from "@/pages/global/HomePage";
 import { QueryClient, QueryClientProvider } from "react-query";
-import ProjectDashboardWrapper from "./pages/teacher/ProjectDashboardWrapper";
-import ProjectEditWrapper from "./pages/teacher/ProjectEditWrapper";
-import HomeDashboardPage from "./pages/global/HomeDashboardPage";
-import IsAuthenticatedWall from "./middleware/IsAuthenticatedWall";
-import IsTeacherWall from "./middleware/IsTeacherWall";
-import ScoringGridPage from "./pages/teacher/ScoringGridPage";
-import IsStudentWall from "./middleware/IsStudentWall";
-import ProjectStudentDashboardPage from "./pages/student/ProjectStudentDashboardPage";
+import ProjectDashboardWrapper from "@/pages/teacher/ProjectDashboardWrapper";
+import ProjectEditWrapper from "@/pages/teacher/ProjectEditWrapper";
+import HomeDashboardPage from "@/pages/global/HomeDashboardPage";
+import IsAuthenticatedWall from "@/middleware/IsAuthenticatedWall";
+import IsTeacherWall from "@/middleware/IsTeacherWall";
+import ScoringGridPage from "@/pages/teacher/ScoringGridPage";
+import IsStudentWall from "@/middleware/IsStudentWall";
+import ProjectStudentDashboardPage from "@/pages/student/ProjectStudentDashboardPage";
+import JoinGroupProjectPage from "@/pages/student/JoinGroupProjectPage";
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -40,13 +41,14 @@ const App = () => {
               <Route path="/promotions/:id" element={<PromotionEditorPage />} />
 
               {/* ============== PROJET ============== */}
-              <Route path="/projets" element={<ProjectManagerPage />} />
 
               <Route element={<IsStudentWall />}>
+                <Route path="/students/projets" element={<ProjectListPage />} />
                 <Route path="/students/projets/:id" element={<ProjectStudentDashboardPage />} />
                 <Route path="/students/projets/:id/livrables" element={<ProjectStudentDashboardPage />} />
                 <Route path="/students/projets/:id/rapports" element={<ProjectStudentDashboardPage />} />
                 <Route path="/students/projets/:id/notes" element={<ProjectStudentDashboardPage />} />
+                <Route path="/students/projets/:id/rejoindre" element={<JoinGroupProjectPage />} />
               </Route>
 
               {/* ============== TEACHER ============== */}
@@ -57,6 +59,7 @@ const App = () => {
                 <Route path="/grille-notation" element={<ScoringGridPage />} />
 
                 {/* ============== PROJET ============== */}
+                <Route path="/projets" element={<ProjectListPage />} />
                 <Route path="/projets/:id" element={<ProjectDashboardWrapper />} />
                 <Route path="/projets/:id/editer" element={<ProjectEditWrapper />} />
 

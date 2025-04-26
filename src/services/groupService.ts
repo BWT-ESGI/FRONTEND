@@ -62,3 +62,11 @@ export async function fetchGroupsWithMembers(
   const response = await api.get<Group[]>(`/groups/by-project/${projectId}`);
   return response.data;
 }
+
+export async function leaveGroup(groupId: string, userId: string) {
+  return await api.delete(`/groups/${groupId}/students/${userId}/leave`);
+}
+
+export async function joinGroup(groupId: string, userId: string) {
+  return await api.post(`/groups/${groupId}/students/${userId}/join`);
+}

@@ -24,10 +24,3 @@ export async function updateProject(
   const response = await api.patch(`/projects/${projectId}`, payload);
   return response.data;
 }
-
-export async function getProjectDetailedById(
-  projectId: string
-): Promise<Project | null> {
-  const response = await api.get(`/projects/findProjectForStudent/${projectId}`);
-  return response.data;
-}

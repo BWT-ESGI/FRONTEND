@@ -30,7 +30,7 @@ export function useSidebarData() {
   const baseNavData = [
     {
       name: "Projets",
-      url: "/projets",
+      url: {isStudent: "/students/projets", isTeacher: "/projets"}[isStudent() ? "isStudent" : "isTeacher"],
       icon: FolderOpenDot,
     },
     {

@@ -4,7 +4,7 @@ import FlexibleCard from "../template/FlexibleCard";
 import FlexibleAlert from "../template/FlexibleAlert";
 
 interface GroupMemberCardProps {
-  members: User[];
+  members: User[] | undefined;
   className: string;
 }
 

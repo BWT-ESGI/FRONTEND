@@ -15,20 +15,26 @@ import {
   fetchGroupBuilderDataByProject,
   saveGroupsForProject,
   updateProjectConfig,
+  joinGroup,
 } from "@/services/groupService";
 import { User } from "@/types/user.type";
 import { Group } from "@/types/group.type";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { ArrowDown, ArrowUp, OctagonX, Shuffle } from "lucide-react";
 import { useProjectContext } from "@/contexts/ProjectContext";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import Divider from "../layout/Divider";
 import FlexibleAlert from "../template/FlexibleAlert";
+import isStudent from "@/utils/isStudent";
+import getUserInfoFromLocalStorage from "@/utils/getUserInfoFromLocalStorage";
 
 export default function GroupBuilder() {
+  const navigate = useNavigate();
   const { project } = useProjectContext();
   const { id: projectId } = useParams<{ id: string }>();
+  const userIsStudent = isStudent();
+  const currentUserId = getUserInfoFromLocalStorage()?.userId;
 
   const mode = project?.groupCompositionType ?? "manual";
   const minSize = project?.nbStudentsMinPerGroup ?? 0;
@@ -50,7 +56,7 @@ export default function GroupBuilder() {
   useEffect(() => {
     (async () => {
       if (!projectId) return;
-  const data = await fetchGroupBuilderDataByProject(projectId);
+      const data = await fetchGroupBuilderDataByProject(projectId);
       setUsers(data.users);
       setGroups(data.groups);
       setInitialUsers(data.users);
@@ -106,22 +112,41 @@ export default function GroupBuilder() {
   const handleSave = async () => {
     if (!projectId) return;
     try {
-      await saveGroupsForProject(projectId, groups);
-      await updateProjectConfig(projectId, {
-        nbStudentsMinPerGroup: minSize,
-        nbStudentsMaxPerGroup: maxSize,
-        groupCompositionType: mode,
-        nbGroups: groups.length,
-        deadline: deadline?.toISOString(),
-      });
-      toast.success("Groupes et configuration enregistrés !");
-    } catch {
-      toast.error("Erreur lors de l'enregistrement des groupes.");
+      if (userIsStudent) {
+        const studentGroup = groups.find(g =>
+          g.members.some(m => m.id === currentUserId)
+        );
+        if (!studentGroup) {
+          toast.error("Vous devez d'abord rejoindre un groupe.");
+          return;
+        }
+        if (currentUserId) {
+          await joinGroup(studentGroup.id, currentUserId);
+        } else {
+          toast.error("Utilisateur non identifié.");
+          return;
+        }
+        toast.success("Votre affectation a été enregistrée.");
+        navigate(`/students/projets/${projectId}`);
+      } else {
+        await saveGroupsForProject(projectId, groups);
+        await updateProjectConfig(projectId, {
+          nbStudentsMinPerGroup: minSize,
+          nbStudentsMaxPerGroup: maxSize,
+          groupCompositionType: mode,
+          nbGroups: groups.length,
+          deadline: deadline?.toISOString(),
+        });
+        toast.success("Groupes et configuration enregistrés !");
+      }
+    } catch (error) {
+      console.error(error);
+      toast.error("Erreur lors de l'enregistrement.");
     }
   };
 
   const handleDragEnd = (event: DragEndEvent) => {
-    if (mode !== "manual") return;
+    if (mode === "random") return;
 
     if (minSize <= 0 || maxSize <= 0) {
       toast.error("Veuillez définir le nombre mini/maxi d'étudiants par groupe avant de déplacer.");
@@ -148,14 +173,18 @@ export default function GroupBuilder() {
   const DraggableUser = ({ user }: { user: User }) => {
     const { attributes, listeners, setNodeRef, transform, isDragging } =
       useDraggable({ id: user.id });
+
+    const canDrag = !userIsStudent || user.id === currentUserId;
+
     return (
       <div
         ref={setNodeRef}
-        {...listeners}
-        {...attributes}
+        {...(canDrag ? listeners : {})}
+        {...(canDrag ? attributes : {})}
         className={cn(
-          "flex flex-row items-center p-2 border rounded-lg shadow-sm cursor-move bg-white dark:bg-muted gap-2",
-          isDragging && "opacity-50"
+          "flex flex-row items-center p-2 border rounded-lg shadow-sm bg-white dark:bg-muted",
+          canDrag ? "cursor-move" : "cursor-not-allowed",
+          isDragging && canDrag && "opacity-50"
         )}
         style={{
           transform: transform
@@ -200,7 +229,7 @@ export default function GroupBuilder() {
               className="flex flex-row items-center p-2 border rounded-lg shadow-sm cursor-move bg-white dark:bg-muted gap-2"
             >
               <Avatar className="h-6 w-6 rounded-md">
-                <AvatarFallback className="rounded text-sm">
+                <AvatarFallback className="rounded-md text-sm">
                   {member.firstName[0]}
                   {member.lastName[0]}
                 </AvatarFallback>
@@ -237,9 +266,12 @@ export default function GroupBuilder() {
             <Shuffle className="inline-block mr-2" /> Générer aléatoirement
           </Button>
         )}
-        <Button onClick={resetGroups} variant="outline">
-          Réinitialiser
-        </Button>
+        {!userIsStudent && (
+          <Button onClick={resetGroups} variant="outline">
+            Réinitialiser
+          </Button>
+        )}
+
         <Button onClick={() => handleSave()}>Enregistrer</Button>
       </div>
       <DndContext
@@ -306,14 +338,16 @@ export default function GroupBuilder() {
       </DndContext>
 
       <div className="flex justify-center space-x-4 mt-6">
-        {mode === "random" && (
+        {mode === "random" && !userIsStudent && (
           <Button onClick={handleGenerateRandom} variant="outline">
             <Shuffle className="inline-block mr-2" /> Générer aléatoirement
           </Button>
         )}
-        <Button onClick={resetGroups} variant="outline">
-          Réinitialiser
-        </Button>
+        {!userIsStudent && (
+          <Button onClick={resetGroups} variant="outline">
+            Réinitialiser
+          </Button>
+        )}
         <Button onClick={() => handleSave()}>Enregistrer</Button>
       </div>
     </div>

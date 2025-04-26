@@ -1,6 +1,11 @@
 import api from "../config/axios";
 import { Defense } from "@/types/defense.type";
 
+export async function getDefenseByGroupId(groupId: string): Promise<Defense[]> {
+  const { data } = await api.get<Defense[]>(`/defenses/${groupId}`);
+  return data;
+}
+
 export async function saveOrder(order: Defense[]): Promise<void> {
   try {
     await api.post(`/order`, order, {
