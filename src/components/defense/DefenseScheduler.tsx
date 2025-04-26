@@ -22,6 +22,9 @@ import {
 import { useProjectContext } from "@/contexts/ProjectContext";
 import { Defense } from "@/types/defense.type";
 import { User } from "@/types/user.type";
+import { Avatar } from "../ui/avatar";
+import { AvatarFallback } from "@radix-ui/react-avatar";
+import FlexibleCard from "../template/FlexibleCard";
 
 function SortableItem({ defense }: { defense: Defense }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -34,7 +37,7 @@ function SortableItem({ defense }: { defense: Defense }) {
       style={style}
       {...attributes}
       {...listeners}
-      className="p-4 bg-white rounded-2xl shadow"
+      className="p-4 rounded-2xl shadow"
     >
       <div className="font-bold text-lg">{defense.group.name}</div>
       <div className="text-sm mb-2">
@@ -154,9 +157,7 @@ export default function SoutenanceScheduler() {
       // 3) Mettre à jour chaque défense côté backend,
       // puis merger le `group` / `members` d'origine
       const updated = await Promise.all(
-        order.map((d) =>
-          updateDefense(d.id, { start: d.start, end: d.end })
-        )
+        order.map((d) => updateDefense(d.id, { start: d.start, end: d.end }))
       );
       const merged = updated.map((u) => {
         const orig = order.find((d) => d.id === u.id)!;
@@ -172,31 +173,21 @@ export default function SoutenanceScheduler() {
   };
 
   return (
-    <div className="space-y-6 p-6">
-      {/* Carte 1 : Groupes actifs */}
-      <Card>
-        <CardHeader title="Groupes actifs" />
-        <CardContent>
-          {defenses.map((d) => (
-            <div key={d.id} className="mb-4">
-              <div className="font-semibold">{d.group.name}</div>
-              <div className="text-sm text-gray-600">
-                Membres : {d.group.members.map((m) => m.firstName).join(", ")}
-              </div>
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Carte 2 : Paramétrage */}
-      <Card>
-        <CardHeader title="Génération de l'ordre de passage" />
-        <CardContent className="space-y-4 grid grid-cols-2 gap-4">
+    <div className="space-y-4">
+      <FlexibleCard title="Génération de l'ordre de passage"
+      childrenFooter={
+        <div className="flex">
+          <Button onClick={handleGenerate}>Générer</Button>
+        </div>
+      }
+      >
+        <div className="space-y-4 grid grid-cols-2 gap-4">
           <div>
             <Label htmlFor="start">Date et heure de début</Label>
             <Input
               id="start"
               type="datetime-local"
+              className="mt-2"
               value={start}
               onChange={(e) => setStart(e.target.value)}
             />
@@ -206,6 +197,7 @@ export default function SoutenanceScheduler() {
             <Input
               id="end"
               type="datetime-local"
+              className="mt-2"
               value={end}
               onChange={(e) => setEnd(e.target.value)}
             />
@@ -221,17 +213,15 @@ export default function SoutenanceScheduler() {
               />
             </div>
           )}
-          <div className="col-span-2 pt-4">
-            <Button onClick={handleGenerate}>Générer</Button>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      </FlexibleCard>
 
-      {/* Carte 3 : Ordre, DnD, PDF, Enregistrer */}
-      <Card>
-        <CardHeader title="Ordre de passage" />
-        <CardContent>
-          <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <FlexibleCard title="Ordre de passage">
+        <div>
+          <DndContext
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
+          >
             <SortableContext
               items={order.map((d) => d.id)}
               strategy={verticalListSortingStrategy}
@@ -255,8 +245,8 @@ export default function SoutenanceScheduler() {
             </Button>
             <Button onClick={handleSave}>Enregistrer</Button>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </FlexibleCard>
     </div>
   );
 }

@@ -35,7 +35,7 @@ export default function ProjectEditPage() {
         />
 
         <Tabs defaultValue="general" className="mt-4 w-full">
-          <TabsList className="w-full grid grid-cols-5">
+          <TabsList className="w-full grid grid-cols-5 mb-4">
             <TabsTrigger value="general">Information Général</TabsTrigger>
             <TabsTrigger value="groupes">Groupes</TabsTrigger>
             <TabsTrigger value="livrables">Livrables</TabsTrigger>
@@ -43,22 +43,27 @@ export default function ProjectEditPage() {
             <TabsTrigger value="soutenances">Soutenances</TabsTrigger>
           </TabsList>
 
-          <div className="mt-2 p-4 border rounded-md">
-            <TabsContent value="general">
+          <TabsContent value="general">
+            <FlexibleCard>
               <ProjectGlobalEditComponent />
-            </TabsContent>
-            <TabsContent value="groupes">
+            </FlexibleCard>
+          </TabsContent>
+          <TabsContent value="groupes" className="flex flex-col gap-4">
+            <FlexibleCard title="">
               <GroupEditComponent promotion={promotion}/>
-              <GroupBuilder/>
-            </TabsContent>
-            <TabsContent value="livrables"></TabsContent>
-            <TabsContent value="rapports">
-              Grille de notation des rapports a selectionner
-            </TabsContent>
-            <TabsContent value="soutenances">
-              <DefenseScheduler />
-            </TabsContent>
-          </div>
+            </FlexibleCard>
+            <FlexibleCard title="">
+              <GroupBuilder />
+            </FlexibleCard>
+          </TabsContent>
+          <TabsContent value="livrables"></TabsContent>
+          <TabsContent value="rapports">
+            Grille de notation des rapports a selectionner
+          </TabsContent>
+          <TabsContent value="soutenances">
+            <DefenseScheduler />
+          </TabsContent>
+
         </Tabs>
       </FlexibleCard>
     </DashboardLayout>

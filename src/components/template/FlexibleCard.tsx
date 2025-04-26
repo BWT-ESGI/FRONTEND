@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card";
 
 interface FlexibleCardProps {
-  title: string;
+  title?: string;
   description?: string;
   children: React.ReactNode;
   childrenRightEnd?: React.ReactNode;
@@ -26,13 +26,16 @@ export default function FlexibleCard({
 }: FlexibleCardProps) {
   return (
     <Card className={`${className}`}>
-      <CardHeader className="flex items-center justify-between w-full">
-        <div>
-          <CardTitle>{title}</CardTitle>
-          {description && <CardDescription>{description}</CardDescription>}
-        </div>
-        {childrenRightEnd && <div>{childrenRightEnd}</div>}
-      </CardHeader>
+      {childrenRightEnd || title || description ? (
+        <CardHeader className="flex items-center justify-between w-full">
+          <div>
+            {title && (<CardTitle>{title}</CardTitle>)}
+            {description && <CardDescription>{description}</CardDescription>}
+          </div>
+          {childrenRightEnd && <div>{childrenRightEnd}</div>}
+        </CardHeader>
+        ) : <></>
+      }
       <CardContent className="h-full">{children}</CardContent>
       {childrenFooter && (
         <CardFooter className="mt-auto">
