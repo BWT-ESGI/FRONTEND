@@ -99,7 +99,8 @@ export default function GroupBuilder() {
     }
   
     setGroups(newGroups);
-    setUsers([]);
+    const assignedUserIds = newGroups.flatMap(g => g.members.map(m => m.id));
+    setUsers(users.filter(user => !assignedUserIds.includes(user.id)));
   };
 
   const handleSave = async () => {
