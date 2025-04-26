@@ -1,6 +1,4 @@
 import FlexibleCard from "@/components/template/FlexibleCard";
-import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
 
 export interface DefenseCardProps {
   defense: {

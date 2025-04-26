@@ -5,7 +5,7 @@ import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
 import Heading from '@tiptap/extension-heading'
-import { AlignJustify, AlignLeft, AlignRight, Baseline, Bold, Italic, Link as LinkIcon, List, ListOrdered, Strikethrough } from "lucide-react";
+import { AlignJustify, AlignLeft, AlignRight, Baseline, Bold, Italic, List, ListOrdered, Strikethrough } from "lucide-react";
 
 import {
   fetchRapportContent,
