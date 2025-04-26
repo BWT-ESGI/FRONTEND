@@ -276,7 +276,7 @@ export default function GroupBuilder() {
               <ArrowDown className="text-red-500 inline-block text-xs" />{" "}
               {minSize} Minimum -{" "}
               <ArrowUp className="text-green-500 inline-block text-xs" />{" "}
-              {maxSize} Maximum
+              {maxSize} Maximum ({totalSlots} places disponibles)
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
               {groups.map((g) => (
