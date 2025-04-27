@@ -10,11 +10,12 @@ import NotFoundPage from "../NotFoundPage";
 import { Project } from "@/types/project.type";
 import { Button, buttonVariants } from "@/components/ui/button";
 import ProjectFormModal from "@/components/promotion/ProjectFormModal";
+import PromotionFormModal from "@/components/promotion/PromotionFormModal";
 import { useState } from "react";
 import { deletePromotionById } from "@/services/promotionService";
 import isStudent from "@/utils/isStudent";
 import { FloatingDock } from "@/components/ui/floating-dock";
-import { FolderUp, GraduationCap, Info, OctagonAlert, Trash, X } from "lucide-react";
+import { FolderUp, GraduationCap, Info, OctagonAlert, Trash, X, Edit } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import FlexibleAlert from "@/components/template/FlexibleAlert";
 import toast from "react-hot-toast";
@@ -25,10 +26,16 @@ export default function PromotionEditorPage() {
   const { promotion, loading, refetch } = usePromotion(id ?? "");
   const [openModal, setOpenModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  const [openPromotionModal, setOpenPromotionModal] = useState(false);
 
   const handleCloseModal = () => {
     setOpenModal(false);
     refetch();
+  };
+
+  const handleClosePromotionModal = () => {
+    setOpenPromotionModal(false);
+    refetch(); // pour recharger les données de la promo
   };
 
   const handleDeletePromotion = async () => {
@@ -58,6 +65,11 @@ export default function PromotionEditorPage() {
 
   const tabs = [
     {
+      title: "Modifier la promotion",
+      icon: <Edit className="h-full w-full text-neutral-500 dark:text-neutral-300" />,
+      onClick: () => setOpenPromotionModal(true),
+    },
+    {
       title: "Créer un Projets",
       icon: <FolderUp className="h-full w-full text-neutral-500 dark:text-neutral-300" />,
       onClick: () => setOpenModal(true),
@@ -80,6 +92,11 @@ export default function PromotionEditorPage() {
         open={openModal}
         onClose={handleCloseModal}
         promotionId={promotion.id.toString()}
+      />
+      <PromotionFormModal
+        open={openPromotionModal}
+        onClose={handleClosePromotionModal}
+        promotion={promotion}
       />
       {!isStudent() && (
         <div className="flex w-full justify-center">

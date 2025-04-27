@@ -26,6 +26,14 @@ export async function deletePromotionById(id: string): Promise<void> {
   await api.delete(`/promotions/${id}`);
 }
 
+export async function updatePromotionById(
+  id: string,
+  payload: Partial<CreatePromotionPayload>
+): Promise<Promotion> {
+  const response = await api.patch<Promotion>(`/promotions/${id}`, payload);
+  return response.data;
+}
+
 export async function updateStudentsPromotion(id: string, studentIds: string[]): Promise<Promotion> {
   const response = await api.patch<Promotion>(`/promotions/${id}/edit-students`, {
     ids: studentIds,
