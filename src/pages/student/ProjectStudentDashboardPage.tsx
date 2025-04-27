@@ -98,7 +98,7 @@ export default function ProjectStudentDashboardPage() {
     {
       title: "Quitter le groupe",
       icon: (
-        <X className="h-full w-full text-red-200 dark:text-red-500" />
+        <X className="h-full w-full text-red-500" />
       ),
       onClick: handleLeaveGroup,
     },

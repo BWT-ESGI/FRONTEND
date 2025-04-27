@@ -10,7 +10,6 @@ export function useReport(groupId: string) {
     setLoading(true);
     try {
       await fetchRapports(groupId).then((data) => {
-        console.log("Rapport data:", data);
         if (data && Array.isArray(data) && data.length > 0) {
           setReport(data[0]);
         } else {

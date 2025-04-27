@@ -34,6 +34,7 @@
     "@tailwindcss/vite": "^4.0.14",
     "@tanstack/react-table": "^8.21.2",
     "@tiptap/extension-document": "^2.11.7",
+    "@tiptap/extension-hard-break": "^2.11.7",
     "@tiptap/extension-heading": "^2.11.7",
     "@tiptap/extension-text-align": "^2.11.7",
     "@tiptap/extension-underline": "^2.11.7",
