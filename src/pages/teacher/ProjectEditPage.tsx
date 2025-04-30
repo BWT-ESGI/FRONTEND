@@ -49,10 +49,10 @@ export default function ProjectEditPage() {
             </FlexibleCard>
           </TabsContent>
           <TabsContent value="groupes" className="flex flex-col gap-4">
-            <FlexibleCard title="">
+            <FlexibleCard>
               <GroupEditComponent promotion={promotion}/>
             </FlexibleCard>
-            <FlexibleCard title="">
+            <FlexibleCard>
               <GroupBuilder />
             </FlexibleCard>
           </TabsContent>

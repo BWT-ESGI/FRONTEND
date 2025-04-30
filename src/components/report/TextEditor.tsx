@@ -16,7 +16,6 @@ import { Button } from "../ui/button";
 import FlexibleCard from "../template/FlexibleCard";
 import toast from "react-hot-toast";
 
-// Après l'import de HardBreak
 const CustomHardBreak = HardBreak.extend({
   addKeyboardShortcuts() {
     return {
@@ -31,7 +30,6 @@ interface TextEditorProps {
 
 export default function TextEditor({ rapportId }: TextEditorProps) {
   const { theme } = useTheme();
-  const [submittedContent, setSubmittedContent] = useState("");
 
   const editor = useEditor({
     extensions: [
@@ -82,7 +80,6 @@ export default function TextEditor({ rapportId }: TextEditorProps) {
 
     try {
       await saveRapportContent(rapportId, html);
-      setSubmittedContent(html);
       toast.success("Contenu sauvegardé !");
     } catch (error) {
       toast.error("Erreur lors de la sauvegarde du contenu.");
@@ -202,16 +199,6 @@ export default function TextEditor({ rapportId }: TextEditorProps) {
           </Button>
         </form>
       </FlexibleCard>
-
-      {submittedContent && (
-        <FlexibleCard className="mt-4">
-          <h4 className="font-semibold text-sm">Aperçu :</h4>
-          <div
-            className={`prose max-w-none mt-2 whitespace-pre-wrap [&_*]:whitespace-pre-wrap ${isDark ? "prose-invert" : ""}`}
-            dangerouslySetInnerHTML={{ __html: submittedContent }}
-          />
-        </FlexibleCard>
-      )}
     </>
   );
 }

@@ -5,14 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import FlexibleCard from "@/components/template/FlexibleCard";
 import ProjectSummaryCard from "@/components/project/ProjectSummaryCard";
 import RemainingDaysCard from "@/components/project/RemainingDayCard";
-import {
-  Check,
-  ClipboardMinus,
-  FileText,
-  FolderUp,
-  GraduationCap,
-  X,
-} from "lucide-react";
+import { Check, ClipboardMinus, FileText, FolderUp, GraduationCap, X} from "lucide-react";
 import GroupMemberCard from "@/components/project/GroupMemberCard";
 import { useEffect, useState } from "react";
 import TextEditor from "@/components/report/TextEditor";
@@ -135,20 +128,14 @@ export default function ProjectStudentDashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex w-full justify-center">
-        <FloatingDock items={tabs} desktopClassName="w-full" />
-      </div>
+      <div className="flex w-full justify-center"><FloatingDock items={tabs} desktopClassName="w-full" /></div>
 
       {activeTab === "resume" && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <ProjectSummaryCard project={project!} />
             <RemainingDaysCard endAt={project!.endAt} />
-            <DefenseCard
-              defense={defense}
-              loading={projectLoading || defenseLoading}
-              formattedDuration={formattedDuration}
-            />
+            <DefenseCard defense={defense} loading={projectLoading || defenseLoading} formattedDuration={formattedDuration}/>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
@@ -227,33 +214,19 @@ export default function ProjectStudentDashboardPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-            <GroupMemberCard
-              members={project?.groups[0].members}
-              className="col-span-3"
-            />
+            <GroupMemberCard members={project?.groups[0].members} className="col-span-3"/>
           </div>
         </>
       )}
 
       {activeTab === "livrables" && (
-        <FlexibleAlert
-          title="Aucun livrable trouvé"
-          icon={<ClipboardMinus className="h-4 w-4 text-neutral-500" />}
-        />
+        <FlexibleAlert title="Aucun livrable trouvé" icon={<ClipboardMinus className="h-4 w-4 text-neutral-500" />}/>
       )}
       {activeTab === "rapports" ? (
-        report ? (
-          <TextEditor rapportId={report.id} />
-        ) : (
+        report ? (<TextEditor rapportId={report.id} />) : (
           <div className="flex flex-col items-center justify-center h-full">
-            <FlexibleAlert
-              title="Aucun rapport trouvé"
-              icon={<ClipboardMinus className="h-4 w-4 text-neutral-500" />}
-            />
-            <Button onClick={() => handleCreateReport()} className="mt-4">
-              Créer un rapport
-            </Button>
-
+            <FlexibleAlert title="Aucun rapport trouvé" icon={<ClipboardMinus className="h-4 w-4 text-neutral-500" />}/>
+            <Button onClick={() => handleCreateReport()} className="mt-4"> Créer un rapport</Button>
           </div>
         )
       ) : null}
