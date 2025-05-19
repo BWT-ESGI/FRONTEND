@@ -11,6 +11,7 @@ import GroupBuilder from "@/components/group/ GroupBuilder";
 import ProjectGlobalEditComponent from "@/components/project/ProjectGlobalEditComponent";
 import DefenseScheduler from "@/components/defense/DefenseScheduler";
 import { useProjectContext } from "@/contexts/ProjectContext";
+import CreateDelivrableComponent from "@/components/delivrable/CreateDelivrableComponent";
 
 export default function ProjectEditPage() {
   const { project, loading } = useProjectContext();
@@ -56,7 +57,9 @@ export default function ProjectEditPage() {
               <GroupBuilder />
             </FlexibleCard>
           </TabsContent>
-          <TabsContent value="livrables"></TabsContent>
+          <TabsContent value="livrables">
+            <CreateDelivrableComponent />
+          </TabsContent>
           <TabsContent value="rapports">
             Grille de notation des rapports a selectionner
           </TabsContent>

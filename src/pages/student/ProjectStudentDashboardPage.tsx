@@ -20,6 +20,7 @@ import { leaveGroup } from "@/services/groupService";
 import FlexibleAlert from "@/components/template/FlexibleAlert";
 import { Button } from "@/components/ui/button";
 import { createRapport } from "@/services/rapportService";
+import DelivrableComponent from "@/components/delivrable/DelivrableComponent";
 
 
 export default function ProjectStudentDashboardPage() {
@@ -219,8 +220,8 @@ export default function ProjectStudentDashboardPage() {
         </>
       )}
 
-      {activeTab === "livrables" && (
-        <FlexibleAlert title="Aucun livrable trouvé" icon={<ClipboardMinus className="h-4 w-4 text-neutral-500" />}/>
+      {activeTab === "livrables" && project && groupId && (
+        <DelivrableComponent projectId={project.id} groupId={groupId} />
       )}
       {activeTab === "rapports" ? (
         report ? (<TextEditor rapportId={report.id} />) : (
