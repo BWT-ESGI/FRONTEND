@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import toast from "react-hot-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { updateUserProfile, finalizeRegistration, checkRegistrationId } from "@/services/authentification"; // <-- ajout updateUserProfile
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -43,7 +44,10 @@ const StudentRegisterPage = () => {
           if (!res.valid) {
             setInvalidId(true);
           } else {
-            setEmail(res.email || "");
+            setEmail(res.user.email || "");
+            form.setValue("email", res.user.email || "");
+            form.setValue("firstName", res.user.firstName || "");
+            form.setValue("lastName", res.user.lastName || "");
           }
         })
         .catch(() => setInvalidId(true));
@@ -58,9 +62,11 @@ const StudentRegisterPage = () => {
       const response = await updateUserProfile(email, data);
       if(response.status == 200) {
         setSubmitted(true);
+        setInvalidId(false);
+        toast.success("Mise à jour des éléments effectuées !");
       }
     } catch (err) {
-      console.error("Erreur lors de la mise à jour du profil:", err);
+      toast.error("Erreur lors de la mise à jour des éléments !");
     }
   };
 
@@ -125,12 +131,13 @@ const StudentRegisterPage = () => {
                 )}
               />
               <FormField
+                control={form.control}
                 name="email"
-                render={() => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" value={email} disabled />
+                      <Input type="email" {...field} disabled />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
