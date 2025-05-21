@@ -20,6 +20,11 @@ import { leaveGroup } from "@/services/groupService";
 import FlexibleAlert from "@/components/template/FlexibleAlert";
 import { Button } from "@/components/ui/button";
 import { createRapport } from "@/services/rapportService";
+import DelivrableComponent from "@/components/delivrable/DelivrableComponent";
+import { Deliverable, Submission } from "@/types/deliverable.type";
+import { fetchDeliverablesByProject } from "@/services/deliverableService";
+import { fetchSubmissionsByGroup } from "@/services/submissionService";
+import ProjectDeliverableSteps from "@/components/project/ProjectDeliverableSteps";
 
 
 export default function ProjectStudentDashboardPage() {
@@ -28,6 +33,8 @@ export default function ProjectStudentDashboardPage() {
   const groupId = project?.groups?.[0]?.id;
   const { defense, loading: defenseLoading } = useDefense(groupId || "");
   const { report, loading: reportLoading, setReport } = useReport(groupId || "");
+  const [deliverables, setDeliverables] = useState<Deliverable[]>([]);
+  const [submissions, setSubmissions] = useState<Submission[]>([]);
   const userInfo = getUserInfoFromLocalStorage();
   const userId = userInfo ? userInfo.userId : null;
   const navigate = useNavigate();
@@ -54,6 +61,18 @@ export default function ProjectStudentDashboardPage() {
         }
       });
     }
+    if (!project || !groupId) return;
+    Promise.all([
+      fetchDeliverablesByProject(project.id),
+      fetchSubmissionsByGroup(groupId),
+    ])
+      .then(([dRes, sRes]) => {
+        setDeliverables(Array.isArray(dRes.data) ? dRes.data : []);
+        setSubmissions(Array.isArray(sRes.data) ? sRes.data : []);
+      })
+      .catch(() =>
+        toast.error("Erreur lors du chargement des livrables ou rendus")
+      )
   }, [project]);
     
   if (projectLoading) return <FallBackPageSkeleton />;
@@ -128,33 +147,32 @@ export default function ProjectStudentDashboardPage() {
 
   return (
     <DashboardLayout>
-      <div className="flex w-full justify-center"><FloatingDock items={tabs} desktopClassName="w-full" /></div>
+      <div className="flex w-full justify-center">
+        <FloatingDock items={tabs} desktopClassName="w-full" />
+      </div>
 
       {activeTab === "resume" && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <ProjectSummaryCard project={project!} />
             <RemainingDaysCard endAt={project!.endAt} />
-            <DefenseCard defense={defense} loading={projectLoading || defenseLoading} formattedDuration={formattedDuration}/>
+            <DefenseCard
+              defense={defense}
+              loading={projectLoading || defenseLoading}
+              formattedDuration={formattedDuration}
+            />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-            <FlexibleCard title="Statut du projet" className="col-span-1">
+            <FlexibleCard title="Etapes du projet" className="col-span-3">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-medium">Livrable :</span>
-                  <span
-                    className={`font-bold ${
-                      true ? "text-green-500" : "text-red-500"
-                    } flex items-center gap-1`}
-                  >
-                    {true ? (
-                      <Check className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <X className="h-4 w-4 text-red-500" />
-                    )}
-                    {true ? "Soumis" : "Non soumis"}
-                  </span>
+                  <ProjectDeliverableSteps
+                    project={project}
+                    deliverables={deliverables}
+                    submissions={submissions}
+                    defense={defense}
+                  />
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="font-medium">Rapport :</span>
@@ -171,62 +189,35 @@ export default function ProjectStudentDashboardPage() {
                     {report?.content ? "Soumis" : "Non soumis"}
                   </span>
                 </div>
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">Soutenance :</span>
-                  <span
-                    className={`font-bold ${
-                      defense?.start ? "text-green-500" : "text-red-500"
-                    } flex items-center gap-1`}
-                  >
-                    {defense?.start ? (
-                      <Check className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <X className="h-4 w-4 text-red-500" />
-                    )}
-                    {defense?.start ? "Planifiée" : "Non planifiée"}
-                  </span>
-                </div>
-              </div>
-            </FlexibleCard>
-
-            <FlexibleCard title="Note du projet" className="col-span-1">
-              <div className="flex flex-col gap-2">
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">Livrable :</span>
-                  <span className={`font-bold flex items-center gap-1`}>
-                    11<span className="text-gray-500">/20</span>
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">Rapport :</span>
-                  <span className={`font-bold flex items-center gap-1`}>
-                    24<span className="text-gray-500">/20</span>
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="font-medium">Soutenance :</span>
-                  <span className={`font-bold flex items-center gap-1`}>
-                    15<span className="text-gray-500">/20</span>
-                  </span>
-                </div>
               </div>
             </FlexibleCard>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-            <GroupMemberCard members={project?.groups[0].members} className="col-span-3"/>
+            <GroupMemberCard
+              members={project?.groups[0].members}
+              className="col-span-3"
+            />
           </div>
         </>
       )}
 
-      {activeTab === "livrables" && (
-        <FlexibleAlert title="Aucun livrable trouvé" icon={<ClipboardMinus className="h-4 w-4 text-neutral-500" />}/>
+      {activeTab === "livrables" && project && groupId && (
+        <DelivrableComponent projectId={project.id} groupId={groupId} />
       )}
       {activeTab === "rapports" ? (
-        report ? (<TextEditor rapportId={report.id} />) : (
+        report ? (
+          <TextEditor rapportId={report.id} />
+        ) : (
           <div className="flex flex-col items-center justify-center h-full">
-            <FlexibleAlert title="Aucun rapport trouvé" icon={<ClipboardMinus className="h-4 w-4 text-neutral-500" />}/>
-            <Button onClick={() => handleCreateReport()} className="mt-4"> Créer un rapport</Button>
+            <FlexibleAlert
+              title="Aucun rapport trouvé"
+              icon={<ClipboardMinus className="h-4 w-4 text-neutral-500" />}
+            />
+            <Button onClick={() => handleCreateReport()} className="mt-4">
+              {" "}
+              Créer un rapport
+            </Button>
           </div>
         )
       ) : null}
