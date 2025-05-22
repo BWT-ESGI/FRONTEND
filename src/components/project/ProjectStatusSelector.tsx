@@ -3,7 +3,7 @@ import React, { JSX, useMemo } from "react";
 import FlexibleRadioGroupCard from "@/components/template/FlexibleRadioGroupCard";
 import { OptionGroupe } from "@/types/optionGroupe.type";
 import { ProjectStatus } from "@/types/project.type";
-import { Pencil, Share, Archive, CheckCircle } from "lucide-react";
+import { Pencil, Share, Archive } from "lucide-react";
 
 interface Props {
   status: ProjectStatus;

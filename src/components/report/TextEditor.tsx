@@ -1,5 +1,4 @@
-import { useEffect, useState } from "react";
-import { useTheme } from "@/hooks/theme-provider";
+import { useEffect } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
@@ -29,8 +28,6 @@ interface TextEditorProps {
 }
 
 export default function TextEditor({ rapportId }: TextEditorProps) {
-  const { theme } = useTheme();
-
   const editor = useEditor({
     extensions: [
       CustomHardBreak,
@@ -86,9 +83,6 @@ export default function TextEditor({ rapportId }: TextEditorProps) {
       console.error("Erreur de sauvegarde :", error);
     }
   };
-
-  const isDark =
-    theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   const getButtonClass = (active: boolean) =>
     `flex items-center justify-center px-3 py-1 rounded-md transition ${
