@@ -1,5 +1,3 @@
-import { Alert } from "../ui/alert";
-
 interface FlexibleAlertProps {
     variant?: "info" | "success" | "warning" | "error";
     icon: React.ReactNode;

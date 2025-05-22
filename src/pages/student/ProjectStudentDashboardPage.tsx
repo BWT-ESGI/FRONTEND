@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import FlexibleCard from "@/components/template/FlexibleCard";
 import ProjectSummaryCard from "@/components/project/ProjectSummaryCard";
 import RemainingDaysCard from "@/components/project/RemainingDayCard";
-import { Check, ClipboardMinus, FileText, FolderUp, GraduationCap, X} from "lucide-react";
+import { ClipboardMinus, FileText, FolderUp, GraduationCap, X} from "lucide-react";
 import GroupMemberCard from "@/components/project/GroupMemberCard";
 import { useEffect, useState } from "react";
 import TextEditor from "@/components/report/TextEditor";
