@@ -106,15 +106,6 @@ export default function ProjectGlobalEditComponent() {
             />
           </div>
         </div>
-
-        {/*         <div>
-          <h4 className="text-sm mb-2">Promotion:</h4>
-          <Input
-            value={promotion}
-            onChange={(e) => setPromotion(e.target.value)}
-            placeholder="Promotion"
-          />
-        </div> */}
       </div>
 
       <div className="mt-6 flex justify-end">

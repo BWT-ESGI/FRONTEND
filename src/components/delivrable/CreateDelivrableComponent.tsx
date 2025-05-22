@@ -4,6 +4,13 @@ import { fetchDeliverablesByProject, createDeliverable, updateDeliverable, delet
 import { useProjectContext } from "@/contexts/ProjectContext";
 import toast from "react-hot-toast";
 import { showApiErrorToast } from "@/utils/showApiErrorToast";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import FlexibleCard from "../template/FlexibleCard";
 
 export default function CreateDelivrableComponent() {
   const { project } = useProjectContext();
@@ -48,7 +55,6 @@ export default function CreateDelivrableComponent() {
       if (editingId) {
         await updateDeliverable(editingId, form);
       } else {
-        // Correction : deadline doit être une string ISO, maxSize un number ou undefined
         const payload = {
           ...form,
           projectId: project.id,
@@ -93,52 +99,84 @@ export default function CreateDelivrableComponent() {
   };
 
   return (
-    <div className="space-y-6">
-      <h2 className="text-xl font-bold mb-4">Gestion des livrables</h2>
-      <form onSubmit={handleSubmit} className="space-y-2 border rounded p-4">
-        <div className="flex flex-col md:flex-row gap-2">
-          <input name="name" value={form.name || ""} onChange={handleChange} placeholder="Nom du livrable" className="border rounded px-2 py-1 flex-1" required />
-          <input name="deadline" value={form.deadline || ""} onChange={handleChange} type="datetime-local" className="border rounded px-2 py-1 flex-1" required />
-        </div>
-        <textarea name="description" value={form.description || ""} onChange={handleChange} placeholder="Description" className="border rounded px-2 py-1 w-full" />
-        <div className="flex flex-col md:flex-row gap-2 items-center">
-          <label className="flex items-center gap-2">
-            <input type="checkbox" name="allowLateSubmission" checked={!!form.allowLateSubmission} onChange={handleChange} /> Autoriser le rendu en retard
-          </label>
-          <input name="penaltyPerHourLate" value={form.penaltyPerHourLate || 0} onChange={handleChange} type="number" min={0} step={0.1} className="border rounded px-2 py-1 w-32" placeholder="Malus/heure" />
-          <select name="submissionType" value={form.submissionType || "archive"} onChange={handleChange} className="border rounded px-2 py-1 w-32">
-            <option value="archive">Archive</option>
-            <option value="git">Git</option>
-          </select>
-          <input name="maxSize" value={form.maxSize || ""} onChange={handleChange} type="number" min={0} step={1} className="border rounded px-2 py-1 w-32" placeholder="Taille max (Mo)" />
-        </div>
-        <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" disabled={loading}>
-          {editingId ? "Modifier" : "Créer"} le livrable
-        </button>
-        {editingId && (
-          <button type="button" className="ml-2 px-4 py-2 bg-gray-400 text-white rounded" onClick={() => { setForm({ name: "", description: "", deadline: "", allowLateSubmission: false, penaltyPerHourLate: 0, submissionType: "archive", maxSize: undefined }); setEditingId(null); }}>
-            Annuler
-          </button>
-        )}
+    <div className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <FlexibleCard
+          title="Gestion des livrables"
+          childrenFooter={(
+            <>
+              <Button type="submit" disabled={loading}>
+                {editingId ? "Modifier" : "Créer"} le livrable
+              </Button>
+              {editingId && (
+                <Button type="button" variant="secondary" onClick={() => { setForm({ name: "", description: "", deadline: "", allowLateSubmission: false, penaltyPerHourLate: 0, submissionType: "archive", maxSize: undefined }); setEditingId(null); }}>
+                  Annuler
+                </Button>
+              )}
+            </>
+          )}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Nom du livrable</Label>
+              <Input id="name" name="name" value={form.name || ""} onChange={handleChange} placeholder="Nom du livrable" required />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="deadline">Deadline</Label>
+              <Input id="deadline" name="deadline" value={form.deadline || ""} onChange={handleChange} type="datetime-local" required />
+            </div>
+          </div>
+          <div className="space-y-2 mt-4">
+            <Label htmlFor="description">Description</Label>
+            <Textarea id="description" name="description" value={form.description || ""} onChange={handleChange} placeholder="Description" />
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4 items-end">
+            <div className="flex flex-col items-start gap-2">
+              <div className="flex items-center gap-2">
+                <Checkbox id="allowLateSubmission" name="allowLateSubmission" checked={!!form.allowLateSubmission} onCheckedChange={v => handleChange({ target: { name: "allowLateSubmission", checked: v, type: "checkbox" } } as any)} />
+                <Label htmlFor="allowLateSubmission">Autoriser le rendu en retard</Label>
+              </div>
+            </div>
+            <div className="flex flex-col items-start gap-2">
+              <Label htmlFor="penaltyPerHourLate">Malus/heure</Label>
+              <Input id="penaltyPerHourLate" name="penaltyPerHourLate" value={form.penaltyPerHourLate || 0} onChange={handleChange} type="number" min={0} step={0.1} placeholder="Malus/heure" />
+            </div>
+            <div className="flex flex-col items-start gap-2">
+              <Label htmlFor="submissionType">Type de rendu</Label>
+              <Select name="submissionType" value={form.submissionType || "archive"} onValueChange={value => handleChange({ target: { name: "submissionType", value, type: "select-one" } } as any)}>
+                <SelectTrigger id="submissionType">
+                  <SelectValue placeholder="Type de rendu" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="archive">Archive</SelectItem>
+                  <SelectItem value="git">Git</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex flex-col items-start gap-2">
+              <Label htmlFor="maxSize">Taille max (Mo)</Label>
+              <Input id="maxSize" name="maxSize" value={form.maxSize || ""} onChange={handleChange} type="number" min={0} step={1} placeholder="Taille max (Mo)" />
+            </div>
+          </div>
+        </FlexibleCard>
       </form>
-      <div>
-        <h3 className="font-semibold mb-2">Livrables existants</h3>
+      <FlexibleCard title="Livrables existants">
         <ul className="space-y-2">
           {Array.isArray(deliverables) && deliverables.map((d) => (
-            <li key={d.id} className="border rounded p-3 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
+            <li key={d.id} className="border rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2 bg-muted/30">
               <div>
-                <div className="font-bold">{d.name}</div>
-                <div className="text-xs text-gray-500">Deadline : {new Date(d.deadline).toLocaleString()}</div>
-                <div className="text-xs text-gray-400">{d.description}</div>
+                <div className="font-bold text-lg">{d.name}</div>
+                <div className="text-xs text-muted-foreground">Deadline : {new Date(d.deadline).toLocaleString()}</div>
+                <div className="text-xs text-muted-foreground">{d.description}</div>
               </div>
               <div className="flex gap-2">
-                <button className="px-3 py-1 bg-yellow-500 text-white rounded" onClick={() => handleEdit(d)}>Modifier</button>
-                <button className="px-3 py-1 bg-red-600 text-white rounded" onClick={() => handleDelete(d.id)}>Supprimer</button>
+                <Button size="sm" variant="outline" onClick={() => handleEdit(d)}>Modifier</Button>
+                <Button size="sm" variant="destructive" onClick={() => handleDelete(d.id)}>Supprimer</Button>
               </div>
             </li>
           ))}
         </ul>
-      </div>
+      </FlexibleCard>
     </div>
   );
 }

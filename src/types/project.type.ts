@@ -4,7 +4,7 @@ export enum ProjectStatus {
     DRAFT = "draft",
     PUBLISHED = "published",
     ARCHIVED = "archived",
-    ACTIVE = "active",
+   /*  ACTIVE = "active", */
 };
 
 export type GroupCompositionType = "manual" | "random" | "student_choice";

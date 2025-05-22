@@ -11,7 +11,6 @@ import { CSS } from "@dnd-kit/utilities";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardHeader, CardContent } from "@/components/ui/card";
 
 import toast from "react-hot-toast";
 import { generatePdf } from "@/services/pdfService";
@@ -23,7 +22,8 @@ import { useProjectContext } from "@/contexts/ProjectContext";
 import { Defense } from "@/types/defense.type";
 import { User } from "@/types/user.type";
 import FlexibleCard from "../template/FlexibleCard";
-import { FileSpreadsheet } from "lucide-react";
+import { FileSpreadsheet, TriangleAlert } from "lucide-react";
+import FlexibleAlert from "../template/FlexibleAlert";
 
 function SortableItem({ defense }: { defense: Defense }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -85,21 +85,10 @@ export default function SoutenanceScheduler() {
 
   if (defenses.length === 0) {
     return (
-      <div className="p-6">
-        <Card>
-          <CardHeader title="Aucun groupe disponible" />
-          <CardContent>
-            <p className="text-sm">
-              Aucun groupe avec des membres n’est pour l’instant généré.
-              Veuillez d’abord créer et peupler des groupes.
-            </p>
-          </CardContent>
-        </Card>
-      </div>
+      <FlexibleAlert title="Aucun groupe disponible. Veuillez d’abord créer et peupler des groupes avant de créer des soutenances" variant="error" icon={<TriangleAlert />}/>
     );
   }
 
-  // 2) Recalcule les dates selon l'ordre
   const computeSchedule = (list: Defense[]): Defense[] => {
     const baseStartTs = start
       ? new Date(start).getTime()
@@ -153,8 +142,6 @@ export default function SoutenanceScheduler() {
 
   const handleSave = async () => {
     try {
-      // 3) Mettre à jour chaque défense côté backend,
-      // puis merger le `group` / `members` d'origine
       const updated = await Promise.all(
         order.map((d) => updateDefense(d.id, { start: d.start, end: d.end }))
       );

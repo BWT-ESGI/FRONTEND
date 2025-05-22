@@ -11,17 +11,17 @@ interface Props {
 }
 
 const ProjectStatusRelatedIcon: Record<ProjectStatus, JSX.Element | string> = {
-    [ProjectStatus.DRAFT]: <Pencil />,
-    [ProjectStatus.PUBLISHED]: <Share />,
-    [ProjectStatus.ARCHIVED]: <Archive />,
-    [ProjectStatus.ACTIVE]: <CheckCircle />
+    [ProjectStatus.DRAFT]: <Pencil className="mb-2.5 text-muted-foreground" />,
+    [ProjectStatus.PUBLISHED]: <Share className="mb-2.5 text-muted-foreground" />,
+    [ProjectStatus.ARCHIVED]: <Archive className="mb-2.5 text-muted-foreground" />,
+/*     [ProjectStatus.ACTIVE]: <CheckCircle /> */
 };
 
 const ProjectStatusDisplayName: Record<ProjectStatus, string> = {
     [ProjectStatus.DRAFT]: "Brouillon",
     [ProjectStatus.PUBLISHED]: "Publié",
     [ProjectStatus.ARCHIVED]: "Archivé",
-    [ProjectStatus.ACTIVE]: "Actif"
+    /* [ProjectStatus.ACTIVE]: "Actif" */
 };
 
 const ProjectStatusSelector: React.FC<Props> = ({ status, setStatus }) => {
@@ -40,7 +40,7 @@ const ProjectStatusSelector: React.FC<Props> = ({ status, setStatus }) => {
       options={statusOptions}
       defaultValue={status}
       onValueChange={(val: any) => setStatus(val as ProjectStatus)}
-      gridCols={4}
+      gridCols={3}
       className="my-4"
     />
   );
