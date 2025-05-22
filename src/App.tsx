@@ -6,7 +6,7 @@ import { ThemeProvider } from "./hooks/theme-provider";
 import PromotionManagerPage from "@/pages/global/promotion/PromotionManagerPage";
 import PromotionEditorPage from "@/pages/global/promotion/PromotionEditorPage";
 import NotFoundPage from "@/pages/global/NotFoundPage";
-import PromotionEditStudentPage from "@/pages/teacher/PromotionEditStudentPage";
+import PromotionEditStudentPage from "@/components/project/PromotionEditStudentComponent";
 import ProjectListPage from "@/pages/global/project/ProjectListPage";
 import UserCreatePage from "@/pages/teacher/UserCreatePage";
 import StudentRegisterPage from "@/pages/global/StudentRegisterPage";

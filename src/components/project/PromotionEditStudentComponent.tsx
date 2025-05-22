@@ -11,13 +11,13 @@ import { ClipboardMinus } from "lucide-react";
 import FlexibleCard from "@/components/template/FlexibleCard";
 import { useParams } from "react-router-dom";
 import { usePromotion } from "@/hooks/api/usePromotion";
-import FallBackPageSkeleton from "../global/FallBackPageSkeleton";
+import FallBackPageSkeleton from "../../pages/global/FallBackPageSkeleton";
 import { Button } from "@/components/ui/button";
 import { updateStudentsPromotion } from "@/services/promotionService";
 import toast from "react-hot-toast";
 import { useStudents } from "@/hooks/api/useStudents";
 
-export default function PromotionAddStudentPage() {
+export default function PromotionEditStudentComponent() {
   const { students: users } = useStudents();
   const [selectedEmails, setSelectedEmails] = useState<string[]>([]);
   const [importedEmails, setImportedEmails] = useState<string[]>([]);
@@ -100,15 +100,13 @@ export default function PromotionAddStudentPage() {
 
 
   return (
-    <DashboardLayout>
-      <div className="p-4 pt-0">
-        <FlexibleAlert
-          variant="warning"
-          icon={<ClipboardMinus />}
-          title={`Les étudiants doivent être ajouter via l'onglet "Gestion utilisateur" avant d'être ajouté dans une promotion`}
-        />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4">
+    <div>
+      <FlexibleAlert
+        variant="warning"
+        icon={<ClipboardMinus />}
+        title={`Les étudiants doivent être ajouter via l'onglet "Gestion utilisateur" avant d'être ajouté dans une promotion`}
+      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-4 px-0">
         <FlexibleCard title="Liste des utilisateurs"
           childrenRightEnd={<Button onClick={() => handleSave()}>Sauvegarder</Button>}
           childrenFooter={
@@ -127,7 +125,7 @@ export default function PromotionAddStudentPage() {
             onChange={(e) => setSearch(e.target.value)}
             className="my-2"
           />
-          <div className="flex flex-wrap justify-center gap-4 max-h-[500px] overflow-y-auto pt-4">
+          <div className="grid grid-cols-2 gap-2 max-h-[500px] overflow-y-auto pt-4 w-full">
             {filteredUsers?.map((member) => {
               const isSelected = selectedEmails.includes(member.email);
               return (
@@ -135,7 +133,7 @@ export default function PromotionAddStudentPage() {
                   key={member.email}
                   onClick={() => handleCardClick(member.email)}
                   className={clsx(
-                    "flex flex-col items-center p-4 border rounded-lg shadow-sm w-48 cursor-pointer transition-all",
+                    "flex items-center p-2 gap-2 border rounded-lg shadow-sm w-full cursor-pointer transition-all",
                     {
                       "border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/30":
                         isSelected,
@@ -145,18 +143,18 @@ export default function PromotionAddStudentPage() {
                   )}
                 >
                   <div className="flex-shrink-0">
-                    <Avatar className="h-12 w-12 rounded-lg">
+                    <Avatar className="h-8 w-8 rounded-lg">
                       <AvatarFallback className="rounded-lg">
                         {member.firstName[0]}
                         {member.lastName[0]}
                       </AvatarFallback>
                     </Avatar>
                   </div>
-                  <div className="flex flex-col mt-4 text-center">
-                    <p className="text-lg font-semibold">
+                  <div className="flex flex-col text-left">
+                    <p className="text-sm font-medium">
                       {member.firstName} {member.lastName}
                     </p>
-                    <p className="text-sm text-gray-500">{member.email}</p>
+                    <p className="text-xs text-gray-500">{member.email}</p>
                   </div>
                 </div>
               );
@@ -183,6 +181,6 @@ export default function PromotionAddStudentPage() {
           )}
         </FlexibleCard>
       </div>
-    </DashboardLayout>
+    </div>
   );
 }

@@ -164,7 +164,7 @@ export default function ProjectStudentDashboardPage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-            <FlexibleCard title="Etapes du projet" className="col-span-3">
+            <FlexibleCard className="col-span-3">
               <div className="flex flex-col gap-2">
                 <div className="flex items-center justify-between">
                   <ProjectDeliverableSteps
@@ -174,7 +174,7 @@ export default function ProjectStudentDashboardPage() {
                     defense={defense}
                   />
                 </div>
-                <div className="flex items-center justify-between">
+               {/*  <div className="flex items-center justify-between">
                   <span className="font-medium">Rapport :</span>
                   <span
                     className={`font-bold ${
@@ -188,7 +188,7 @@ export default function ProjectStudentDashboardPage() {
                     )}
                     {report?.content ? "Soumis" : "Non soumis"}
                   </span>
-                </div>
+                </div> */}
               </div>
             </FlexibleCard>
           </div>

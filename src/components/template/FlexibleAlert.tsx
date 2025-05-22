@@ -1,4 +1,4 @@
-import { Alert, AlertTitle } from "../ui/alert";
+import { Alert } from "../ui/alert";
 
 interface FlexibleAlertProps {
     variant?: "info" | "success" | "warning" | "error";
@@ -15,9 +15,13 @@ const variantClasses = {
 
 export default function FlexibleAlert({ variant = "info", icon, title, ...props }: FlexibleAlertProps) {
     return (
-        <Alert {...props} className={`flex items-center gap-2 p-4 rounded-md ${variantClasses[variant]}`}>
-            {icon}
-            <AlertTitle>{title}</AlertTitle>
-        </Alert>
+        <div {...props} className={`p-4 rounded-md ${variantClasses[variant]}`}>
+            <div className="flex items-start gap-2 min-w-0 w-full">
+                <span className="flex-shrink-0 text-sm">{icon}</span>
+                <div className="flex-1 min-w-0 w-full whitespace-normal break-normal">
+                    {title}
+                </div>
+            </div>
+        </div>
     )
 }

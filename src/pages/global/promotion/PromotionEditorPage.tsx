@@ -1,4 +1,4 @@
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { FlexibleCircularProgress } from "@/components/template/FlexibleCircularProgress";
 import FlexibleCard from "@/components/template/FlexibleCard";
 import FlexibleTable from "@/components/template/FlexibleTable";
@@ -15,10 +15,11 @@ import { useState } from "react";
 import { deletePromotionById } from "@/services/promotionService";
 import isStudent from "@/utils/isStudent";
 import { FloatingDock } from "@/components/ui/floating-dock";
-import { FolderUp, GraduationCap, Info, OctagonAlert, Trash, X, Edit } from "lucide-react";
+import { FolderUp, GraduationCap, Info, OctagonAlert, Trash, X, Edit, Home } from "lucide-react";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import FlexibleAlert from "@/components/template/FlexibleAlert";
 import toast from "react-hot-toast";
+import PromotionEditStudentComponent from "../../../components/project/PromotionEditStudentComponent";
 
 export default function PromotionEditorPage() {
   const { id } = useParams<{ id: string }>();
@@ -27,6 +28,7 @@ export default function PromotionEditorPage() {
   const [openModal, setOpenModal] = useState(false);
   const [openDeleteModal, setOpenDeleteModal] = useState(false);
   const [openPromotionModal, setOpenPromotionModal] = useState(false);
+  const [tab, setTab] = useState<'default' | 'students'>('default');
 
   const handleCloseModal = () => {
     setOpenModal(false);
@@ -35,7 +37,7 @@ export default function PromotionEditorPage() {
 
   const handleClosePromotionModal = () => {
     setOpenPromotionModal(false);
-    refetch(); // pour recharger les données de la promo
+    refetch();
   };
 
   const handleDeletePromotion = async () => {
@@ -65,6 +67,11 @@ export default function PromotionEditorPage() {
 
   const tabs = [
     {
+      title: "Résumé",
+      icon: <Home className="h-full w-full text-neutral-500 dark:text-neutral-300" />,
+      onClick: () => setTab('default'),
+    },
+    {
       title: "Modifier la promotion",
       icon: <Edit className="h-full w-full text-neutral-500 dark:text-neutral-300" />,
       onClick: () => setOpenPromotionModal(true),
@@ -77,7 +84,7 @@ export default function PromotionEditorPage() {
     {
       title: "Modifier la liste des étudiants",
       icon: <GraduationCap className="h-full w-full text-neutral-500 dark:text-neutral-300" />,
-      onClick: () => navigate(`/promotions/${promotion.id}/ajouter-etudiant`),
+      onClick: () => setTab('students'),
     },
     { 
       title: "Supprimer la promotion",
@@ -103,111 +110,113 @@ export default function PromotionEditorPage() {
           <FloatingDock items={tabs} desktopClassName="w-full" />
         </div>
       )}
-      <div className="flex flex-1 flex-col gap-4 pt-0">
-        <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+      {tab === 'students' ? (
+        <PromotionEditStudentComponent />
+      ) : (
+        <div className="flex flex-1 flex-col gap-4 pt-0">
+          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
+            <FlexibleCard
+              key={promotion.id}
+              title={promotion.name}
+              description={`Enseignant: ${promotion.teacher.firstName} ${promotion.teacher.lastName}`}
+            >
+              <div className="max-w-xs mx-auto w-full flex items-center">
+                <div className="flex flex-col items-center justify-center w-full">
+                  <FlexibleCircularProgress
+                    value={promotion.students.length}
+                    size={120}
+                    strokeWidth={10}
+                    showLabel
+                    labelClassName="text-xl font-bold"
+                    progressClassName="stroke-green-500"
+                  />
+                  <p className="mt-2 text-sm font-medium">Nombre d'étudiants</p>
+                </div>
+                <div className="flex flex-col items-center justify-center w-full">
+                  <FlexibleCircularProgress
+                    value={promotion.projects.length}
+                    size={120}
+                    strokeWidth={10}
+                    showLabel
+                    labelClassName="text-xl font-bold"
+                    progressClassName="stroke-orange-500"
+                  />
+                  <p className="mt-2 text-sm font-medium">Nombre de projets</p>
+                </div>
+              </div>
+            </FlexibleCard>
+          </div>
+
           <FlexibleCard
-            key={promotion.id}
-            title={promotion.name}
-            description={`Enseignant: ${promotion.teacher.firstName} ${promotion.teacher.lastName}`}
+            title="Projets de la promotion"
+            description="Gérer les projets de la promotion"
+            childrenRightEnd={
+              isStudent() ? undefined : (
+                <Button size="sm" onClick={() => setOpenModal(true)}>
+                  Créer un projet
+                </Button>
+              )
+            }
           >
-            <div className="max-w-xs mx-auto w-full flex items-center">
-              <div className="flex flex-col items-center justify-center w-full">
-                <FlexibleCircularProgress
-                  value={promotion.students.length}
-                  size={120}
-                  strokeWidth={10}
-                  showLabel
-                  labelClassName="text-xl font-bold"
-                  progressClassName="stroke-green-500"
-                />
-                <p className="mt-2 text-sm font-medium">Nombre d'étudiants</p>
-              </div>
-              <div className="flex flex-col items-center justify-center w-full">
-                <FlexibleCircularProgress
-                  value={promotion.projects.length}
-                  size={120}
-                  strokeWidth={10}
-                  showLabel
-                  labelClassName="text-xl font-bold"
-                  progressClassName="stroke-orange-500"
-                />
-                <p className="mt-2 text-sm font-medium">Nombre de projets</p>
-              </div>
-            </div>
+            <FlexibleTable<Project>
+              data={promotion.projects}
+              columns={[
+                {
+                  accessorKey: "name",
+                  header: "Nom",
+                },
+                {
+                  accessorKey: "description",
+                  header: "Description",
+                },
+                {
+                  accessorKey: "createdAt",
+                  header: "Créer le",
+                },
+                {
+                  accessorKey: "deadline",
+                  header: "Se termine le",
+                },
+              ]}
+            />
+          </FlexibleCard>
+
+          <FlexibleCard
+            title="Etudiants de la promotion"
+            description="Gérer les étudiants de la promotion"
+            childrenRightEnd={
+              isStudent() ? undefined : (
+                <Button size="sm" onClick={() => setTab('students')}>
+                  Modifier la liste des étudiants
+                </Button>
+              )
+            }
+          >
+            <FlexibleTable<User>
+              data={promotion.students}
+              columns={[
+                {
+                  accessorKey: "firstName",
+                  header: "Prénom",
+                },
+                {
+                  accessorKey: "lastName",
+                  header: "Nom de famille",
+                },
+                {
+                  accessorKey: "username",
+                  header: "Nom d'utilisateur",
+                },
+                {
+                  accessorKey: "email",
+                  header: "Email",
+                },
+              ]}
+            />
           </FlexibleCard>
         </div>
-
-        <FlexibleCard
-          title="Projets de la promotion"
-          description="Gérer les projets de la promotion"
-          childrenRightEnd={
-            isStudent() ? undefined : (
-              <Button size="sm" onClick={() => setOpenModal(true)}>
-                Créer un projet
-              </Button>
-            )
-          }
-        >
-          <FlexibleTable<Project>
-            data={promotion.projects}
-            columns={[
-              {
-                accessorKey: "name",
-                header: "Nom",
-              },
-              {
-                accessorKey: "description",
-                header: "Description",
-              },
-              {
-                accessorKey: "createdAt",
-                header: "Créer le",
-              },
-              {
-                accessorKey: "deadline",
-                header: "Se termine le",
-              },
-            ]}
-          />
-        </FlexibleCard>
-
-        <FlexibleCard
-          title="Etudiants de la promotion"
-          description="Gérer les étudiants de la promotion"
-          childrenRightEnd={
-            isStudent() ? undefined : (
-              <Button size="sm">
-                <Link to={`/promotions/${promotion.id}/ajouter-etudiant`}>
-                  Modifier la liste des étudiants
-                </Link>
-              </Button>
-            )
-          }
-        >
-          <FlexibleTable<User>
-            data={promotion.students}
-            columns={[
-              {
-                accessorKey: "firstName",
-                header: "Prénom",
-              },
-              {
-                accessorKey: "lastName",
-                header: "Nom de famille",
-              },
-              {
-                accessorKey: "username",
-                header: "Nom d'utilisateur",
-              },
-              {
-                accessorKey: "email",
-                header: "Email",
-              },
-            ]}
-          />
-        </FlexibleCard>
-      </div>
-       <AlertDialog onOpenChange={setOpenDeleteModal} open={openDeleteModal}>
+      )}
+      <AlertDialog onOpenChange={setOpenDeleteModal} open={openDeleteModal}>
             <AlertDialogTrigger asChild>
                 <div />
             </AlertDialogTrigger>

@@ -3,6 +3,8 @@ import { fetchDeliverablesByProject } from "@/services/deliverableService";
 import { fetchSubmissionsByGroup, uploadSubmission, downloadSubmission } from "@/services/submissionService";
 import { Deliverable, Submission } from "@/types/deliverable.type";
 import toast from "react-hot-toast";
+import FlexibleAlert from "../template/FlexibleAlert";
+import { Info } from "lucide-react";
 
 interface DelivrableComponentProps {
   projectId: string;
@@ -78,7 +80,7 @@ export default function DelivrableComponent({ projectId, groupId }: DelivrableCo
   }
 
   if (!deliverables.length) {
-    return <div className="text-center text-gray-500">Aucun livrable à rendre pour ce projet.</div>;
+    return <FlexibleAlert title="Aucun livrable à rendre pour ce projet." icon={<Info className="!text-blue-500 text-center" />} variant="info" />;
   }
 
   return (
