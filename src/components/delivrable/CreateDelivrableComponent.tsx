@@ -11,6 +11,8 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import FlexibleCard from "../template/FlexibleCard";
+import RuleList from '../rules/RuleList';
+import RuleForm from "../rules/RuleForm";
 
 export default function CreateDelivrableComponent() {
   const { project } = useProjectContext();
@@ -26,6 +28,7 @@ export default function CreateDelivrableComponent() {
   });
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingRulesFor, setEditingRulesFor] = useState<string | null>(null);
 
   useEffect(() => {
     if (project?.id) {
@@ -164,10 +167,21 @@ export default function CreateDelivrableComponent() {
         <ul className="space-y-2">
           {Array.isArray(deliverables) && deliverables.map((d) => (
             <li key={d.id} className="border rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2 bg-muted/30">
-              <div>
+              <div className="flex-1">
                 <div className="font-bold text-lg">{d.name}</div>
                 <div className="text-xs text-muted-foreground">Deadline : {new Date(d.deadline).toLocaleString()}</div>
                 <div className="text-xs text-muted-foreground">{d.description}</div>
+                <div className="mt-2">
+                  <RuleList deliverableId={d.id} />
+                  {editingRulesFor === d.id ? (
+                    <div className="mt-2">
+                      <RuleForm deliverableId={d.id} onRuleCreated={() => setEditingRulesFor(null)} />
+                      <Button size="sm" variant="secondary" className="mt-2" onClick={() => setEditingRulesFor(null)}>Fermer</Button>
+                    </div>
+                  ) : (
+                    <Button size="sm" variant="outline" className="mt-2" onClick={() => setEditingRulesFor(d.id)}>Gérer les règles</Button>
+                  )}
+                </div>
               </div>
               <div className="flex gap-2">
                 <Button size="sm" variant="outline" onClick={() => handleEdit(d)}>Modifier</Button>
