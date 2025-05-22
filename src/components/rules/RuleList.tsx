@@ -1,18 +1,34 @@
 import React, { useEffect, useState } from 'react';
-import { fetchRulesByDeliverable } from '@/services/ruleService';
+import { fetchRulesByDeliverable, deleteRule } from '@/services/ruleService';
 import { FileTree, FileTreeNode } from '@/components/ui/filetree';
 
 export default function RuleList({ deliverableId, onEditRule }: { deliverableId: string, onEditRule?: (rule: any) => void }) {
     const [rules, setRules] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const [deletingId, setDeletingId] = useState<string | null>(null);
 
-    useEffect(() => {
+    const refresh = () => {
         setLoading(true);
         fetchRulesByDeliverable(deliverableId).then(data => {
             setRules(Array.isArray(data) ? data : []);
             setLoading(false);
         });
+    };
+
+    useEffect(() => {
+        refresh();
     }, [deliverableId]);
+
+    async function handleDelete(id: string) {
+        if (!window.confirm('Supprimer cette règle ?')) return;
+        setDeletingId(id);
+        try {
+            await deleteRule(id);
+            refresh();
+        } finally {
+            setDeletingId(null);
+        }
+    }
 
     function formatRule(rule: any) {
         if (rule.type === 'FILE_EXISTS') {
@@ -64,15 +80,25 @@ export default function RuleList({ deliverableId, onEditRule }: { deliverableId:
                             </span>
                             {rule.preset && <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Preset : {rule.preset}</span>}
                         </div>
-                        {onEditRule && (
+                        <div className="flex gap-2">
+                            {onEditRule && (
+                                <button
+                                    className="text-xs text-primary underline hover:opacity-80"
+                                    onClick={() => onEditRule(rule)}
+                                    type="button"
+                                >
+                                    Modifier
+                                </button>
+                            )}
                             <button
-                                className="text-xs text-primary underline hover:opacity-80"
-                                onClick={() => onEditRule(rule)}
+                                className="text-xs text-destructive underline hover:opacity-80"
+                                onClick={() => handleDelete(rule.id)}
                                 type="button"
+                                disabled={deletingId === rule.id}
                             >
-                                Modifier
+                                {deletingId === rule.id ? 'Suppression...' : 'Supprimer'}
                             </button>
-                        )}
+                        </div>
                     </div>
                     {formatRule(rule)}
                 </li>

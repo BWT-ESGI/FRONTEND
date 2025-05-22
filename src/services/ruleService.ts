@@ -24,3 +24,8 @@ export const updateRule = async (id: string, payload: any) => {
     const { data } = await api.put(`/rules/${id}`, payload);
     return data;
 };
+
+export const deleteRule = async (id: string) => {
+    const { data } = await api.delete(`/rules/${id}`);
+    return data;
+};
