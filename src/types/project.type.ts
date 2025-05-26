@@ -10,17 +10,18 @@ export enum ProjectStatus {
 export type GroupCompositionType = "manual" | "random" | "student_choice";
 
 export type Project = {
-    id: string;
-    name: string;
-    description?: string | null;
-    nbStudentsMinPerGroup: number;
-    nbStudentsMaxPerGroup: number;
-    nbGroups: number;
-    groupCompositionType: GroupCompositionType;
-    status: ProjectStatus;
-    groups: Group[];
-    createdAt: Date;
-    endAt: Date;
-    deadline: Date;
-    promotion: Promotion;
+  id: string;
+  name: string;
+  description?: string | null;
+  nbStudentsMinPerGroup: number;
+  nbStudentsMaxPerGroup: number;
+  nbGroups: number;
+  groupCompositionType: GroupCompositionType;
+  status: ProjectStatus;
+  groups: Group[];
+  createdAt: Date;
+  updatedAt: Date;
+  endAt: Date;
+  deadline: Date;
+  promotion: Promotion;
 };

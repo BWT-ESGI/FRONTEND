@@ -21,6 +21,7 @@ import ScoringGridPage from "@/pages/teacher/ScoringGridPage";
 import IsStudentWall from "@/middleware/IsStudentWall";
 import ProjectStudentDashboardPage from "@/pages/student/ProjectStudentDashboardPage";
 import JoinGroupProjectPage from "@/pages/student/JoinGroupProjectPage";
+import ProjectCorrectionPage from "./pages/teacher/ProjectCorrectionPage";
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -62,7 +63,7 @@ const App = () => {
                 <Route path="/projets" element={<ProjectListPage />} />
                 <Route path="/projets/:id" element={<ProjectDashboardWrapper />} />
                 <Route path="/projets/:id/editer" element={<ProjectEditWrapper />} />
-
+                <Route path="/projets/:id/correction" element={<ProjectCorrectionPage />} />
                 {/* ============== UTILISATEUR ============== */}
                 <Route path="/gestion-utilisateurs/create" element={<UserCreatePage />} />
                 <Route path="/gestion-utilisateurs" element={<UserManagerPage />} />

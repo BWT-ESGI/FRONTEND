@@ -25,9 +25,10 @@ const CustomHardBreak = HardBreak.extend({
 
 interface TextEditorProps {
   rapportId: string;
+  readOnly?: boolean;
 }
 
-export default function TextEditor({ rapportId }: TextEditorProps) {
+export default function TextEditor({ rapportId, readOnly }: TextEditorProps) {
   const editor = useEditor({
     extensions: [
       CustomHardBreak,
@@ -93,105 +94,113 @@ export default function TextEditor({ rapportId }: TextEditorProps) {
 
   return (
     <>
-      <FlexibleCard className="mb-4">
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => editor.chain().focus().setParagraph().run()}
-            className={getButtonClass(editor.isActive("paragraph"))}
-            title="Paragraphe"
-          >
-            <Pilcrow className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-            className={getButtonClass(editor.isActive("heading", { level: 1 }))}
-            title="Titre 1"
-          >
-            <Heading1 className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-            className={getButtonClass(editor.isActive("heading", { level: 2 }))}
-            title="Titre 2"
-          >
-            <Heading2 className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleBold().run()}
-            className={getButtonClass(editor.isActive("bold"))}
-            title="Gras"
-          >
-            <Bold className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleItalic().run()}
-            className={getButtonClass(editor.isActive("italic"))}
-            title="Italique"
-          >
-            <Italic className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleUnderline().run()}
-            className={getButtonClass(editor.isActive("underline"))}
-            title="Souligné"
-          >
-            <Baseline className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleStrike().run()}
-            className={getButtonClass(editor.isActive("strike"))}
-            title="Barré"
-          >
-            <Strikethrough className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleBulletList().run()}
-            className={getButtonClass(editor.isActive("bulletList"))}
-            title="Liste à puces"
-          >
-            <List className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().toggleOrderedList().run()}
-            className={getButtonClass(editor.isActive("orderedList"))}
-            title="Liste numérotée"
-          >
-            <ListOrdered className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().setTextAlign("left").run()}
-            className={getButtonClass(editor.isActive({ textAlign: "left" }))}
-            title="Aligner à gauche"
-          >
-            <AlignLeft className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().setTextAlign("center").run()}
-            className={getButtonClass(editor.isActive({ textAlign: "center" }))}
-            title="Centrer"
-          >
-            <AlignJustify className="h-4 w-4" />
-          </button>
-          <button
-            onClick={() => editor.chain().focus().setTextAlign("right").run()}
-            className={getButtonClass(editor.isActive({ textAlign: "right" }))}
-            title="Aligner à droite"
-          >
-            <AlignRight className="h-4 w-4" />
-          </button>
-        </div>
-      </FlexibleCard>
-
+      {!readOnly && (
+        <FlexibleCard className="mb-4">
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => editor.chain().focus().setParagraph().run()}
+              className={getButtonClass(editor.isActive("paragraph"))}
+              title="Paragraphe"
+            >
+              <Pilcrow className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+              className={getButtonClass(editor.isActive("heading", { level: 1 }))}
+              title="Titre 1"
+            >
+              <Heading1 className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+              className={getButtonClass(editor.isActive("heading", { level: 2 }))}
+              title="Titre 2"
+            >
+              <Heading2 className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleBold().run()}
+              className={getButtonClass(editor.isActive("bold"))}
+              title="Gras"
+            >
+              <Bold className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleItalic().run()}
+              className={getButtonClass(editor.isActive("italic"))}
+              title="Italique"
+            >
+              <Italic className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleUnderline().run()}
+              className={getButtonClass(editor.isActive("underline"))}
+              title="Souligné"
+            >
+              <Baseline className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleStrike().run()}
+              className={getButtonClass(editor.isActive("strike"))}
+              title="Barré"
+            >
+              <Strikethrough className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleBulletList().run()}
+              className={getButtonClass(editor.isActive("bulletList"))}
+              title="Liste à puces"
+            >
+              <List className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => editor.chain().focus().toggleOrderedList().run()}
+              className={getButtonClass(editor.isActive("orderedList"))}
+              title="Liste numérotée"
+            >
+              <ListOrdered className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => editor.chain().focus().setTextAlign("left").run()}
+              className={getButtonClass(editor.isActive({ textAlign: "left" }))}
+              title="Aligner à gauche"
+            >
+              <AlignLeft className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => editor.chain().focus().setTextAlign("center").run()}
+              className={getButtonClass(editor.isActive({ textAlign: "center" }))}
+              title="Centrer"
+            >
+              <AlignJustify className="h-4 w-4" />
+            </button>
+            <button
+              onClick={() => editor.chain().focus().setTextAlign("right").run()}
+              className={getButtonClass(editor.isActive({ textAlign: "right" }))}
+              title="Aligner à droite"
+            >
+              <AlignRight className="h-4 w-4" />
+            </button>
+          </div>
+        </FlexibleCard>
+      )}
       <FlexibleCard className="flex flex-col">
-        <form onSubmit={handleSubmit} className="flex flex-col flex-1">
+        {readOnly ? (
           <EditorContent
             editor={editor}
-            className="flex-1 p-4 min-h-[500px]"
+            className="flex-1 p-4 min-h-[500px] bg-gray-50 dark:bg-gray-900/30 rounded-md"
           />
-          <Button type="submit" className="mt-4 px-6 py-2 self-start w-auto">
-            Enregistrer
-          </Button>
-        </form>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex flex-col flex-1">
+            <EditorContent
+              editor={editor}
+              className="flex-1 p-4 min-h-[500px]"
+            />
+            <Button type="submit" className="mt-4 px-6 py-2 self-start w-auto">
+              Enregistrer
+            </Button>
+          </form>
+        )}
       </FlexibleCard>
     </>
   );

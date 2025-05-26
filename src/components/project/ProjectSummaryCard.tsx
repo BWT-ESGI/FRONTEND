@@ -10,25 +10,51 @@ interface ProjectSummaryCardProps {
 
 export default function ProjectSummaryCard({ project, btn = (<></>) } : ProjectSummaryCardProps) {
     if (!project) return null;
+
+    console.log(project);
     return (
       <FlexibleCard
         key={project.id}
         title={project.name}
         description={project.description || "Aucune description"}
-        className="w-full"
+        className="w-full h-full"
         childrenRightEnd={<FlexibleBadge status={project.status} />}
         childrenFooter={
           <div className="flex justify-between mt-4 items-center">
-            <p className="text-sm text-gray-500">
-              Créer le{" "}
-              {new Date(project.createdAt).toLocaleString("fr-FR", {
-                day: "numeric",
-                month: "short",
-                year: "numeric",
-                hour: "2-digit",
-                minute: "2-digit",
-              })}
-            </p>
+            <div>
+              <p className="text-sm text-gray-500">
+                Créé le{" "}
+                {new Date(project.createdAt).toLocaleString("fr-FR", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+              <p className="text-sm text-gray-500">
+                Mis à jour le{" "}
+                {new Date(project.updatedAt).toLocaleString("fr-FR", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </p>
+              {project.endAt && (
+                <p className="text-sm text-gray-500">
+                  Date de fin :{" "}
+                  {new Date(project.endAt).toLocaleString("fr-FR", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
+              )}
+            </div>
             {btn && btn}
           </div>
         }
@@ -51,13 +77,25 @@ export default function ProjectSummaryCard({ project, btn = (<></>) } : ProjectS
             <span>{project.nbStudentsMinPerGroup}</span>
             <Progress
               value={
-                (project.nbStudentsMinPerGroup / project.nbStudentsMaxPerGroup) *
+                (project.nbStudentsMinPerGroup /
+                  project.nbStudentsMaxPerGroup) *
                 100
               }
               className="w-full"
             />
             <span>{project.nbStudentsMaxPerGroup}</span>
           </div>
+          <div className="flex items-center gap-2 mt-1">
+            <strong>Nombre de groupes : </strong>
+            <span>{project.nbGroups}</span>
+          </div>
+          {project.promotion && (
+            <div className="flex items-center gap-2 mt-1">
+              <strong>Promotion : </strong>
+              <span>{project.promotion.name}</span>
+            </div>
+          )}
+
         </div>
       </FlexibleCard>
     );
