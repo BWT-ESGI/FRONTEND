@@ -114,19 +114,23 @@ function convertPathsToFileTree(paths: string[]): FileTreeNode[] {
         const parts = path.split('/').filter(Boolean);
         let current = root;
         for (let i = 0; i < parts.length; i++) {
-            const isFolder = path.endsWith('/') && i === parts.length - 1;
+            const isLast = i === parts.length - 1;
+            const isFolder = path.endsWith('/') && isLast;
             const name = parts[i];
-            let node = current.find(n => n.name === name && n.type === (isFolder ? 'folder' : 'file'));
+            // Fusionne les dossiers existants, ne crée qu'un seul noeud par nom/type
+            let node = current.find(n => n.name === name && n.type === (isLast ? (isFolder ? 'folder' : 'file') : 'folder'));
             if (!node) {
                 node = {
                     id: `${name}-${i}-${Math.random().toString(36).slice(2, 8)}`,
                     name,
-                    type: isFolder ? 'folder' : (i === parts.length - 1 ? 'file' : 'folder'),
-                    children: isFolder || i < parts.length - 1 ? [] : undefined,
+                    type: isLast ? (isFolder ? 'folder' : 'file') : 'folder',
+                    children: isLast && !isFolder ? undefined : [],
                 };
                 current.push(node);
             }
-            if (node.children) current = node.children;
+            if (node.type === 'folder' && node.children) {
+                current = node.children;
+            }
         }
     }
     return root;

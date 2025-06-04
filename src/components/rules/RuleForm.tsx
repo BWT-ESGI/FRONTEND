@@ -176,8 +176,8 @@ export default function RuleForm({ deliverableId, onRuleCreated }: { deliverable
                         {preset === "__custom__" && (
                             <div className="mt-2 flex flex-col gap-2">
                                 <FolderTreeEditor value={treeValue} onChange={setTreeValue} />
-                                <Input className="mt-2" placeholder="src/,public/,README.md" value={customValue} onChange={e => setCustomValue(e.target.value)} />
-                                <div className="text-xs text-muted-foreground">Vous pouvez éditer l'arborescence visuellement ou saisir une liste de chemins séparés par des virgules.</div>
+                                <Input className="mt-2" placeholder="src/,public/,README.md" value={customValue} onChange={e => setCustomValue(e.target.value)} readOnly />
+                                <div className="text-xs text-muted-foreground">L'arborescence attendue ne peut être modifiée que via l'interface graphique ci-dessus.</div>
                                 {treeValue.length > 0 && (
                                     <div className="mt-4">
                                         <Label>Prévisualisation de l'arborescence</Label>
