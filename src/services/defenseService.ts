@@ -30,3 +30,8 @@ export async function updateDefense(
   const { data } = await api.patch<Defense>(`/defenses/${defenseId}`, payload);
   return data;
 }
+
+export async function fetchDefensesByProjectId(projectId: string): Promise<Defense[]> {
+  const { data } = await api.get<Defense[]>(`/defenses/byProject/${projectId}`);
+  return data;
+}

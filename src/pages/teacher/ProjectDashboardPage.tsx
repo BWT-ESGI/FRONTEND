@@ -64,7 +64,7 @@ export default function ProjectDashboardPage() {
 
             <div className="flex flex-col gap-4 h-full">
               <Link
-                to={`/projets/${project.id}/correction`}
+                to={`/projets/${project.id}/projets/correction`}
                 style={{ textDecoration: "none", height: "100%" }}
                 className="h-full"
               >
@@ -83,7 +83,7 @@ export default function ProjectDashboardPage() {
                 </FlexibleCard>
               </Link>
               <Link
-                to={`/projets/${project.id}/soutenances`}
+                to={`/projets/${project.id}/soutenances/correction`}
                 style={{ textDecoration: "none", height: "100%" }}
                 className="h-full"
               >

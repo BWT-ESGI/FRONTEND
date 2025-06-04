@@ -3,8 +3,6 @@ import FileInput from "@/components/ui/FileInput";
 import { parseCSV } from "@/utils/parseCSV";
 import Divider from "@/components/layout/Divider";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import clsx from "clsx";
 import FlexibleAlert from "@/components/template/FlexibleAlert";
 import { ClipboardMinus } from "lucide-react";
 import FlexibleCard from "@/components/template/FlexibleCard";
@@ -15,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { updateStudentsPromotion } from "@/services/promotionService";
 import toast from "react-hot-toast";
 import { useStudents } from "@/hooks/api/useStudents";
+import UserCard from "@/components/user/UserCard";
 
 export default function PromotionEditStudentComponent() {
   const { students: users } = useStudents();
@@ -128,34 +127,14 @@ export default function PromotionEditStudentComponent() {
             {filteredUsers?.map((member) => {
               const isSelected = selectedEmails.includes(member.email);
               return (
-                <div
+                <UserCard
                   key={member.email}
+                  firstName={member.firstName}
+                  lastName={member.lastName}
+                  email={member.email}
+                  selected={isSelected}
                   onClick={() => handleCardClick(member.email)}
-                  className={clsx(
-                    "flex items-center p-2 gap-2 border rounded-lg shadow-sm w-full cursor-pointer transition-all",
-                    {
-                      "border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/30":
-                        isSelected,
-                      "border-gray-200 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800":
-                        !isSelected,
-                    }
-                  )}
-                >
-                  <div className="flex-shrink-0">
-                    <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarFallback className="rounded-lg">
-                        {member.firstName[0]}
-                        {member.lastName[0]}
-                      </AvatarFallback>
-                    </Avatar>
-                  </div>
-                  <div className="flex flex-col text-left">
-                    <p className="text-sm font-medium">
-                      {member.firstName} {member.lastName}
-                    </p>
-                    <p className="text-xs text-gray-500">{member.email}</p>
-                  </div>
-                </div>
+                />
               );
             })}
           </div>
