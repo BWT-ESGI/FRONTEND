@@ -1,4 +1,3 @@
-// src/hooks/api/useProjects.ts
 import { useEffect, useState } from "react";
 import { Project } from "@/types/project.type";
 import { fetchAllProjects } from "@/services/projectService";
