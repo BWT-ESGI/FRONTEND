@@ -38,7 +38,7 @@ export default function ProjectEditPage() {
 
         <Tabs defaultValue="general" className="mt-4 w-full">
           <TabsList className="w-full grid grid-cols-5 mb-4">
-            <TabsTrigger value="general">Information Général</TabsTrigger>
+            <TabsTrigger value="general">Informations Générales</TabsTrigger>
             <TabsTrigger value="groupes">Groupes</TabsTrigger>
             <TabsTrigger value="livrables">Livrables</TabsTrigger>
             <TabsTrigger value="rapports">Rapports</TabsTrigger>
