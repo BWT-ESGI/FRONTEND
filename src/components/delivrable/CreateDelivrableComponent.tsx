@@ -13,7 +13,6 @@ import { Label } from "@/components/ui/label";
 import FlexibleCard from "../template/FlexibleCard";
 import RuleList from '../rules/RuleList';
 import RuleForm from "../rules/RuleForm";
-import { fetchRulesByDeliverable } from '@/services/ruleService';
 
 export default function CreateDelivrableComponent() {
   const { project } = useProjectContext();
@@ -30,19 +29,11 @@ export default function CreateDelivrableComponent() {
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingRulesFor, setEditingRulesFor] = useState<string | null>(null);
-  const [rulesByDeliverable, setRulesByDeliverable] = useState<Record<string, any[]>>({});
 
   useEffect(() => {
     if (project?.id) {
       fetchDeliverablesByProject(project.id).then((res) => {
-        const deliverables = Array.isArray(res.data) ? res.data : [];
-        setDeliverables(deliverables);
-        // Charger les règles pour chaque livrable
-        deliverables.forEach((d) => {
-          fetchRulesByDeliverable(d.id).then((rules) => {
-            setRulesByDeliverable(prev => ({ ...prev, [d.id]: Array.isArray(rules) ? rules : [] }));
-          });
-        });
+        setDeliverables(Array.isArray(res.data) ? res.data : []);
       });
     }
   }, [project?.id]);
@@ -181,23 +172,6 @@ export default function CreateDelivrableComponent() {
                 <div className="text-xs text-muted-foreground">Deadline : {new Date(d.deadline).toLocaleString()}</div>
                 <div className="text-xs text-muted-foreground">{d.description}</div>
                 <div className="mt-2">
-                  {/* Résumé des règles */}
-                  {rulesByDeliverable[d.id] && rulesByDeliverable[d.id].length > 0 ? (
-                    <div className="text-xs text-green-700 mb-1">
-                      {rulesByDeliverable[d.id].length} règle{rulesByDeliverable[d.id].length > 1 ? 's' : ''} définie{rulesByDeliverable[d.id].length > 1 ? 's' : ''} :
-                      {rulesByDeliverable[d.id].map((rule, idx) => (
-                        <span key={rule.id} className="ml-2">
-                          {rule.type === 'FILE_EXISTS' && 'Fichier'}
-                          {rule.type === 'DIR_STRUCTURE' && 'Arborescence'}
-                          {rule.type === 'CONTENT_REGEX' && 'Contenu'}
-                          {idx < rulesByDeliverable[d.id].length - 1 && ','}
-                        </span>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-xs text-red-600 mb-1">Aucune règle définie.</div>
-                  )}
-                  {/* Fin résumé règles */}
                   <RuleList deliverableId={d.id} />
                   {editingRulesFor === d.id ? (
                     <div className="mt-2">
