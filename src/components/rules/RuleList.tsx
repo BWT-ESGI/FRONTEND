@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { fetchRulesByDeliverable, deleteRule } from '@/services/ruleService';
 import { FileTree, FileTreeNode } from '@/components/ui/filetree';
-import { CheckCircle, Folder, FileText, Regex, Trash2, Edit2 } from 'lucide-react';
+import { Folder, FileText, Regex, Trash2, Edit2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 export default function RuleList({ deliverableId, onEditRule }: { deliverableId: string, onEditRule?: (rule: any) => void }) {

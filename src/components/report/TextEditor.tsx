@@ -43,6 +43,7 @@ export default function TextEditor({ rapportId, readOnly }: TextEditorProps) {
     ],
     content: "<p>Chargement...</p>",
     autofocus: true,
+    editable: !readOnly,
     editorProps: {
       attributes: {
         class:
