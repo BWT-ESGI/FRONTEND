@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { fetchPromotions } from "@/services/promotionService";
 import { Promotion } from "@/types/promotion.type";
+import toast from "react-hot-toast";
 
 export default function ProjectListPage() {
   const { projects, loading } = useProjects();
@@ -78,14 +79,21 @@ export default function ProjectListPage() {
                   const hasGroup = project.groups?.some(g =>
                     g.members.some(m => m.id === userId)
                   );
+                  const handleDetailsClick = (e: React.MouseEvent) => {
+                    if (isStudentUser && !hasGroup) {
+                      e.preventDefault();
+                      toast.error("Vous n'avez pas été attribué à un groupe pour ce projet. Veuillez contacter votre professeur.");
+                    }
+                  };
                   return (
                     <ProjectSummaryCard key={project.id} project={project} btn={
                       isStudentUser && project.groupCompositionType === "student_choice" && !hasGroup ? (
                         <Link to={`/students/projets/${project.id}/rejoindre`}>
                           <Button className="cursor-pointer">Rejoindre un groupe</Button>
                         </Link>
-                      ) :  (
-                        <Link to={isStudentUser ? `/students/projets/${project.id}` : `/projets/${project.id}`}>
+                      ) : (
+                        <Link to={isStudentUser ? `/students/projets/${project.id}` : `/projets/${project.id}`}
+                          onClick={handleDetailsClick}>
                           <Button className="cursor-pointer">Voir les détails</Button>
                         </Link>)
                     } />

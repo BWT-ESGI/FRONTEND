@@ -29,6 +29,7 @@ export default function CreateDelivrableComponent() {
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingRulesFor, setEditingRulesFor] = useState<string | null>(null);
+  const [refreshRulesKey, setRefreshRulesKey] = useState(0);
 
   useEffect(() => {
     if (project?.id) {
@@ -199,10 +200,10 @@ export default function CreateDelivrableComponent() {
                     {d.description && <div className="text-sm text-gray-600 mb-1 break-words">{d.description}</div>}
                   </div>
                   <div className="mt-1">
-                    <RuleList deliverableId={d.id} />
+                    <RuleList deliverableId={d.id} key={d.id + '-' + refreshRulesKey} />
                     {editingRulesFor === d.id ? (
                       <div className="mt-3">
-                        <RuleForm deliverableId={d.id} onRuleCreated={() => setEditingRulesFor(null)} />
+                        <RuleForm deliverableId={d.id} onRuleCreated={() => { setEditingRulesFor(null); setRefreshRulesKey(k => k + 1); }} />
                         <Button size="sm" variant="secondary" className="mt-2 w-full" onClick={() => setEditingRulesFor(null)}>Fermer</Button>
                       </div>
                     ) : (

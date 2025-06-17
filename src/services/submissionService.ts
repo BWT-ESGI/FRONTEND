@@ -19,3 +19,7 @@ export async function downloadSubmission(submissionId: string) {
     responseType: "blob",
   });
 }
+
+export async function deleteSubmission(submissionId: string) {
+  return api.delete(`/submissions/${submissionId}`);
+}

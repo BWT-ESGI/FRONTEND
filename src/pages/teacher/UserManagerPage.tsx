@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { deleteUser } from "@/services/userService";
 import { useState } from "react";
+import { Trash2 } from "lucide-react";
 
 export default function UserManagerPage() {
   const { users, loading } = useUsers();
@@ -64,8 +65,8 @@ export default function UserManagerPage() {
               header: "Actions",
               cell: ({ row }) => (
                 <Button
-                  size="sm"
-                  variant="destructive"
+                  size="icon"
+                  variant="ghost"
                   disabled={deletingId === row.original.id}
                   onClick={async () => {
                     if (!window.confirm("Supprimer cet utilisateur ?")) return;
@@ -77,8 +78,10 @@ export default function UserManagerPage() {
                       setDeletingId(null);
                     }
                   }}
+                  aria-label="Supprimer"
+                  className="group hover:cursor-pointer"
                 >
-                  Supprimer
+                  <Trash2 size={18} className="text-muted-foreground group-hover:text-red-500 transition-colors" />
                 </Button>
               ),
             },

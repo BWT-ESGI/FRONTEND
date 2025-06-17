@@ -5,7 +5,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import FlexibleCard from "@/components/template/FlexibleCard";
 import ProjectSummaryCard from "@/components/project/ProjectSummaryCard";
 import RemainingDaysCard from "@/components/project/RemainingDayCard";
-import { ClipboardMinus, FileText, FolderUp, GraduationCap, X} from "lucide-react";
+import { ClipboardMinus, FileText, FolderUp, GraduationCap, X } from "lucide-react";
 import GroupMemberCard from "@/components/project/GroupMemberCard";
 import { useEffect, useState } from "react";
 import TextEditor from "@/components/report/TextEditor";
@@ -21,6 +21,7 @@ import FlexibleAlert from "@/components/template/FlexibleAlert";
 import { Button } from "@/components/ui/button";
 import { createRapport } from "@/services/rapportService";
 import DelivrableComponent from "@/components/delivrable/DelivrableComponent";
+import StudentDeliverableTimeline from "@/components/delivrable/StudentDeliverableTimeline";
 import { Deliverable, Submission } from "@/types/deliverable.type";
 import { fetchDeliverablesByProject } from "@/services/deliverableService";
 import { fetchSubmissionsByGroup } from "@/services/submissionService";
@@ -70,13 +71,26 @@ export default function ProjectStudentDashboardPage() {
         setDeliverables(Array.isArray(dRes.data) ? dRes.data : []);
         setSubmissions(Array.isArray(sRes.data) ? sRes.data : []);
       })
-      .catch(() =>
-        toast.error("Erreur lors du chargement des livrables ou rendus")
-      )
+      .catch((err) => {
+        // Si l'erreur est une 404 (pas de livrables), on ne toast pas
+        if (err?.response?.status !== 404) {
+          toast.error("Erreur lors du chargement des livrables ou rendus");
+        }
+      })
   }, [project]);
-    
+
   if (projectLoading) return <FallBackPageSkeleton />;
   if (reportLoading) return <FallBackPageSkeleton />;
+  if (!groupId) {
+    return (
+      <DashboardLayout>
+        <FlexibleAlert
+          title={<div><div>Aucun groupe attribué</div><div className="text-sm text-neutral-500">Vous n'avez pas été attribué à un groupe pour ce projet. Veuillez contacter votre professeur.</div></div>}
+          icon={<X className="h-6 w-6 text-red-500" />}
+        />
+      </DashboardLayout>
+    );
+  }
 
   const tabs = [
     {
@@ -121,9 +135,8 @@ export default function ProjectStudentDashboardPage() {
   const duration = Math.abs(end.getTime() - start.getTime());
   const hours = Math.floor((duration % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
   const minutes = Math.floor((duration % (1000 * 60 * 60)) / (1000 * 60));
-  const formattedDuration = `${hours > 0 ? `${hours}h` : ""} ${
-    minutes > 0 ? `${minutes}m` : ""
-  }`.trim();
+  const formattedDuration = `${hours > 0 ? `${hours}h` : ""} ${minutes > 0 ? `${minutes}m` : ""
+    }`.trim();
 
   const handleCreateReport = async () => {
     if (!project) return;
@@ -138,7 +151,7 @@ export default function ProjectStudentDashboardPage() {
       }).catch((error) => {
         console.error("Erreur lors de la création du rapport :", error);
         toast.error("Erreur lors de la création du rapport");
-      });      
+      });
     } catch (error) {
       console.error("Erreur lors de la création du rapport :", error);
       toast.error("Erreur lors de la création du rapport");
@@ -174,7 +187,7 @@ export default function ProjectStudentDashboardPage() {
                     defense={defense}
                   />
                 </div>
-               {/*  <div className="flex items-center justify-between">
+                {/*  <div className="flex items-center justify-between">
                   <span className="font-medium">Rapport :</span>
                   <span
                     className={`font-bold ${
@@ -195,7 +208,7 @@ export default function ProjectStudentDashboardPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
             <GroupMemberCard
-              members={project?.groups[0].members}
+              members={project?.groups[0]?.members || []}
               className="col-span-3"
             />
           </div>
@@ -203,7 +216,7 @@ export default function ProjectStudentDashboardPage() {
       )}
 
       {activeTab === "livrables" && project && groupId && (
-        <DelivrableComponent projectId={project.id} groupId={groupId} />
+        <StudentDeliverableTimeline projectId={project.id} groupId={groupId} />
       )}
       {activeTab === "rapports" ? (
         report ? (
