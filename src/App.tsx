@@ -17,13 +17,13 @@ import ProjectEditWrapper from "@/pages/teacher/ProjectEditWrapper";
 import HomeDashboardPage from "@/pages/global/HomeDashboardPage";
 import IsAuthenticatedWall from "@/middleware/IsAuthenticatedWall";
 import IsTeacherWall from "@/middleware/IsTeacherWall";
-import ScoringGridPage from "@/pages/teacher/ScoringGridPage";
 import IsStudentWall from "@/middleware/IsStudentWall";
 import ProjectStudentDashboardPage from "@/pages/student/ProjectStudentDashboardPage";
 import JoinGroupProjectPage from "@/pages/student/JoinGroupProjectPage";
 import ProjectCorrectionPage from "./pages/teacher/ProjectCorrectionPage";
 import DefenseCorrectionPage from "./pages/teacher/DefenseCorrectionPage";
 import CreateCriteriaSetPage from "./pages/teacher/CreateCriteriaSetPage";
+import CriteriaGridPage from "@/pages/teacher/CriteriaGridPage";
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -60,6 +60,7 @@ const App = () => {
                 <Route path="/promotions/:id/ajouter-etudiant" element={<PromotionEditStudentPage />} />
 
                 <Route path="/grille-notation" element={<CreateCriteriaSetPage />} />
+                <Route path="/teacher/criteria-grid" element={<CriteriaGridPage />} />
 
                 {/* ============== PROJET ============== */}
                 <Route path="/projets" element={<ProjectListPage />} />

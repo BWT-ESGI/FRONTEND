@@ -12,7 +12,6 @@ import ProjectGlobalEditComponent from "@/components/project/ProjectGlobalEditCo
 import DefenseScheduler from "@/components/defense/DefenseScheduler";
 import { useProjectContext } from "@/contexts/ProjectContext";
 import CreateDelivrableComponent from "@/components/delivrable/CreateDelivrableComponent";
-import DeliverableRulesPage from "./DeliverableRulesPage";
 
 export default function ProjectEditPage() {
   const { project, loading } = useProjectContext();

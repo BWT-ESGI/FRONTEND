@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import RuleForm from '@/components/rules/RuleForm';
 import RuleList from '@/components/rules/RuleList';
 
