@@ -6,13 +6,16 @@ import { useUsers } from "@/hooks/api/useUsers";
 import UserManagerPageSkeleton from "./UserManagerPageSkeleton";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { deleteUser } from "@/services/userService";
+import { useState } from "react";
 
 export default function UserManagerPage() {
   const { users, loading } = useUsers();
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   if (loading) {
     return (
-      <UserManagerPageSkeleton/>
+      <UserManagerPageSkeleton />
     );
   }
 
@@ -55,6 +58,29 @@ export default function UserManagerPage() {
             {
               accessorKey: "role",
               header: "Rôle",
+            },
+            {
+              id: "actions",
+              header: "Actions",
+              cell: ({ row }) => (
+                <Button
+                  size="sm"
+                  variant="destructive"
+                  disabled={deletingId === row.original.id}
+                  onClick={async () => {
+                    if (!window.confirm("Supprimer cet utilisateur ?")) return;
+                    setDeletingId(row.original.id);
+                    try {
+                      await deleteUser(row.original.id);
+                      window.location.reload(); // Ou re-fetch users si hook
+                    } finally {
+                      setDeletingId(null);
+                    }
+                  }}
+                >
+                  Supprimer
+                </Button>
+              ),
             },
           ]} />
         </FlexibleCard>

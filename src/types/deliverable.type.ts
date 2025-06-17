@@ -7,6 +7,7 @@ export type Deliverable = {
   penaltyPerHourLate: number;
   submissionType: 'archive' | 'git';
   maxSize?: number;
+  projectId: string;
 };
 
 export type Submission = {

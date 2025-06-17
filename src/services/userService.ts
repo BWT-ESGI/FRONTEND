@@ -42,3 +42,7 @@ export async function addMultipleStudents(
     throw error;
   }
 }
+
+export async function deleteUser(id: string): Promise<void> {
+  await api.delete(`/users/${id}`);
+}

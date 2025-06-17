@@ -32,6 +32,7 @@ export default function CreateDelivrableComponent() {
 
   useEffect(() => {
     if (project?.id) {
+      console.log("Chargement des livrables pour le projet", project.id);
       fetchDeliverablesByProject(project.id).then((res) => {
         setDeliverables(Array.isArray(res.data) ? res.data : []);
       });
@@ -50,6 +51,14 @@ export default function CreateDelivrableComponent() {
     }));
   };
 
+  // Ajout d'un handler dédié pour la checkbox
+  const handleAllowLateSubmissionChange = (checked: boolean) => {
+    setForm((prev) => ({
+      ...prev,
+      allowLateSubmission: checked,
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!project?.id) return;
@@ -63,7 +72,7 @@ export default function CreateDelivrableComponent() {
           projectId: project.id,
           deadline: form.deadline ? new Date(form.deadline).toISOString() : undefined,
           maxSize:
-            form.maxSize !== undefined && form.maxSize !== null && `${form.maxSize}` !== ""
+            form.submissionType === "archive" && form.maxSize !== undefined && form.maxSize !== null && `${form.maxSize}` !== ""
               ? Number(form.maxSize)
               : undefined,
           penaltyPerHourLate:
@@ -136,7 +145,12 @@ export default function CreateDelivrableComponent() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4 items-end">
             <div className="flex flex-col items-start gap-2">
               <div className="flex items-center gap-2">
-                <Checkbox id="allowLateSubmission" name="allowLateSubmission" checked={!!form.allowLateSubmission} onCheckedChange={v => handleChange({ target: { name: "allowLateSubmission", checked: v, type: "checkbox" } } as any)} />
+                <Checkbox
+                  id="allowLateSubmission"
+                  name="allowLateSubmission"
+                  checked={!!form.allowLateSubmission}
+                  onCheckedChange={handleAllowLateSubmissionChange}
+                />
                 <Label htmlFor="allowLateSubmission">Autoriser le rendu en retard</Label>
               </div>
             </div>
@@ -146,7 +160,11 @@ export default function CreateDelivrableComponent() {
             </div>
             <div className="flex flex-col items-start gap-2">
               <Label htmlFor="submissionType">Type de rendu</Label>
-              <Select name="submissionType" value={form.submissionType || "archive"} onValueChange={value => handleChange({ target: { name: "submissionType", value, type: "select-one" } } as any)}>
+              <Select
+                name="submissionType"
+                value={form.submissionType || "archive"}
+                onValueChange={value => handleChange({ target: { name: "submissionType", value, type: "select-one" } } as any)}
+              >
                 <SelectTrigger id="submissionType">
                   <SelectValue placeholder="Type de rendu" />
                 </SelectTrigger>
@@ -156,10 +174,12 @@ export default function CreateDelivrableComponent() {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex flex-col items-start gap-2">
-              <Label htmlFor="maxSize">Taille max (Mo)</Label>
-              <Input id="maxSize" name="maxSize" value={form.maxSize || ""} onChange={handleChange} type="number" min={0} step={1} placeholder="Taille max (Mo)" />
-            </div>
+            {form.submissionType === "archive" && (
+              <div className="flex flex-col items-start gap-2">
+                <Label htmlFor="maxSize">Taille max (Mo)</Label>
+                <Input id="maxSize" name="maxSize" value={form.maxSize || ""} onChange={handleChange} type="number" min={0} step={1} placeholder="Taille max (Mo)" />
+              </div>
+            )}
           </div>
         </FlexibleCard>
       </form>

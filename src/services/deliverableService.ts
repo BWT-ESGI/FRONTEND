@@ -3,7 +3,7 @@ import api from "../config/axios";
 import { Deliverable } from '@/types/deliverable.type';
 
 export async function fetchDeliverablesByProject(projectId: string) {
-  return api.get<Deliverable[]>(`/deliverables?projectId=${projectId}`);
+  return api.get<Deliverable[]>(`/deliverables/by-project/${projectId}`);
 }
 
 export async function createDeliverable(data: Partial<Deliverable> & { projectId: string }) {
