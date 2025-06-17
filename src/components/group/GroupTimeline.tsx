@@ -5,10 +5,17 @@ interface GroupTimelineProps {
 }
 
 export default function GroupTimeline({ groups, currentIndex, onSelect }: GroupTimelineProps) {
+  const sortedGroups = [...groups].sort((a, b) => {
+    if (!a.defenseDate && !b.defenseDate) return 0;
+    if (!a.defenseDate) return 1;
+    if (!b.defenseDate) return -1;
+    return new Date(a.defenseDate).getTime() - new Date(b.defenseDate).getTime();
+  });
+
   return (
     <div className="max-w-screen-sm md:mx-auto py-6 px-2">
       <div className="relative">
-        {groups.map((group, idx) => {
+        {sortedGroups.map((group, idx) => {
           const isActive = idx === currentIndex;
           const dateObj = group.defenseDate ? new Date(group.defenseDate) : null;
           const dateStr = dateObj ? dateObj.toLocaleDateString("fr-FR", { year: "numeric", month: "2-digit", day: "2-digit" }) : "—";

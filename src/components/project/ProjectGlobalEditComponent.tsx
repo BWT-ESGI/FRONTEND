@@ -2,13 +2,14 @@ import { Info } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Project, ProjectStatus } from "@/types/project.type";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { updateProject } from "@/services/projectService";
 import toast from "react-hot-toast";
 import { useProjectContext } from "@/contexts/ProjectContext";
 import NotFoundPage from "@/pages/global/NotFoundPage";
 import { Textarea } from "@/components/ui/textarea";
 import ProjectStatusSelector from "@/components/project/ProjectStatusSelector";
+import { getCriteriaSets, CriteriaSet } from "@/services/criteriaSetService";
 
 export default function ProjectGlobalEditComponent() {
   const { project, setProject } = useProjectContext();
@@ -26,6 +27,14 @@ export default function ProjectGlobalEditComponent() {
   );
   const [promotion] = useState(project.promotion?.name || "");
   const [loading, setLoading] = useState(false);
+  const [criteriaSets, setCriteriaSets] = useState<CriteriaSet[]>([]);
+  const [defenseCriteriaSetId, setDefenseCriteriaSetId] = useState<string | undefined>(project.defenseCriteriaSetId);
+  const [reportCriteriaSetId, setReportCriteriaSetId] = useState<string | undefined>(project.reportCriteriaSetId);
+  const [deliverableCriteriaSetId, setDeliverableCriteriaSetId] = useState<string | undefined>(project.deliverableCriteriaSetId);
+
+  useEffect(() => {
+    getCriteriaSets().then(setCriteriaSets).catch(() => {});
+  }, []);
 
   const handleSave = async () => {
     setLoading(true);
@@ -39,6 +48,9 @@ export default function ProjectGlobalEditComponent() {
         promotion: project.promotion
           ? { ...project.promotion, name: promotion }
           : undefined,
+        defenseCriteriaSetId,
+        reportCriteriaSetId,
+        deliverableCriteriaSetId,
       };
       await updateProject(String(project.id), payload);
       setProject({
@@ -105,6 +117,46 @@ export default function ProjectGlobalEditComponent() {
               type="date"
             />
           </div>
+        </div>
+
+        <div>
+          <label className="block font-medium mb-1">Grille de notation pour les soutenances</label>
+          <select
+            className="border rounded px-2 py-1 w-full"
+            value={defenseCriteriaSetId || ''}
+            onChange={e => setDefenseCriteriaSetId(e.target.value || undefined)}
+          >
+            <option value="">Aucune</option>
+            {criteriaSets.filter(cs => cs.type === 'defense').map(cs => (
+              <option key={cs.id} value={cs.id}>{cs.title}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block font-medium mb-1">Grille de notation pour les rapports</label>
+          <select
+            className="border rounded px-2 py-1 w-full"
+            value={reportCriteriaSetId || ''}
+            onChange={e => setReportCriteriaSetId(e.target.value || undefined)}
+          >
+            <option value="">Aucune</option>
+            {criteriaSets.filter(cs => cs.type === 'report').map(cs => (
+              <option key={cs.id} value={cs.id}>{cs.title}</option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="block font-medium mb-1">Grille de notation pour les rendus</label>
+          <select
+            className="border rounded px-2 py-1 w-full"
+            value={deliverableCriteriaSetId || ''}
+            onChange={e => setDeliverableCriteriaSetId(e.target.value || undefined)}
+          >
+            <option value="">Aucune</option>
+            {criteriaSets.filter(cs => cs.type === 'deliverable').map(cs => (
+              <option key={cs.id} value={cs.id}>{cs.title}</option>
+            ))}
+          </select>
         </div>
       </div>
 

@@ -23,6 +23,7 @@ import ProjectStudentDashboardPage from "@/pages/student/ProjectStudentDashboard
 import JoinGroupProjectPage from "@/pages/student/JoinGroupProjectPage";
 import ProjectCorrectionPage from "./pages/teacher/ProjectCorrectionPage";
 import DefenseCorrectionPage from "./pages/teacher/DefenseCorrectionPage";
+import CreateCriteriaSetPage from "./pages/teacher/CreateCriteriaSetPage";
 
 const App = () => {
   const queryClient = new QueryClient();
@@ -58,7 +59,7 @@ const App = () => {
                 {/* ============== PROMOTION ============== */}
                 <Route path="/promotions/:id/ajouter-etudiant" element={<PromotionEditStudentPage />} />
 
-                <Route path="/grille-notation" element={<ScoringGridPage />} />
+                <Route path="/grille-notation" element={<CreateCriteriaSetPage />} />
 
                 {/* ============== PROJET ============== */}
                 <Route path="/projets" element={<ProjectListPage />} />

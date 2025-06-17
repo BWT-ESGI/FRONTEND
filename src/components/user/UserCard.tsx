@@ -20,7 +20,7 @@ export default function UserCard({
   return (
     <div
       onClick={onClick}
-      className={`flex items-center p-2 gap-2 border rounded-lg shadow-sm w-full min-h-[56px] bg-white dark:bg-gray-900 border shadow-sm flex-wrap break-words transition-all
+      className={`flex items-center p-2 gap-2 border rounded-lg shadow-sm w-full min-h-[56px] bg-card border shadow-sm flex-wrap break-words transition-all
         ${
           selected
             ? "border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/30"

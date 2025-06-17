@@ -1,4 +1,3 @@
-
 import { Group } from "./group.type";import { Promotion } from "./promotion.type";
 export enum ProjectStatus {
     DRAFT = "draft",
@@ -24,4 +23,7 @@ export type Project = {
   endAt: Date;
   deadline: Date;
   promotion: Promotion;
+  defenseCriteriaSetId?: string;
+  reportCriteriaSetId?: string;
+  deliverableCriteriaSetId?: string;
 };
