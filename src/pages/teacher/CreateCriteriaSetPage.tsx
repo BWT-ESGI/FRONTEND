@@ -25,8 +25,8 @@ export default function CreateCriteriaSetPage() {
     { label: '', maxScore: 10, weight: 1, commentGlobal: '', commentPerCriteria: '' },
   ]);
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState('');
+  const [, setSuccess] = useState(false);
+  const [, setError] = useState('');
   const [criteriaSets, setCriteriaSets] = useState<CriteriaSet[]>([]);
   const [filterType, setFilterType] = useState<string>('all');
 
