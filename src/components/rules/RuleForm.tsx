@@ -7,7 +7,6 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select';
 import FolderTreeEditor, { TreeNode } from './FolderTreeEditor';
 import { FileTree, FileTreeNode } from '@/components/ui/filetree';
-import RuleList from './RuleList';
 
 const RuleTypeOptions = [
     { value: 'FILE_EXISTS', label: 'Présence de fichier' },
@@ -131,7 +130,7 @@ export default function RuleForm({ deliverableId, onRuleCreated }: { deliverable
     };
 
     return (
-        <Card className="p-6 max-w-xl w-full">
+        <Card className="p-6 max-w-md w-full mx-auto">
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                 <div>
                     <Label>Type de règle</Label>
@@ -216,8 +215,6 @@ export default function RuleForm({ deliverableId, onRuleCreated }: { deliverable
                 )}
                 {error && <div className="text-red-600">{error}</div>}
             </form>
-            {/* Juste après le formulaire, afficher la liste des règles existantes */}
-            <RuleList deliverableId={deliverableId} onEditRule={setRuleToEdit} />
         </Card>
     );
 }

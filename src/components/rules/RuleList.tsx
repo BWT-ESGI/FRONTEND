@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { fetchRulesByDeliverable, deleteRule } from '@/services/ruleService';
 import { FileTree, FileTreeNode } from '@/components/ui/filetree';
+import { CheckCircle, Folder, FileText, Regex, Trash2, Edit2 } from 'lucide-react';
+import { Badge } from '@/components/ui/badge';
 
 export default function RuleList({ deliverableId, onEditRule }: { deliverableId: string, onEditRule?: (rule: any) => void }) {
     const [rules, setRules] = useState<any[]>([]);
@@ -70,37 +72,42 @@ export default function RuleList({ deliverableId, onEditRule }: { deliverableId:
     return (
         <ul className="space-y-4">
             {rules.map(rule => (
-                <li key={rule.id} className="border p-3 rounded bg-white shadow-sm flex flex-col gap-2">
-                    <div className="flex items-center gap-2 justify-between">
-                        <div className="flex items-center gap-2">
-                            <span className="uppercase text-xs font-bold tracking-wider text-gray-500">
-                                {rule.type === 'FILE_EXISTS' && 'Fichiers requis'}
-                                {rule.type === 'DIR_STRUCTURE' && 'Architecture du projet'}
-                                {rule.type === 'CONTENT_REGEX' && 'Contenu de fichier'}
-                            </span>
-                            {rule.preset && <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded border border-blue-100">Preset : {rule.preset}</span>}
-                        </div>
-                        <div className="flex gap-2">
-                            {onEditRule && (
-                                <button
-                                    className="text-xs text-primary underline hover:opacity-80"
-                                    onClick={() => onEditRule(rule)}
-                                    type="button"
-                                >
-                                    Modifier
-                                </button>
-                            )}
-                            <button
-                                className="text-xs text-destructive underline hover:opacity-80"
-                                onClick={() => handleDelete(rule.id)}
-                                type="button"
-                                disabled={deletingId === rule.id}
-                            >
-                                {deletingId === rule.id ? 'Suppression...' : 'Supprimer'}
-                            </button>
-                        </div>
+                <li key={rule.id} className="border rounded-xl bg-white/90 shadow-sm hover:shadow-md transition-shadow p-4 flex flex-col gap-2 relative group">
+                    <div className="flex items-center gap-3 mb-1">
+                        {rule.type === 'FILE_EXISTS' && <FileText className="h-5 w-5 text-blue-500" />}
+                        {rule.type === 'DIR_STRUCTURE' && <Folder className="h-5 w-5 text-yellow-500" />}
+                        {rule.type === 'CONTENT_REGEX' && <Regex className="h-5 w-5 text-green-600" />}
+                        <span className="uppercase text-xs font-bold tracking-wider text-gray-600">
+                            {rule.type === 'FILE_EXISTS' && 'Fichier requis'}
+                            {rule.type === 'DIR_STRUCTURE' && 'Architecture du projet'}
+                            {rule.type === 'CONTENT_REGEX' && 'Contenu de fichier'}
+                        </span>
+                        {rule.preset && <Badge variant="outline" className="ml-2 text-xs border-blue-200 bg-blue-50 text-blue-700">Preset : {rule.preset}</Badge>}
                     </div>
-                    {formatRule(rule)}
+                    <div className="pl-7">
+                        {formatRule(rule)}
+                    </div>
+                    <div className="flex gap-2 absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {onEditRule && (
+                            <button
+                                className="rounded p-1 hover:bg-blue-50"
+                                onClick={() => onEditRule(rule)}
+                                type="button"
+                                title="Modifier"
+                            >
+                                <Edit2 className="h-4 w-4 text-blue-600" />
+                            </button>
+                        )}
+                        <button
+                            className="rounded p-1 hover:bg-red-50"
+                            onClick={() => handleDelete(rule.id)}
+                            type="button"
+                            title="Supprimer"
+                            disabled={deletingId === rule.id}
+                        >
+                            {deletingId === rule.id ? <span className="text-xs text-red-600">...</span> : <Trash2 className="h-4 w-4 text-red-500" />}
+                        </button>
+                    </div>
                 </li>
             ))}
         </ul>

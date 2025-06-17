@@ -31,8 +31,8 @@ export default function ProjectEditPage() {
     <DashboardLayout>
       <FlexibleCard title={`${project.name}`}>
         <FlexibleAlert
-          variant="warning"
-          icon={<Info className="!text-orange-500 text-center" />}
+          variant="info"
+          icon={<Info className="!text-grey-500 text-center" />}
           title="N'oubliez pas de sauvegarder vos modifications !"
         />
 
