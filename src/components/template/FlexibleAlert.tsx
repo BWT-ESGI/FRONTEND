@@ -1,7 +1,7 @@
 interface FlexibleAlertProps {
     variant?: "info" | "success" | "warning" | "error";
     icon: React.ReactNode;
-    title: string;
+    title: React.ReactNode;
 }
 
 const variantClasses = {

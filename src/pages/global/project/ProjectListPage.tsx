@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/select";
 import { fetchPromotions } from "@/services/promotionService";
 import { Promotion } from "@/types/promotion.type";
+import toast from "react-hot-toast";
 
 export default function ProjectListPage() {
   const { projects, loading } = useProjects();
@@ -87,16 +88,22 @@ export default function ProjectListPage() {
                   const hasGroup = project.groups?.some((g) =>
                     g.members.some((m) => m.id === userId)
                   );
+                  const handleDetailsClick = (e: React.MouseEvent) => {
+                    if (isStudentUser && !hasGroup) {
+                      e.preventDefault();
+                      toast.error("Vous n'avez pas été attribué à un groupe pour ce projet. Veuillez contacter votre professeur.");
+                    }
+                  };
                   return (
                     <ProjectSummaryCard
                       key={project.id}
                       project={project}
                       btn={
                         isStudentUser &&
-                        project.groupCompositionType === "student_choice" &&
-                        !hasGroup ? (
+                          project.groupCompositionType === "student_choice" &&
+                          !hasGroup ? (
                           project.deadlineGroupSelection &&
-                          new Date(project.deadlineGroupSelection) <
+                            new Date(project.deadlineGroupSelection) <
                             new Date() ? (
                             <Button disabled className="cursor-not-allowed">
                               Deadline dépassée
@@ -111,16 +118,9 @@ export default function ProjectListPage() {
                             </Link>
                           )
                         ) : (
-                          <Link
-                            to={
-                              isStudentUser
-                                ? `/students/projets/${project.id}`
-                                : `/projets/${project.id}`
-                            }
-                          >
-                            <Button className="cursor-pointer">
-                              Voir les détails
-                            </Button>
+                          <Link to={isStudentUser ? `/students/projets/${project.id}` : `/projets/${project.id}`}
+                            onClick={handleDetailsClick}>
+                            <Button className="cursor-pointer">Voir les détails</Button>
                           </Link>
                         )
                       }
