@@ -11,6 +11,8 @@ import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "@
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import FlexibleCard from "../template/FlexibleCard";
+import RuleList from '../rules/RuleList';
+import RuleForm from "../rules/RuleForm";
 
 export default function CreateDelivrableComponent() {
   const { project } = useProjectContext();
@@ -26,6 +28,7 @@ export default function CreateDelivrableComponent() {
   });
   const [loading, setLoading] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [editingRulesFor, setEditingRulesFor] = useState<string | null>(null);
 
   useEffect(() => {
     if (project?.id) {
@@ -161,21 +164,43 @@ export default function CreateDelivrableComponent() {
         </FlexibleCard>
       </form>
       <FlexibleCard title="Livrables existants">
-        <ul className="space-y-2">
-          {Array.isArray(deliverables) && deliverables.map((d) => (
-            <li key={d.id} className="border rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2 bg-muted/30">
-              <div>
-                <div className="font-bold text-lg">{d.name}</div>
-                <div className="text-xs text-muted-foreground">Deadline : {new Date(d.deadline).toLocaleString()}</div>
-                <div className="text-xs text-muted-foreground">{d.description}</div>
-              </div>
-              <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={() => handleEdit(d)}>Modifier</Button>
-                <Button size="sm" variant="destructive" onClick={() => handleDelete(d.id)}>Supprimer</Button>
-              </div>
-            </li>
-          ))}
-        </ul>
+        <div className="w-full">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            {Array.isArray(deliverables) && deliverables
+              .slice()
+              .sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime())
+              .map((d) => (
+                <li key={d.id} className="bg-white/90 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow p-4 flex flex-col gap-2 max-w-full w-full mx-auto min-w-[0]">
+                  <div className="flex flex-col gap-2 flex-1">
+                    <div className="font-bold text-lg text-primary-700 flex items-center gap-2 break-words">
+                      <span>{d.name}</span>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1 break-words">Deadline : {new Date(d.deadline).toLocaleString()}</div>
+                    {d.description && <div className="text-sm text-gray-600 mb-1 break-words">{d.description}</div>}
+                  </div>
+                  <div className="mt-1">
+                    <RuleList deliverableId={d.id} />
+                    {editingRulesFor === d.id ? (
+                      <div className="mt-3">
+                        <RuleForm deliverableId={d.id} onRuleCreated={() => setEditingRulesFor(null)} />
+                        <Button size="sm" variant="secondary" className="mt-2 w-full" onClick={() => setEditingRulesFor(null)}>Fermer</Button>
+                      </div>
+                    ) : (
+                      <Button size="sm" variant="outline" className="mt-3 w-full" onClick={() => setEditingRulesFor(d.id)}>Gérer les règles</Button>
+                    )}
+                  </div>
+                  <div className="flex gap-2 mt-2 flex-wrap w-full">
+                    <Button size="sm" variant="outline" className="flex-1 min-w-[90px]" onClick={() => handleEdit(d)}>
+                      Modifier
+                    </Button>
+                    <Button size="sm" variant="destructive" className="flex-1 min-w-[90px]" onClick={() => handleDelete(d.id)}>
+                      Supprimer
+                    </Button>
+                  </div>
+                </li>
+              ))}
+          </ul>
+        </div>
       </FlexibleCard>
     </div>
   );

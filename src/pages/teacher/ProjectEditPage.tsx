@@ -12,6 +12,7 @@ import ProjectGlobalEditComponent from "@/components/project/ProjectGlobalEditCo
 import DefenseScheduler from "@/components/defense/DefenseScheduler";
 import { useProjectContext } from "@/contexts/ProjectContext";
 import CreateDelivrableComponent from "@/components/delivrable/CreateDelivrableComponent";
+import DeliverableRulesPage from "./DeliverableRulesPage";
 
 export default function ProjectEditPage() {
   const { project, loading } = useProjectContext();
@@ -30,8 +31,8 @@ export default function ProjectEditPage() {
     <DashboardLayout>
       <FlexibleCard title={`${project.name}`}>
         <FlexibleAlert
-          variant="warning"
-          icon={<Info className="!text-orange-500 text-center" />}
+          variant="info"
+          icon={<Info className="!text-grey-500 text-center" />}
           title="N'oubliez pas de sauvegarder vos modifications !"
         />
 
@@ -51,7 +52,7 @@ export default function ProjectEditPage() {
           </TabsContent>
           <TabsContent value="groupes" className="flex flex-col gap-4">
             <FlexibleCard>
-              <GroupEditComponent promotion={promotion}/>
+              <GroupEditComponent promotion={promotion} />
             </FlexibleCard>
             <FlexibleCard>
               <GroupBuilder />
@@ -59,6 +60,8 @@ export default function ProjectEditPage() {
           </TabsContent>
           <TabsContent value="livrables">
             <CreateDelivrableComponent />
+            {/* Exemple d'intégration de la page de gestion des règles */}
+            {/* <DeliverableRulesPage deliverableId={idDuLivrable} /> */}
           </TabsContent>
           <TabsContent value="rapports">
             Grille de notation des rapports a selectionner

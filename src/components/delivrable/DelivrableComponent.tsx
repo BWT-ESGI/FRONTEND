@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
 import { fetchDeliverablesByProject } from "@/services/deliverableService";
 import { fetchSubmissionsByGroup, uploadSubmission, downloadSubmission } from "@/services/submissionService";
+import { fetchRulesByDeliverable } from '@/services/ruleService';
 import { Deliverable, Submission } from "@/types/deliverable.type";
 import toast from "react-hot-toast";
 import FlexibleAlert from "../template/FlexibleAlert";
 import { Info } from "lucide-react";
+import { FileTree } from '@/components/ui/filetree';
 
 interface DelivrableComponentProps {
   projectId: string;
@@ -16,6 +18,7 @@ export default function DelivrableComponent({ projectId, groupId }: DelivrableCo
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [selectedFiles, setSelectedFiles] = useState<Record<string, File | null>>({});
   const [loading, setLoading] = useState(false);
+  const [rulesByDeliverable, setRulesByDeliverable] = useState<Record<string, any[]>>({});
 
   useEffect(() => {
     if (!projectId || !groupId) return;
@@ -25,8 +28,15 @@ export default function DelivrableComponent({ projectId, groupId }: DelivrableCo
       fetchSubmissionsByGroup(groupId),
     ])
       .then(([dRes, sRes]) => {
-        setDeliverables(Array.isArray(dRes.data) ? dRes.data : []);
+        const deliverables = Array.isArray(dRes.data) ? dRes.data : [];
+        setDeliverables(deliverables);
         setSubmissions(Array.isArray(sRes.data) ? sRes.data : []);
+        // Charger les règles pour chaque livrable
+        deliverables.forEach((d) => {
+          fetchRulesByDeliverable(d.id).then((rules) => {
+            setRulesByDeliverable(prev => ({ ...prev, [d.id]: Array.isArray(rules) ? rules : [] }));
+          });
+        });
       })
       .catch(() => toast.error("Erreur lors du chargement des livrables ou rendus"))
       .finally(() => setLoading(false));
@@ -41,7 +51,7 @@ export default function DelivrableComponent({ projectId, groupId }: DelivrableCo
     if (!file) return toast.error("Aucun fichier sélectionné");
     setLoading(true);
     const formData = new FormData();
-    formData.append("archive", file);
+    formData.append("file", file); // <-- Correction ici
     formData.append("deliverableId", deliverableId);
     formData.append("groupId", groupId);
     try {
@@ -95,6 +105,46 @@ export default function DelivrableComponent({ projectId, groupId }: DelivrableCo
                 <div className="font-semibold">{d.name}</div>
                 <div className="text-sm text-gray-500">{d.description}</div>
                 <div className="text-xs text-gray-400">Deadline : {new Date(d.deadline).toLocaleString()}</div>
+                {/* Résumé des règles */}
+                {rulesByDeliverable[d.id] && rulesByDeliverable[d.id].length > 0 ? (
+                  <div className="mt-2 space-y-2">
+                    <div className="text-xs text-green-700 font-semibold">
+                      {rulesByDeliverable[d.id].length} règle{rulesByDeliverable[d.id].length > 1 ? 's' : ''} définie{rulesByDeliverable[d.id].length > 1 ? 's' : ''}
+                    </div>
+                    <div className="flex flex-col gap-2">
+                      {rulesByDeliverable[d.id].map((rule) => (
+                        <div key={rule.id} className="rounded border-l-4 p-2 bg-green-50 border-green-400 shadow-sm">
+                          {rule.type === 'FILE_EXISTS' && (
+                            <div>
+                              <span className="font-bold text-blue-700">Fichier requis :</span>
+                              <span className="ml-2 font-mono text-blue-900">{rule.config.file}</span>
+                            </div>
+                          )}
+                          {rule.type === 'DIR_STRUCTURE' && (
+                            <div>
+                              <span className="font-bold text-yellow-700">Arborescence attendue :</span>
+                              <div className="ml-2 mt-1">
+                                <FileTree nodes={convertPathsToFileTree(rule.config.structure)} />
+                              </div>
+                            </div>
+                          )}
+                          {rule.type === 'CONTENT_REGEX' && (
+                            <div>
+                              <span className="font-bold text-green-700">Fichier :</span>
+                              <span className="ml-2 font-mono text-green-900">{rule.config.file}</span>
+                              <br />
+                              <span className="font-bold text-green-700">Doit contenir :</span>
+                              <span className="ml-2 font-mono text-green-900">{rule.config.matcher?.type === 'regex' ? 'Regex' : 'Texte'} : {rule.config.matcher?.value}</span>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-xs text-red-600 mb-1">Aucune règle définie.</div>
+                )}
+                {/* Fin résumé règles */}
               </div>
               <div className="flex flex-col md:flex-row gap-2 items-center">
                 {submission ? (
@@ -130,4 +180,38 @@ export default function DelivrableComponent({ projectId, groupId }: DelivrableCo
       })}
     </div>
   );
+}
+
+// Fonction utilitaire pour convertir une liste de chemins en FileTreeNode[]
+type FileTreeNode = {
+  id: string;
+  name: string;
+  type: 'folder' | 'file';
+  children?: FileTreeNode[];
+};
+function convertPathsToFileTree(paths: string[] = []): FileTreeNode[] {
+  const root: FileTreeNode[] = [];
+  for (const path of paths) {
+    const parts = path.split('/').filter(Boolean);
+    let current = root;
+    for (let i = 0; i < parts.length; i++) {
+      const isLast = i === parts.length - 1;
+      const isFolder = path.endsWith('/') && isLast;
+      const name = parts[i];
+      let node = current.find(n => n.name === name && n.type === (isLast ? (isFolder ? 'folder' : 'file') : 'folder'));
+      if (!node) {
+        node = {
+          id: `${name}-${i}-${Math.random().toString(36).slice(2, 8)}`,
+          name,
+          type: isLast ? (isFolder ? 'folder' : 'file') : 'folder',
+          children: isLast && !isFolder ? undefined : [],
+        };
+        current.push(node);
+      }
+      if (node.type === 'folder' && node.children) {
+        current = node.children;
+      }
+    }
+  }
+  return root;
 }
