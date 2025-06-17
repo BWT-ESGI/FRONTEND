@@ -8,7 +8,6 @@ import { ProjectSimilarityBarChart } from "@/components/project/similarity/Proje
 import { ProjectFileSimilarityHeatmap } from "@/components/project/similarity/ProjectFileSimilarityHeatmap";
 import TextEditor from "@/components/report/TextEditor";
 import { useReport } from "@/hooks/api/useReport";
-import FallBackPageSkeleton from "../global/FallBackPageSkeleton";
 import { fetchGroupsWithMembers } from "@/services/groupService";
 import { fetchSubmissionsByGroup } from "@/services/submissionService";
 import { fetchDeliverablesByProject } from "@/services/deliverableService";
@@ -20,6 +19,7 @@ import { submitEvaluationGrid, fetchEvaluationGrid } from '@/services/evaluation
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/components/ui/collapsible';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ProjectProvider, useProjectContext } from '@/contexts/ProjectContext';
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function ProjectCorrectionPageWithProvider() {
   const { id } = useParams<{ id: string }>();
@@ -79,7 +79,6 @@ function ProjectCorrectionPage() {
     }
   }, [groups, currentGroupIndex, id]);
 
-  // Récupère toutes les grilles de critères livrable
   useEffect(() => {
     async function fetchSets() {
       const sets = await getCriteriaSets('deliverable');
@@ -88,7 +87,6 @@ function ProjectCorrectionPage() {
     fetchSets();
   }, []);
 
-  // Récupère toutes les grilles d'évaluation pour chaque livrable/groupe
   useEffect(() => {
     async function fetchGrids() {
       const group = groups[currentGroupIndex];
@@ -96,7 +94,6 @@ function ProjectCorrectionPage() {
       if (!groupId || deliverables.length === 0 || criteriaSets.length === 0) return;
       const grids: Record<string, any> = {};
       for (const deliverable of deliverables) {
-        // On suppose que le criteriaSet a un nom unique par livrable
         const set = criteriaSets.find(cs => cs.title === deliverable.name);
         if (set && set.id) {
           grids[deliverable.id] = await fetchEvaluationGrid(set.id, groupId);
@@ -132,14 +129,22 @@ function ProjectCorrectionPage() {
   const goPrevious = () => setCurrentGroupIndex((i) => Math.max(i - 1, 0));
   const goNext = () => setCurrentGroupIndex((i) => Math.min(i + 1, groups.length - 1));
 
-  if (loading) return <FallBackPageSkeleton />;
-
   return (
     <DashboardLayout>
-      <Divider text={`Correction du groupe ${group?.name || "-"}`} className="mt-0 cursor-pointer" />
       <div className="flex justify-between items-center mb-4">
         <Button onClick={goPrevious} disabled={currentGroupIndex === 0}>&larr; Groupe précédent</Button>
-        <span>Groupe {currentGroupIndex + 1} / {groups.length}</span>
+        <AnimatePresence mode="wait">
+          <motion.span
+            key={currentGroupIndex}
+            initial={{ scale: 0.7, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.7, opacity: 0 }}
+            transition={{ duration: 0.15 }}
+            className="mx-4 font-semibold"
+          >
+            Groupe {currentGroupIndex + 1} / {groups.length}
+          </motion.span>
+        </AnimatePresence>
         <Button onClick={goNext} disabled={currentGroupIndex === groups.length - 1}>Groupe suivant &rarr;</Button>
       </div>
 
@@ -163,11 +168,11 @@ function ProjectCorrectionPage() {
               <FlexibleAlert variant="info" title="Aucun rendu disponible pour ce groupe" icon={<InfoIcon />} />
             )}
           </div>
-          <div className="w-full mb-8">
+          <div className="w-full mt-8 mb-8">
             {deliverables.length === 0 && (
               <FlexibleAlert
                 variant="info"
-                title="Aucun livrable défini pour ce projet."
+                title="Aucune grille de notation de livrable défini pour ce projet."
                 icon={<InfoIcon />}
               />
             )}
@@ -216,7 +221,11 @@ function ProjectCorrectionPage() {
           {report ? (
             <TextEditor rapportId={report.id} readOnly />
           ) : (
-            <div className="text-center text-sm text-muted-foreground mt-4">Aucun rapport disponible pour ce groupe.</div>
+            <FlexibleAlert 
+              variant="info"
+              title="Aucun rapport disponible pour ce groupe."
+              icon={<InfoIcon />}
+            />
           )}
           <div className="w-full mb-8">
             {(!project?.reportCriteriaSetId || reportCriteriaSets.length === 0) && (

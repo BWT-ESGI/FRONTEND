@@ -106,6 +106,13 @@ function DefenseCorrectionPageInner() {
               onSelect={setCurrentGroupIndex}
             />
             <Button
+              className="w-full mb-2"
+              onClick={() => setCurrentGroupIndex((idx) => Math.max(idx - 1, 0))}
+              disabled={currentGroupIndex <= 0}
+            >
+              Groupe précédent
+            </Button>
+            <Button
               className="w-full"
               onClick={() => setCurrentGroupIndex((idx) => Math.min(idx + 1, timelineGroups.length - 1))}
               disabled={currentGroupIndex >= timelineGroups.length - 1}
