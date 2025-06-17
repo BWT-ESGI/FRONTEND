@@ -29,6 +29,7 @@ export default function GroupEditComponent({
       nbGroups: number;
       nbStudentsMinPerGroup: number;
       nbStudentsMaxPerGroup: number;
+      deadlineGroupSelection: Date;
     }>
   ) => {
     setProject({
@@ -119,6 +120,24 @@ export default function GroupEditComponent({
             max={promotion?.students?.length || 1}
           />
         </div>
+
+        {project.groupCompositionType === "student_choice" && (
+        <div className="flex flex-col w-full">
+          <h4 className="text-sm mb-2">Date de clôture :</h4>
+          <Input
+            type="date"
+            defaultValue={
+              project.deadlineGroupSelection
+                ? new Date(project.deadlineGroupSelection).toISOString().split("T")[0]
+                : ""
+            }
+            onBlur={e => {
+              updateConfig({
+                deadlineGroupSelection: e.target.value ? new Date(e.target.value) : undefined              });
+            }}
+          />
+        </div>
+      )}
       </div>
 
       <Divider className="my-4" />

@@ -9,7 +9,13 @@ import { Button } from "@/components/ui/button";
 import isStudent from "@/utils/isStudent";
 import getUserInfoFromLocalStorage from "@/utils/getUserInfoFromLocalStorage";
 import { useEffect, useState } from "react";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectValue,
+  SelectContent,
+  SelectItem,
+} from "@/components/ui/select";
 import { fetchPromotions } from "@/services/promotionService";
 import { Promotion } from "@/types/promotion.type";
 
@@ -21,7 +27,9 @@ export default function ProjectListPage() {
 
   // Promotion filter state
   const [promotions, setPromotions] = useState<Promotion[]>([]);
-  const [selectedPromotionId, setSelectedPromotionId] = useState<string | "all">("all");
+  const [selectedPromotionId, setSelectedPromotionId] = useState<
+    string | "all"
+  >("all");
   const [promotionsLoading, setPromotionsLoading] = useState(true);
 
   useEffect(() => {
@@ -35,7 +43,8 @@ export default function ProjectListPage() {
   // Filter projects by selected promotion
   const filteredProjects = (projects.filter(Boolean) as Project[]).filter(
     (project) =>
-      selectedPromotionId === "all" || project.promotion?.id === selectedPromotionId
+      selectedPromotionId === "all" ||
+      project.promotion?.id === selectedPromotionId
   );
 
   return (
@@ -75,20 +84,47 @@ export default function ProjectListPage() {
             render={(filteredProjects) => (
               <div className="grid auto-rows-min gap-4 md:grid-cols-3">
                 {filteredProjects.map((project) => {
-                  const hasGroup = project.groups?.some(g =>
-                    g.members.some(m => m.id === userId)
+                  const hasGroup = project.groups?.some((g) =>
+                    g.members.some((m) => m.id === userId)
                   );
                   return (
-                    <ProjectSummaryCard key={project.id} project={project} btn={
-                      isStudentUser && project.groupCompositionType === "student_choice" && !hasGroup ? (
-                        <Link to={`/students/projets/${project.id}/rejoindre`}>
-                          <Button className="cursor-pointer">Rejoindre un groupe</Button>
-                        </Link>
-                      ) :  (
-                        <Link to={isStudentUser ? `/students/projets/${project.id}` : `/projets/${project.id}`}>
-                          <Button className="cursor-pointer">Voir les détails</Button>
-                        </Link>)
-                    } />
+                    <ProjectSummaryCard
+                      key={project.id}
+                      project={project}
+                      btn={
+                        isStudentUser &&
+                        project.groupCompositionType === "student_choice" &&
+                        !hasGroup ? (
+                          project.deadlineGroupSelection &&
+                          new Date(project.deadlineGroupSelection) <
+                            new Date() ? (
+                            <Button disabled className="cursor-not-allowed">
+                              Deadline dépassée
+                            </Button>
+                          ) : (
+                            <Link
+                              to={`/students/projets/${project.id}/rejoindre`}
+                            >
+                              <Button className="cursor-pointer">
+                                Rejoindre un groupe
+                              </Button>
+                            </Link>
+                          )
+                        ) : (
+                          <Link
+                            to={
+                              isStudentUser
+                                ? `/students/projets/${project.id}`
+                                : `/projets/${project.id}`
+                            }
+                          >
+                            <Button className="cursor-pointer">
+                              Voir les détails
+                            </Button>
+                          </Link>
+                        )
+                      }
+                    />
                   );
                 })}
               </div>

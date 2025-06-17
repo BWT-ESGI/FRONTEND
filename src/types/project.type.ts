@@ -21,7 +21,7 @@ export type Project = {
   createdAt: Date;
   updatedAt: Date;
   endAt: Date;
-  deadline: Date;
+  deadlineGroupSelection: Date | undefined;
   promotion: Promotion;
   defenseCriteriaSetId?: string;
   reportCriteriaSetId?: string;

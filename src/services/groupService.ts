@@ -50,10 +50,15 @@ export const updateProjectConfig = async (
     nbStudentsMaxPerGroup: number;
     groupCompositionType?: "manual" | "random" | "student_choice";
     nbGroups?: number;
-    deadline?: string;
+    deadlineGroupSelection?: Date | null;
+    deadline?: string
   }
 ) => {
-  return await api.patch(`/projects/${projectId}`, payload);
+  const dataToSend = { ...payload };
+  if (payload.groupCompositionType != "student_choice") {
+    dataToSend.deadlineGroupSelection = null;
+  }
+  return await api.patch(`/projects/${projectId}`, dataToSend);
 };
 
 export async function fetchGroupsWithMembers(
