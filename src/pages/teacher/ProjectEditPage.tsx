@@ -28,7 +28,6 @@ export default function ProjectEditPage() {
 
   return (
     <DashboardLayout>
-      <FlexibleCard title={`${project.name}`}>
         <FlexibleAlert
           variant="info"
           icon={<Info className="!text-grey-500 text-center" />}

@@ -144,16 +144,16 @@ function ProjectCorrectionPage() {
       <div className="flex justify-between items-center mb-4">
         <Button onClick={goPrevious} disabled={currentGroupIndex === 0}>&larr; Groupe précédent</Button>
         <AnimatePresence mode="wait">
-          <motion.span
+            <motion.span
             key={currentGroupIndex}
             initial={{ scale: 0.7, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.7, opacity: 0 }}
             transition={{ duration: 0.15 }}
             className="mx-4 font-semibold"
-          >
-            Groupe {currentGroupIndex + 1} / {filteredGroups.length}
-          </motion.span>
+            >
+            {group?.name ? group.name : `Groupe ${currentGroupIndex + 1} / ${filteredGroups.length}`}
+            </motion.span>
         </AnimatePresence>
         <Button onClick={goNext} disabled={currentGroupIndex === filteredGroups.length - 1}>Groupe suivant &rarr;</Button>
       </div>
