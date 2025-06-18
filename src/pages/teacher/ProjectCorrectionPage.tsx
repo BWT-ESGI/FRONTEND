@@ -36,7 +36,7 @@ function ProjectCorrectionPage() {
   const [groups, setGroups] = useState<any[]>([]);
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
   const [submissions, setSubmissions] = useState<any[]>([]);
-  const [similarityStats] = useState<any>(null); 
+  const [similarityStats] = useState<any>(null);
   const [, setLoading] = useState(true);
   const [deliverables, setDeliverables] = useState<any[]>([]);
   const [criteriaSets, setCriteriaSets] = useState<CriteriaSet[]>([]);
@@ -144,16 +144,16 @@ function ProjectCorrectionPage() {
       <div className="flex justify-between items-center mb-4">
         <Button onClick={goPrevious} disabled={currentGroupIndex === 0}>&larr; Groupe précédent</Button>
         <AnimatePresence mode="wait">
-            <motion.span
+          <motion.span
             key={currentGroupIndex}
             initial={{ scale: 0.7, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.7, opacity: 0 }}
             transition={{ duration: 0.15 }}
             className="mx-4 font-semibold"
-            >
+          >
             {group?.name ? group.name : `Groupe ${currentGroupIndex + 1} / ${filteredGroups.length}`}
-            </motion.span>
+          </motion.span>
         </AnimatePresence>
         <Button onClick={goNext} disabled={currentGroupIndex === filteredGroups.length - 1}>Groupe suivant &rarr;</Button>
       </div>
@@ -165,19 +165,7 @@ function ProjectCorrectionPage() {
         </TabsList>
         <TabsContent value="rendus">
           <Divider text="Rendus du groupe" />
-          <div className="mb-4">
-            {submissions.length > 0 ? (
-              <ul>
-                {submissions.map((s) => (
-                  <li key={s.id} className="mb-2">
-                    <span className="font-semibold">{s.fileName}</span> - Rendu à l'heure : {s.onTime ? "Oui" : "Non"}
-                  </li>
-                ))}
-              </ul>
-            ) : (
-              <FlexibleAlert variant="info" title="Aucun rendu disponible pour ce groupe" icon={<InfoIcon />} />
-            )}
-          </div>
+
           <div className="w-full mt-8 mb-8">
             {deliverables.length === 0 && (
               <FlexibleAlert
@@ -232,7 +220,7 @@ function ProjectCorrectionPage() {
           {report ? (
             <TextEditor rapportId={report.id} readOnly />
           ) : (
-            <FlexibleAlert 
+            <FlexibleAlert
               variant="info"
               title="Aucun rapport disponible pour ce groupe."
               icon={<InfoIcon />}
@@ -246,7 +234,7 @@ function ProjectCorrectionPage() {
                   title="Aucune grille de notation rapport définie pour ce projet."
                   icon={<InfoIcon />}
                 />
-            </div>
+              </div>
             )}
             {project?.reportCriteriaSetId && reportCriteriaSets
               .filter(cs => cs.id === project.reportCriteriaSetId)
