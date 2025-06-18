@@ -59,8 +59,6 @@ export default function ProjectEditPage() {
           </TabsContent>
           <TabsContent value="livrables">
             <CreateDelivrableComponent />
-            {/* Exemple d'intégration de la page de gestion des règles */}
-            {/* <DeliverableRulesPage deliverableId={idDuLivrable} /> */}
           </TabsContent>
           <TabsContent value="rapports">
             Grille de notation des rapports a selectionner

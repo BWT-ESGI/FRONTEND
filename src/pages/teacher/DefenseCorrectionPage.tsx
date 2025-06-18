@@ -81,12 +81,18 @@ function DefenseCorrectionPageInner() {
       const set = sets.find((s: any) => s.id === project.defenseCriteriaSetId);
       setCriteriaSet(set || null);
       if (set) {
-        const grid = await fetchEvaluationGrid(set.id, group.id);
+        const defense = defenses.find((d: any) => d.group.id === group.id);
+        const grid = await fetchEvaluationGrid(
+          set.id,
+          group.id,
+          undefined,
+          defense?.id // Ajout du defenseId pour l'unicité
+        );
         setEvaluationGrid(grid);
       }
     }
     fetchGrid();
-  }, [id, project, group, currentGroupIndex]);
+  }, [id, project, group, currentGroupIndex, defenses]);
 
   if (loading) return <FallBackPageSkeleton />;
 
@@ -142,10 +148,12 @@ function DefenseCorrectionPageInner() {
                 initialScores={evaluationGrid?.scores ?? {}}
                 initialComments={evaluationGrid?.comments ?? {}}
                 onSubmit={async ({ scores, comments }) => {
+                  const defense = defenses.find((d: any) => d.group.id === group.id);
                   await submitEvaluationGrid({
                     projectId: id!,
                     criteriaSetId: criteriaSet.id!,
                     groupId: group.id,
+                    defenseId: defense?.id, // Ajout du defenseId pour l'unicité
                     filledBy: teacherId,
                     scores,
                     comments,

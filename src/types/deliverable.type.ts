@@ -8,6 +8,7 @@ export type Deliverable = {
   submissionType: 'archive' | 'git';
   maxSize?: number;
   projectId: string;
+  criteriaSetId?: string;
 };
 
 export type Submission = {

@@ -71,9 +71,6 @@ export default function CriteriaGridFillComponent({ criteriaSet, onSubmit, initi
   useEffect(() => {
     setComments(initialComments);
   }, [criteriaSet, initialComments]);
-
-  console.log(criteriaSet)
-
   return (
     <>
       {closeWarning && (

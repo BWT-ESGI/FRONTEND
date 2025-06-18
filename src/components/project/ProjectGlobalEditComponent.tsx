@@ -30,7 +30,6 @@ export default function ProjectGlobalEditComponent() {
   const [criteriaSets, setCriteriaSets] = useState<CriteriaSet[]>([]);
   const [defenseCriteriaSetId, setDefenseCriteriaSetId] = useState<string | undefined>(project.defenseCriteriaSetId);
   const [reportCriteriaSetId, setReportCriteriaSetId] = useState<string | undefined>(project.reportCriteriaSetId);
-  const [deliverableCriteriaSetId, setDeliverableCriteriaSetId] = useState<string | undefined>(project.deliverableCriteriaSetId);
 
   useEffect(() => {
     getCriteriaSets().then(setCriteriaSets).catch(() => {});
@@ -50,7 +49,6 @@ export default function ProjectGlobalEditComponent() {
           : undefined,
         defenseCriteriaSetId,
         reportCriteriaSetId,
-        deliverableCriteriaSetId,
       };
       await updateProject(String(project.id), payload);
       setProject({
@@ -141,19 +139,6 @@ export default function ProjectGlobalEditComponent() {
           >
             <option value="">Aucune</option>
             {criteriaSets.filter(cs => cs.type === 'report').map(cs => (
-              <option key={cs.id} value={cs.id}>{cs.title}</option>
-            ))}
-          </select>
-        </div>
-        <div>
-          <label className="block font-medium mb-1">Grille de notation pour les rendus</label>
-          <select
-            className="border rounded px-2 py-1 w-full"
-            value={deliverableCriteriaSetId || ''}
-            onChange={e => setDeliverableCriteriaSetId(e.target.value || undefined)}
-          >
-            <option value="">Aucune</option>
-            {criteriaSets.filter(cs => cs.type === 'deliverable').map(cs => (
               <option key={cs.id} value={cs.id}>{cs.title}</option>
             ))}
           </select>

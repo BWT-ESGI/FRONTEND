@@ -31,7 +31,6 @@ export default function ProjectDashboardPage() {
       fetchProjectStats(id)
         .then((data) => {
           setStats(data);
-          console.log("Project stats fetched:", data);
         })
         .finally(() => setStatsLoading(false));
     }
@@ -62,7 +61,6 @@ export default function ProjectDashboardPage() {
 };
 
   if (loading) return <FallBackPageSkeleton />;
-  console.log("Project data:", stats);
   return (
     <DashboardLayout>
       <Divider text="Résumé du projet" className="mt-0" />

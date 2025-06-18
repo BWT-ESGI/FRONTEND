@@ -10,8 +10,6 @@ interface ProjectSummaryCardProps {
 
 export default function ProjectSummaryCard({ project, btn = (<></>) } : ProjectSummaryCardProps) {
     if (!project) return null;
-
-    console.log(project);
     return (
       <FlexibleCard
         key={project.id}

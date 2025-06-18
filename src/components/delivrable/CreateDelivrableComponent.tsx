@@ -13,6 +13,7 @@ import { Label } from "@/components/ui/label";
 import FlexibleCard from "../template/FlexibleCard";
 import RuleList from '../rules/RuleList';
 import RuleForm from "../rules/RuleForm";
+import { getCriteriaSets, CriteriaSet } from "@/services/criteriaSetService";
 
 export default function CreateDelivrableComponent() {
   const { project } = useProjectContext();
@@ -30,15 +31,20 @@ export default function CreateDelivrableComponent() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editingRulesFor, setEditingRulesFor] = useState<string | null>(null);
   const [refreshRulesKey, setRefreshRulesKey] = useState(0);
+  const [criteriaSets, setCriteriaSets] = useState<CriteriaSet[]>([]);
+  const [criteriaSetId, setCriteriaSetId] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (project?.id) {
-      console.log("Chargement des livrables pour le projet", project.id);
       fetchDeliverablesByProject(project.id).then((res) => {
         setDeliverables(Array.isArray(res.data) ? res.data : []);
       });
     }
   }, [project?.id]);
+
+  useEffect(() => {
+    getCriteriaSets('deliverable').then(setCriteriaSets).catch(() => {});
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value, type } = e.target;
@@ -66,7 +72,7 @@ export default function CreateDelivrableComponent() {
     setLoading(true);
     try {
       if (editingId) {
-        await updateDeliverable(editingId, form);
+        await updateDeliverable(editingId, { ...form, criteriaSetId });
       } else {
         const payload = {
           ...form,
@@ -80,13 +86,14 @@ export default function CreateDelivrableComponent() {
             form.penaltyPerHourLate !== undefined && form.penaltyPerHourLate !== null && `${form.penaltyPerHourLate}` !== ""
               ? Number(form.penaltyPerHourLate)
               : 0,
+          criteriaSetId,
         };
-        console.log("Payload envoyé à l'API /deliverables:", payload);
         await createDeliverable(payload);
       }
       fetchDeliverablesByProject(project.id).then((res) => setDeliverables(Array.isArray(res.data) ? res.data : []));
       setForm({ name: "", description: "", deadline: "", allowLateSubmission: false, penaltyPerHourLate: 0, submissionType: "archive", maxSize: undefined });
       setEditingId(null);
+      setCriteriaSetId(undefined);
       toast.success(editingId ? "Livrable modifié" : "Livrable créé");
     } catch (error) {
       showApiErrorToast(error);
@@ -98,6 +105,7 @@ export default function CreateDelivrableComponent() {
   const handleEdit = (d: Deliverable) => {
     setForm({ ...d });
     setEditingId(d.id);
+    setCriteriaSetId(d.criteriaSetId);
   };
 
   const handleDelete = async (id: string) => {
@@ -142,6 +150,21 @@ export default function CreateDelivrableComponent() {
           <div className="space-y-2 mt-4">
             <Label htmlFor="description">Description</Label>
             <Textarea id="description" name="description" value={form.description || ""} onChange={handleChange} placeholder="Description" />
+          </div>
+          <div className="space-y-2 mt-4">
+            <Label htmlFor="criteriaSetId">Grille de notation</Label>
+            <select
+              id="criteriaSetId"
+              name="criteriaSetId"
+              className="border rounded px-2 py-1 w-full"
+              value={criteriaSetId || ''}
+              onChange={e => setCriteriaSetId(e.target.value || undefined)}
+            >
+              <option value="">Aucune</option>
+              {criteriaSets.map(cs => (
+                <option key={cs.id} value={cs.id}>{cs.title}</option>
+              ))}
+            </select>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mt-4 items-end">
             <div className="flex flex-col items-start gap-2">

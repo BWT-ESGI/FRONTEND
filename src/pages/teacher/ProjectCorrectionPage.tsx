@@ -47,7 +47,8 @@ function ProjectCorrectionPage() {
 
   const { project } = useProjectContext ? useProjectContext() : { project: null };
 
-  const group = groups[currentGroupIndex];
+  const filteredGroups = groups.filter(g => Array.isArray(g.members) && g.members.length >= 1);
+  const group = filteredGroups[currentGroupIndex];
   const { report, } = useReport(group?.id || "");
 
   useEffect(() => {
@@ -91,18 +92,21 @@ function ProjectCorrectionPage() {
     async function fetchGrids() {
       const group = groups[currentGroupIndex];
       const groupId = group?.id;
-      if (!groupId || deliverables.length === 0 || criteriaSets.length === 0) return;
+      if (!groupId || deliverables.length === 0) return;
       const grids: Record<string, any> = {};
       for (const deliverable of deliverables) {
-        const set = criteriaSets.find(cs => cs.title === deliverable.name);
-        if (set && set.id) {
-          grids[deliverable.id] = await fetchEvaluationGrid(set.id, groupId);
+        if (deliverable.criteriaSetId) {
+          grids[deliverable.id] = await fetchEvaluationGrid(
+            deliverable.criteriaSetId,
+            groupId,
+            deliverable.id // Ajout du deliverableId pour l'unicité
+          );
         }
       }
       setEvaluationGrids(grids);
     }
     fetchGrids();
-  }, [groups, currentGroupIndex, deliverables, criteriaSets]);
+  }, [groups, currentGroupIndex, deliverables]);
 
   useEffect(() => {
     async function fetchSets() {
@@ -118,13 +122,19 @@ function ProjectCorrectionPage() {
       const grids: Record<string, any> = {};
       for (const set of reportCriteriaSets) {
         if (set && set.id) {
-          grids[String(set.id)] = await fetchEvaluationGrid(set.id, group.id);
+          grids[String(set.id)] = await fetchEvaluationGrid(
+            set.id,
+            group.id,
+            undefined,
+            undefined,
+            report?.id // Ajout du reportId pour l'unicité
+          );
         }
       }
       setReportEvaluationGrids(grids);
     }
     fetchGrids();
-  }, [group, reportCriteriaSets]);
+  }, [group, reportCriteriaSets, report]);
 
   const goPrevious = () => setCurrentGroupIndex((i) => Math.max(i - 1, 0));
   const goNext = () => setCurrentGroupIndex((i) => Math.min(i + 1, groups.length - 1));
@@ -142,10 +152,10 @@ function ProjectCorrectionPage() {
             transition={{ duration: 0.15 }}
             className="mx-4 font-semibold"
           >
-            Groupe {currentGroupIndex + 1} / {groups.length}
+            Groupe {currentGroupIndex + 1} / {filteredGroups.length}
           </motion.span>
         </AnimatePresence>
-        <Button onClick={goNext} disabled={currentGroupIndex === groups.length - 1}>Groupe suivant &rarr;</Button>
+        <Button onClick={goNext} disabled={currentGroupIndex === filteredGroups.length - 1}>Groupe suivant &rarr;</Button>
       </div>
 
       <Tabs defaultValue="rendus" className="w-full mx-auto mb-8">
@@ -177,14 +187,14 @@ function ProjectCorrectionPage() {
               />
             )}
             {deliverables.map((deliverable) => {
-              const criteriaSet = criteriaSets.find(cs => cs.title === deliverable.name);
+              const criteriaSet = criteriaSets.find(cs => cs.id === deliverable.criteriaSetId);
               const evaluationGrid = evaluationGrids[deliverable.id];
               return (
                 <div key={deliverable.id} className="mb-8">
                   <Divider text={deliverable.name} />
                   {criteriaSet ? (
                     <CriteriaGridFillComponent
-                      key={criteriaSet.id + '-' + (evaluationGrid?.id || group.id)}
+                      key={deliverable.id + '-' + group.id}
                       criteriaSet={criteriaSet}
                       initialScores={evaluationGrid?.scores ?? {}}
                       initialComments={evaluationGrid?.comments ?? {}}
@@ -196,6 +206,7 @@ function ProjectCorrectionPage() {
                           projectId: id!,
                           criteriaSetId: criteriaSet.id!,
                           groupId: group.id,
+                          deliverableId: deliverable.id, // Ajout du deliverableId pour l'unicité
                           filledBy: teacherId,
                           scores,
                           comments,
@@ -241,6 +252,7 @@ function ProjectCorrectionPage() {
               .filter(cs => cs.id === project.reportCriteriaSetId)
               .map((criteriaSet) => {
                 const evaluationGrid = reportEvaluationGrids[String(criteriaSet.id)];
+                if (!report) return null; // Ne pas afficher la grille si pas de rapport
                 return (
                   <div key={criteriaSet.id} className="mb-8">
                     <Divider text={criteriaSet.title} />
@@ -253,10 +265,12 @@ function ProjectCorrectionPage() {
                       projectId={id}
                       filledBy={teacherId}
                       onSubmit={async ({ scores, comments }) => {
+                        if (!report) return; // Sécurité
                         await submitEvaluationGrid({
                           projectId: id!,
                           criteriaSetId: criteriaSet.id!,
                           groupId: group.id,
+                          reportId: report.id,
                           filledBy: teacherId,
                           scores,
                           comments,

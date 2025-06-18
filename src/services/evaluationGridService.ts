@@ -7,6 +7,9 @@ export interface EvaluationGridPayload {
   filledBy: string;
   scores: Record<string, number>;
   comments: Record<string, string>;
+  deliverableId?: string;
+  defenseId?: string;
+  reportId?: string;
 }
 
 export async function submitEvaluationGrid(payload: EvaluationGridPayload) {
@@ -14,7 +17,17 @@ export async function submitEvaluationGrid(payload: EvaluationGridPayload) {
   return res.data;
 }
 
-export async function fetchEvaluationGrid(criteriaSetId: string, groupId: string) {
-  const res = await api.get('/evaluation-grids', { params: { criteriaSetId, groupId } });
+export async function fetchEvaluationGrid(
+  criteriaSetId: string,
+  groupId: string,
+  deliverableId?: string,
+  defenseId?: string,
+  reportId?: string
+) {
+  const params: any = { criteriaSetId, groupId };
+  if (deliverableId) params.deliverableId = deliverableId;
+  if (defenseId) params.defenseId = defenseId;
+  if (reportId) params.reportId = reportId;
+  const res = await api.get('/evaluation-grids', { params });
   return res.data;
 }
