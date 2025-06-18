@@ -4,7 +4,7 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
-import { CheckCircle, Circle, Play, Flag } from "lucide-react";
+import { CheckCircle, Circle, Play, Flag, Github, Archive } from "lucide-react";
 import { Fragment } from "react";
 
 import { Deliverable, Submission } from "@/types/deliverable.type";
@@ -74,8 +74,19 @@ const ProjectDeliverableSteps = ({
       const dateString = latestSubmission
         ? new Date(latestSubmission.submittedAt).toLocaleDateString("fr-FR")
         : null;
+      // Détermination de l'icône selon le type de rendu
+      const iconElement = d.submissionType === "git" ? (
+        <Github className="w-4 h-4 text-gray-700 dark:text-gray-200" />
+      ) : (
+        <Archive className="w-4 h-4 text-gray-700 dark:text-gray-200" />
+      );
       return {
-        label: d.name || "Livrable",
+        label: (
+          <span className="flex items-center gap-1">
+            {iconElement}
+            {d.name || "Livrable"}
+          </span>
+        ),
         icon: isDone ? CheckCircle : Circle,
         status: isDone ? "done" : "todo",
         dateString,
@@ -89,7 +100,7 @@ const ProjectDeliverableSteps = ({
       icon: Flag,
       status:
         sortedDeliverables.every((d) => getLatestSubmission(d.id)) &&
-        (!defenseStep || defenseStep.status === "done")
+          (!defenseStep || defenseStep.status === "done")
           ? "done"
           : "todo",
       dateString: new Date(project?.endAt || "").toLocaleDateString("fr-FR"),
@@ -106,26 +117,21 @@ const ProjectDeliverableSteps = ({
             <BreadcrumbItem>
               <BreadcrumbPage className="w-full flex flex-col items-center justify-center text-center text-gray-500 dark:text-neutral-400">
                 <step.icon
-                  className={`h-5 w-5 ${
-                    step.status === "done"
+                  className={`h-5 w-5 ${step.status === "done"
                       ? "text-green-500"
                       : "text-gray-400 dark:text-neutral-500"
-                  }`}
+                    }`}
                 />
-                <span
-                  className="font-medium text-center"
-                >
-                  {step.label}
-                </span>
+                <span className="font-medium text-center">{step.label}</span>
                 {step.dateString && (
                   <span className="text-xs text-gray-400 text-center">
                     {step.isDefense
                       ? `(${step.dateString})`
                       : index === 0
-                      ? `Début le ${step.dateString}`
-                      : index === steps.length - 1
-                      ? `Fin le ${step.dateString}`
-                      : `Rendu le ${step.dateString}`}
+                        ? `Début le ${step.dateString}`
+                        : index === steps.length - 1
+                          ? `Fin le ${step.dateString}`
+                          : `Rendu le ${step.dateString}`}
                   </span>
                 )}
                 {step.deadline && !step.isDefense && (
@@ -140,11 +146,10 @@ const ProjectDeliverableSteps = ({
               <li
                 role="presentation"
                 aria-hidden="true"
-                className={`inline-block h-[2px] w-[40px] self-center ${
-                  step.status === "done"
+                className={`inline-block h-[2px] w-[40px] self-center ${step.status === "done"
                     ? "bg-green-500"
                     : "bg-gray-300 dark:bg-neutral-700"
-                }`}
+                  }`}
               />
             )}
           </Fragment>

@@ -14,6 +14,7 @@ import FlexibleCard from "../template/FlexibleCard";
 import RuleList from '../rules/RuleList';
 import RuleForm from "../rules/RuleForm";
 import { getCriteriaSets, CriteriaSet } from "@/services/criteriaSetService";
+import { Archive, Github } from "lucide-react";
 
 export default function CreateDelivrableComponent() {
   const { project } = useProjectContext();
@@ -43,7 +44,7 @@ export default function CreateDelivrableComponent() {
   }, [project?.id]);
 
   useEffect(() => {
-    getCriteriaSets('deliverable').then(setCriteriaSets).catch(() => {});
+    getCriteriaSets('deliverable').then(setCriteriaSets).catch(() => { });
   }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -217,6 +218,11 @@ export default function CreateDelivrableComponent() {
                 <li key={d.id} className="bg-white/90 border border-gray-200 rounded-xl shadow-sm hover:shadow-md transition-shadow p-4 flex flex-col gap-2 max-w-full w-full mx-auto min-w-[0]">
                   <div className="flex flex-col gap-2 flex-1">
                     <div className="font-bold text-lg text-primary-700 flex items-center gap-2 break-words">
+                      {d.submissionType === 'git' ? (
+                        <Github className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                      ) : (
+                        <Archive className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                      )}
                       <span>{d.name}</span>
                     </div>
                     <div className="text-xs text-muted-foreground mt-1 break-words">Deadline : {new Date(d.deadline).toLocaleString()}</div>
