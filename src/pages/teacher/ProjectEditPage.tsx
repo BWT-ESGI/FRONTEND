@@ -13,7 +13,6 @@ import DefenseScheduler from "@/components/defense/DefenseScheduler";
 import { useProjectContext } from "@/contexts/ProjectContext";
 import CreateDelivrableComponent from "@/components/delivrable/CreateDelivrableComponent";
 import ReportEditComponent from "@/components/report/ReportEditComponent";
-import { updateProject } from "@/services/projectService";
 import toast from "react-hot-toast";
 
 export default function ProjectEditPage() {
@@ -32,7 +31,6 @@ export default function ProjectEditPage() {
   const handleReportCriteriaSetChange = async (id?: string) => {
     if (!project) return;
     try {
-      const updated = await updateProject(project.id, { reportCriteriaSetId: id });
       setProject({ ...project, reportCriteriaSetId: id });
       toast.success("Grille de notation des rapports sauvegardée");
     } catch (e) {
