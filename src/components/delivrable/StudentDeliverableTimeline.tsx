@@ -133,14 +133,15 @@ export default function StudentDeliverableTimeline({ projectId, groupId }: Stude
                                     <span className="font-bold text-lg md:text-xl text-primary-700 flex items-center gap-2">
                                         {/* Icône selon le type de rendu */}
                                         {d.submissionType === 'git' ? (
-                                            <Github className="w-5 h-5 text-gray-700 dark:text-gray-200" title="Rendu GitHub" />
+                                            <span title="Rendu GitHub">
+                                                <Github className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                                            </span>
                                         ) : (
-                                            <Archive className="w-5 h-5 text-gray-700 dark:text-gray-200" title="Rendu archive" />
+                                            <span title="Rendu archive">
+                                                <Archive className="w-5 h-5 text-gray-700 dark:text-gray-200" />
+                                            </span>
                                         )}
                                         {d.name}
-                                    </span>
-                                    <span className="text-xs text-red-500 font-semibold whitespace-nowrap md:ml-4">
-                                        Deadline : {new Date(d.deadline).toLocaleString()}
                                     </span>
                                 </div>
                             </div>
