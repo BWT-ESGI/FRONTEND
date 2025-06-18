@@ -31,3 +31,8 @@ export async function fetchEvaluationGrid(
   const res = await api.get('/evaluation-grids', { params });
   return res.data;
 }
+
+export async function fetchGradesForUser() {
+  const res = await api.get('/evaluation-grids/getAllGrad');
+  return res.data;
+}

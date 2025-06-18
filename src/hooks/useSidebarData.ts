@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FolderOpenDot, Table, Users } from "lucide-react";
+import { FolderOpenDot, Table, Users, Notebook } from "lucide-react";
 import getUserInfoFromLocalStorage from "@/utils/getUserInfoFromLocalStorage";
 import isStudent from "@/utils/isStudent";
 
@@ -30,7 +30,7 @@ export function useSidebarData() {
   const baseNavData = [
     {
       name: "Projets",
-      url: {isStudent: "/students/projets", isTeacher: "/projets"}[isStudent() ? "isStudent" : "isTeacher"],
+      url: { isStudent: "/students/projets", isTeacher: "/projets" }[isStudent() ? "isStudent" : "isTeacher"],
       icon: FolderOpenDot,
     },
     {
@@ -38,8 +38,18 @@ export function useSidebarData() {
       url: "/promotions",
       icon: Users,
     },
-    
-  ]
+    // N’ajoute "Notes" que si l’utilisateur est étudiant
+    ...(isStudent()
+      ? [
+          {
+            name: "Notes",
+            url: "/notes",
+            icon: Notebook,
+          },
+        ]
+      : []),
+  ];
+
   const teacherNavData = [
     {
       name: "Utilisateurs",

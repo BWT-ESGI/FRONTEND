@@ -8,6 +8,7 @@ import PromotionEditorPage from "@/pages/global/promotion/PromotionEditorPage";
 import NotFoundPage from "@/pages/global/NotFoundPage";
 import PromotionEditStudentPage from "@/components/project/PromotionEditStudentComponent";
 import ProjectListPage from "@/pages/global/project/ProjectListPage";
+import GradesListPage from "@/pages/student/GradesListPage";
 import UserCreatePage from "@/pages/teacher/UserCreatePage";
 import StudentRegisterPage from "@/pages/global/StudentRegisterPage";
 import HomePage from "@/pages/global/HomePage";
@@ -46,6 +47,7 @@ const App = () => {
               {/* ============== PROJET ============== */}
 
               <Route element={<IsStudentWall />}>
+                <Route path="/notes" element={<GradesListPage />} />
                 <Route path="/students/projets" element={<ProjectListPage />} />
                 <Route path="/students/projets/:id" element={<ProjectStudentDashboardPage />} />
                 <Route path="/students/projets/:id/livrables" element={<ProjectStudentDashboardPage />} />
