@@ -1,4 +1,5 @@
 import FlexibleCard from "@/components/template/FlexibleCard";
+import Divider from "@/components/layout/Divider";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface SummaryGradesStatsSectionProps {
@@ -21,62 +22,45 @@ export default function SummaryGradesStatsSection({
   min,
   max,
 }: SummaryGradesStatsSectionProps) {
-  if (
-    median === undefined || median === null ||
-    average === undefined || average === null ||
-    min === undefined || min === null ||
-    max === undefined || max === null
-  ) {
-    return (
-      <FlexibleCard
-        title="Statistiques des notes"
-        className="col-span-1 flex flex-col gap-8 my-8 h-full"
-      >
-        <div className="flex flex-row items-center justify-around h-full">
-          <p className="text-lg font-bold">Aucune donnée disponible</p>
-        </div>
-      </FlexibleCard>
-    );
-  }
+  const hasData = median !== undefined && median !== null &&
+    average !== undefined && average !== null &&
+    min !== undefined && min !== null &&
+    max !== undefined && max !== null;
+
+  const items = [
+    { key: 'min', value: min, color: 'red' },
+    { key: 'max', value: max, color: 'green' },
+    { key: 'median', value: median, color: 'yellow' },
+    { key: 'average', value: average, color: 'blue' },
+  ];
 
   return (
-      <FlexibleCard
-        title="Statistiques des notes"
-        className="h-full">
-        <div className="flex flex-col items-center justify-around h-full mb-4">
-          <div className="flex flex-row items-center justify-around">
-            <div className="flex flex-col items-center justify-center h-full">
-              <p className="text-lg font-bold">Note minimale</p>
-              <div className="flex items-center justify-center text-2xl text-red-600">
-                <ChevronDown /> {min.toFixed(2)}{" "}
-                <span className="text-muted-foreground">/ 20</span>
-              </div>
-            </div>
-            <div className="flex flex-col items-center justify-center h-full">
-              <p className="text-lg font-bold">Note maximale</p>
-              <div className="flex items-center justify-center text-2xl text-green-600">
-                <ChevronUp /> {max.toFixed(2)}{" "}
-                <span className="text-muted-foreground">/ 20</span>
-              </div>
-            </div>
-          </div>
-          <div className="flex flex-row items-center justify-around">
-              <div className="flex flex-col items-center justify-center h-full">
-                <p className="text-lg font-bold">Médiane</p>
-                <div className="flex items-center justify-center text-2xl text-yellow-600">
-                  {median.toFixed(2)}{" "}
-                  <span className="text-muted-foreground">/ 20</span>
+      <div className="flex flex-col w-full h-full gap-4">
+          {hasData ? (
+            items.map(({ key, value }) => {
+              return (
+                <div
+                  key={key}
+                  className="flex flex-col items-center justify-center border rounded-xl bg-white shadow h-26 hover:shadow-lg transition-shadow"
+                >
+                  <div className="flex items-center gap-2 text-sm text-gray-600">
+                    {key === 'min' && <ChevronDown className="text-red-600" />}
+                    {key === 'max' && <ChevronUp className="text-green-600" />}
+                    <span className="font-medium">{key === 'median' ? 'Médiane' : key === 'average' ? 'Note moyenne' : key === 'min' ? 'Note minimale' : 'Note maximale'}</span>
+                  </div>
+                  <div className={`text-2xl font-bold mb-2 text-${key === 'min' ? 'red' : key === 'max' ? 'green' : key === 'median' ? 'yellow' : 'blue'}-600`}>
+                    {value.toFixed(2)} <span className="text-sm text-muted-foreground">/ 20</span>
+                  </div>
                 </div>
+              );
+            })
+          ) : (
+            [...Array(4)].map((_, i) => (
+              <div key={i} className="flex flex-col items-center justify-center h-32 border rounded-xl bg-muted">
+                <p className="text-sm text-center">Aucune donnée disponible</p>
               </div>
-              <div className="flex flex-col items-center justify-center h-full">
-                <p className="text-lg font-bold">Note moyenne</p>
-                <div className="flex items-center justify-center text-2xl text-blue-600">
-                  {average.toFixed(2)}{" "}
-                  <span className="text-muted-foreground">/ 20</span>
-                </div>
-              </div>
-            </div>
-        </div>
-      </FlexibleCard>
+            ))
+          )}
+      </div>
   );
 }
