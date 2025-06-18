@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import DashboardLayout from "@/layout/dashboard.layout";
-import { fetchGradesForUser } from "@/services/evaluationGridService";
+import { fetchUserGrades } from "@/services/evaluationGridService";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Table,
@@ -9,55 +9,43 @@ import {
   TableRow,
   TableCell,
   TableHead,
-  TableFooter,
 } from "@/components/ui/table";
-import { Loader2, FileText } from "lucide-react";
-
-type Grade = any; // remplace si tu as un type précis
-
-function computeAverage(grades: Grade[]) {
-  if (!grades.length) return 0;
-  const total = grades.reduce((acc: number, grid) => {
-    const values = Object.values(grid.scores) as number[];
-    const sum = values.reduce((a: number, b: number) => Number(a) + Number(b), 0);
-    return acc + sum / values.length;
-  }, 0);
-  return total / grades.length;
-}
+import { Loader2, FileText, ChevronDown, ChevronUp, FileText as FileTextIcon, BookOpen, CheckCircle2, Mic, FolderUp, Presentation } from "lucide-react";
+import FlexibleCard from "@/components/template/FlexibleCard";
 
 export default function GradesListPage() {
-  const [grades, setGrades] = useState<Grade[]>([]);
+  const [gradesByProject, setGradesByProject] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  // State to track which grid details are open
+  const [openDetails, setOpenDetails] = useState<{ [key: string]: boolean }>({});
+  // State to track which projects are open
+  const [openProjects, setOpenProjects] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
-    fetchGradesForUser()
-      .then(setGrades)
+    fetchUserGrades()
+      .then(setGradesByProject)
       .finally(() => setLoading(false));
   }, []);
 
-  // Group by project then by corrector
-  const projectsMap: Record<string, { name: string, correctors: Record<string, { name: string, grades: Grade[] }> }> = {};
+  const allGlobalGrades = gradesByProject.flatMap((p: any) => p.grades.map((g: any) => g.global).filter(Number.isFinite));
+  const generalAverage = allGlobalGrades.length ? (allGlobalGrades.reduce((a: number, b: number) => a + b, 0) / allGlobalGrades.length) : null;
 
-  grades.forEach((g) => {
-    const projectName = g.project?.name || g.projectId;
-    const correctorName = g.corrector
-      ? `${g.corrector.firstName} ${g.corrector.lastName}`
-      : "Enseignant inconnu";
-    if (!projectsMap[projectName]) projectsMap[projectName] = { name: projectName, correctors: {} };
-    if (!projectsMap[projectName].correctors[correctorName]) projectsMap[projectName].correctors[correctorName] = { name: correctorName, grades: [] };
-    projectsMap[projectName].correctors[correctorName].grades.push(g);
-  });
-
-  const allGrades = grades;
+  // Helper to toggle details for a grid
+  const toggleDetails = (gridId: string) => {
+    setOpenDetails(prev => ({ ...prev, [gridId]: !prev[gridId] }));
+  };
+  // Helper to toggle project open/close
+  const toggleProject = (projectId: string) => {
+    setOpenProjects(prev => ({ ...prev, [projectId]: !prev[projectId] }));
+  };
 
   return (
     <DashboardLayout>
-      <div className="max-w-3xl mx-auto mt-8 space-y-6">
         {loading ? (
           <div className="flex justify-center items-center h-60">
             <Loader2 className="animate-spin w-8 h-8" />
           </div>
-        ) : !grades.length ? (
+        ) : !gradesByProject.length ? (
           <Card className="max-w-2xl mx-auto mt-8">
             <CardHeader>
               <div className="flex items-center gap-2">
@@ -72,79 +60,97 @@ export default function GradesListPage() {
             </CardContent>
           </Card>
         ) : (
-          Object.entries(projectsMap).map(([projectName, { correctors }]) => (
-            <Card key={projectName} className="mb-6">
-              <CardHeader>
-                <h2 className="text-lg font-bold">Projet : {projectName}</h2>
-              </CardHeader>
-              <CardContent>
-                {Object.entries(correctors).map(([correctorName, { grades }]) => (
-                  <div key={correctorName} className="mb-6">
-                    <div className="w-full font-semibold mb-2">Professeur : {correctorName}</div>
-                    <Table className="w-full min-w-[700px]">
-                      <TableHeader>
-                        <TableRow>
-                          <TableHead>Enseignant</TableHead>
-                          <TableHead>Matière</TableHead>
-                          <TableHead>Note globale</TableHead>
-                          <TableHead>Dernière mise à jour</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {grades.map((grid) => (
-                          <TableRow key={grid.id}>
-                            <TableCell>{grid.corrector.firstName + " " + grid.corrector.lastName}</TableCell>
-                            <TableCell>
-                              {grid.criteriaScores.criteriaLabel}
-                            </TableCell>
-                            <TableCell>
-                              {grid.scores
-                                ? (
-                                    Object.values(grid.scores as Record<string, number>).reduce(
-                                      (a, b) => Number(a) + Number(b),
-                                      0
-                                    ) / Object.values(grid.scores as Record<string, number>).length
-                                  ).toFixed(2)
-                                : "—"}
-                            </TableCell>
-                            <TableCell>
-                              {grid.updatedAt
-                                ? new Date(grid.updatedAt).toLocaleDateString()
-                                : ""}
-                            </TableCell>
-                          </TableRow>
-                        ))}
-                      </TableBody>
-                      <TableFooter>
-                        <TableRow>
-                          <TableCell colSpan={2} className="font-bold">Moyenne du projet</TableCell>
-                          <TableCell className="font-bold">
-                            {computeAverage(grades).toFixed(2)}
-                          </TableCell>
-                          <TableCell />
-                        </TableRow>
-                      </TableFooter>
-                    </Table>
+          gradesByProject.map((project: any) => {
+            const isProjectOpen = openProjects[project.projectId];
+            // Calcul de la moyenne du projet
+            const projectGlobalGrades = project.grades.map((g: any) => g.global).filter(Number.isFinite);
+            const projectAverage = projectGlobalGrades.length ? (projectGlobalGrades.reduce((a: number, b: number) => a + b, 0) / projectGlobalGrades.length) : null;
+            return (
+              <div key={project.projectId} className="mb-6 border rounded-lg">
+                <div className="flex items-center justify-between px-4 py-3 cursor-pointer select-none hover:bg-muted/40" onClick={() => toggleProject(project.projectId)}>
+                  <div className="font-bold text-lg">Projet : {project.projectName}</div>
+                  <div className="flex items-center gap-4">
+                    {projectAverage !== null && (
+                      <span className="text-base font-semibold">Moyenne projet : {projectAverage.toFixed(2)} / 20</span>
+                    )}
+                    {isProjectOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                   </div>
-                ))}
-              </CardContent>
-            </Card>
-          ))
+                </div>
+                {isProjectOpen && (
+                  <div className="p-4 pt-2">
+                    {project.grades.map((grid: any, idx: number) => {
+                      const gridId = grid.gridId || idx;
+                      const isOpen = openDetails[gridId];
+                      let typeIcon = <FileTextIcon className="w-5 h-5 inline mr-1" />;
+                      let typeLabel = grid.criteriaSet.type;
+                      if (/^defense$/i.test(typeLabel)) {
+                        typeIcon = <Presentation className="w-5 h-5 inline mr-1" />;
+                        typeLabel = "Soutenance";
+                      } else if (/^report$/i.test(typeLabel)) {
+                        typeIcon = <FileText className="w-5 h-5 inline mr-1" />;
+                        typeLabel = "Rapport";
+                      } else if (/^deliverable$/i.test(typeLabel)) {
+                        typeIcon = <FolderUp className="w-5 h-5 inline mr-1" />;
+                        typeLabel = "Rendu";
+                      }
+                      return (
+                        <div key={gridId} className="mb-6 border rounded-lg">
+                          <div className="flex items-center justify-between px-4 py-2 cursor-pointer select-none hover:bg-muted/40" onClick={() => toggleDetails(gridId)}>
+                            <div>
+                              <span className="font-semibold">{typeIcon} <span className="text-sm text-muted-foreground">({typeLabel})</span> {grid.criteriaSet.title}</span>
+                            </div>
+                            <div className="flex items-center gap-4">
+                              <span className="font-bold text-lg">{grid.global !== null ? grid.global + " / 20" : "—"}</span>
+                              {isOpen ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
+                            </div>
+                          </div>
+                          {isOpen && (
+                            <div className="p-4 pt-2">
+                              <Table className="w-full min-w-[700px]">
+                                <TableHeader>
+                                  <TableRow>
+                                    <TableHead>Critère</TableHead>
+                                    <TableHead>Note</TableHead>
+                                    <TableHead>Score</TableHead>
+                                    <TableHead>Poids</TableHead>
+                                    <TableHead>Commentaire</TableHead>
+                                  </TableRow>
+                                </TableHeader>
+                                <TableBody>
+                                  {grid.details.map((crit: any) => (
+                                    <TableRow key={crit.criteriaId}>
+                                      <TableCell>{crit.label}</TableCell>
+                                      <TableCell>{crit.note !== null ? crit.note + " / 20" : "—"}</TableCell>
+                                      <TableCell>{crit.score} / {crit.maxScore}</TableCell>
+                                      <TableCell>{crit.weight}</TableCell>
+                                      <TableCell>{crit.comment || "—"}</TableCell>
+                                    </TableRow>
+                                  ))}
+                                </TableBody>
+                              </Table>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            );
+          })
         )}
-        {/* Moyenne générale */}
-        {!!allGrades.length && (
+        {!!allGlobalGrades.length && (
           <Card>
             <CardHeader>
               <div className="font-bold text-center">Moyenne générale tous projets</div>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-semibold text-center">
-                {computeAverage(allGrades).toFixed(2)} / 20
+                {generalAverage?.toFixed(2)} / 20
               </div>
             </CardContent>
           </Card>
         )}
-      </div>
     </DashboardLayout>
   );
 }

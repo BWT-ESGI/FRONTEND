@@ -1,4 +1,5 @@
 import api from '../config/axios';
+import getUserInfoFromLocalStorage from '@/utils/getUserInfoFromLocalStorage';
 
 export interface EvaluationGridPayload {
   projectId: string;
@@ -34,5 +35,12 @@ export async function fetchEvaluationGrid(
 
 export async function fetchGradesForUser() {
   const res = await api.get('/evaluation-grids/getAllGrad');
+  return res.data;
+}
+
+export async function fetchUserGrades() {
+  const userInfo = getUserInfoFromLocalStorage();
+  if (!userInfo?.userId) throw new Error('Utilisateur non connecté');
+  const res = await api.get(`/statistics/user/${userInfo.userId}/grades`);
   return res.data;
 }
