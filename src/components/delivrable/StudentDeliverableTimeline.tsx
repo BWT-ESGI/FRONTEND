@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { Deliverable, Submission } from "@/types/deliverable.type";
 import { fetchDeliverablesByProject } from "@/services/deliverableService";
-import { fetchSubmissionsByGroup, uploadSubmission, downloadSubmission, deleteSubmission } from "@/services/submissionService";
+import { fetchSubmissionsByGroup, uploadSubmission, downloadSubmission, deleteSubmission, uploadGitSubmission } from "@/services/submissionService";
 import { fetchRulesByDeliverable } from '@/services/ruleService';
 import toast from "react-hot-toast";
-import { CheckCircle, Circle, UploadCloud, FileText, Info, X, Trash2 } from "lucide-react";
+import { CheckCircle, Circle, UploadCloud, Info, X, Trash2, Github, Archive } from "lucide-react";
 import FlexibleAlert from "../template/FlexibleAlert";
 
 interface StudentDeliverableTimelineProps {
@@ -18,6 +18,7 @@ export default function StudentDeliverableTimeline({ projectId, groupId }: Stude
     const [selectedFiles, setSelectedFiles] = useState<Record<string, File | null>>({});
     const [loading, setLoading] = useState(false);
     const [rulesByDeliverable, setRulesByDeliverable] = useState<Record<string, any[]>>({});
+    const [gitLinks, setGitLinks] = useState<Record<string, string>>({});
 
     useEffect(() => {
         if (!projectId || !groupId) return;
@@ -68,6 +69,30 @@ export default function StudentDeliverableTimeline({ projectId, groupId }: Stude
         }
     };
 
+    const handleGitLinkChange = (deliverableId: string, value: string) => {
+        setGitLinks((prev) => ({ ...prev, [deliverableId]: value }));
+    };
+
+    const handleGitUpload = async (deliverableId: string) => {
+        const gitRepoUrl = gitLinks[deliverableId];
+        if (!gitRepoUrl) return toast.error("Veuillez renseigner le lien du dépôt GitHub public");
+        // Validation simple du lien GitHub public
+        if (!/^https:\/\/(www\.)?github\.com\/.+\/.+/.test(gitRepoUrl)) {
+            return toast.error("Le lien doit être une URL GitHub publique valide");
+        }
+        setLoading(true);
+        try {
+            await uploadGitSubmission({ deliverableId, groupId, gitRepoUrl });
+            toast.success("Lien GitHub déposé avec succès");
+            fetchSubmissionsByGroup(groupId).then((res) => setSubmissions(Array.isArray(res.data) ? res.data : []));
+            setGitLinks((prev) => ({ ...prev, [deliverableId]: "" }));
+        } catch (e: any) {
+            toast.error("Erreur lors de l'envoi du lien GitHub");
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleDownload = async (submissionId: string, filename?: string) => {
         try {
             const res = await downloadSubmission(submissionId);
@@ -106,7 +131,12 @@ export default function StudentDeliverableTimeline({ projectId, groupId }: Stude
                                 </span>
                                 <div className="flex flex-col md:flex-row md:items-center gap-2">
                                     <span className="font-bold text-lg md:text-xl text-primary-700 flex items-center gap-2">
-                                        <FileText className="w-5 h-5 text-blue-500" />
+                                        {/* Icône selon le type de rendu */}
+                                        {d.submissionType === 'git' ? (
+                                            <Github className="w-5 h-5 text-gray-700 dark:text-gray-200" title="Rendu GitHub" />
+                                        ) : (
+                                            <Archive className="w-5 h-5 text-gray-700 dark:text-gray-200" title="Rendu archive" />
+                                        )}
                                         {d.name}
                                     </span>
                                     <span className="text-xs text-red-500 font-semibold whitespace-nowrap md:ml-4">
@@ -182,41 +212,64 @@ export default function StudentDeliverableTimeline({ projectId, groupId }: Stude
                                         </>
                                     ) : (
                                         <div className="flex flex-col gap-2 w-full">
-                                            <div className="flex gap-2 items-center w-full">
-                                                <button
-                                                    type="button"
-                                                    className="px-3 py-1 bg-gray-100 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded hover:bg-gray-200 dark:hover:bg-neutral-700 text-sm font-medium transition-colors"
-                                                    onClick={() => {
-                                                        const input = document.createElement('input');
-                                                        input.type = 'file';
-                                                        input.onchange = (e: any) => handleFileChange(d.id, e.target.files?.[0] || null);
-                                                        input.click();
-                                                    }}
-                                                    disabled={loading}
-                                                >
-                                                    Choisir un fichier
-                                                </button>
-                                                {selectedFile && (
-                                                    <span className="flex items-center gap-1 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded px-2 py-1 text-xs">
-                                                        {selectedFile.name}
+                                            {d.submissionType === 'git' ? (
+                                                <>
+                                                    <input
+                                                        type="url"
+                                                        className="w-full px-3 py-2 border border-gray-300 dark:border-neutral-700 rounded focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-neutral-800 text-sm"
+                                                        placeholder="Lien du dépôt GitHub public"
+                                                        value={gitLinks[d.id] || ""}
+                                                        onChange={e => handleGitLinkChange(d.id, e.target.value)}
+                                                        disabled={loading}
+                                                    />
+                                                    <button
+                                                        className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 font-semibold flex items-center justify-center gap-1 shadow-md transition-all"
+                                                        onClick={() => handleGitUpload(d.id)}
+                                                        disabled={loading || !gitLinks[d.id]}
+                                                    >
+                                                        <UploadCloud className="inline w-4 h-4 mr-1" /> Déposer le lien
+                                                    </button>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <div className="flex gap-2 items-center w-full">
                                                         <button
                                                             type="button"
-                                                            className="ml-1 text-red-500 hover:text-red-700"
-                                                            onClick={() => handleFileChange(d.id, null)}
-                                                            aria-label="Retirer le fichier"
+                                                            className="w-full px-3 py-1 bg-gray-100 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded hover:bg-gray-200 dark:hover:bg-neutral-700 text-sm font-medium transition-colors"
+                                                            onClick={() => {
+                                                                const input = document.createElement('input');
+                                                                input.type = 'file';
+                                                                input.accept = '.zip,.rar,.7z,.tar,.gz';
+                                                                input.onchange = (e: any) => handleFileChange(d.id, e.target.files?.[0] || null);
+                                                                input.click();
+                                                            }}
+                                                            disabled={loading}
                                                         >
-                                                            <X className="w-3 h-3" />
+                                                            Choisir un fichier
                                                         </button>
-                                                    </span>
-                                                )}
-                                            </div>
-                                            <button
-                                                className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 font-semibold flex items-center justify-center gap-1 shadow-md transition-all"
-                                                onClick={() => handleUpload(d.id)}
-                                                disabled={loading || !selectedFile}
-                                            >
-                                                <UploadCloud className="inline w-4 h-4 mr-1" /> Déposer
-                                            </button>
+                                                        {selectedFile && (
+                                                            <span className="flex items-center gap-1 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded px-2 py-1 text-xs">
+                                                                {selectedFile.name}
+                                                                <button
+                                                                    type="button"
+                                                                    className="ml-1 text-red-500 hover:text-red-700"
+                                                                    onClick={() => handleFileChange(d.id, null)}
+                                                                    aria-label="Retirer le fichier"
+                                                                >
+                                                                    <X className="w-3 h-3" />
+                                                                </button>
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <button
+                                                        className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 font-semibold flex items-center justify-center gap-1 shadow-md transition-all"
+                                                        onClick={() => handleUpload(d.id)}
+                                                        disabled={loading || !selectedFile}
+                                                    >
+                                                        <UploadCloud className="inline w-4 h-4 mr-1" /> Déposer
+                                                    </button>
+                                                </>
+                                            )}
                                         </div>
                                     )}
                                 </div>

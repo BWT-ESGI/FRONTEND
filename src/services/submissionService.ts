@@ -23,3 +23,7 @@ export async function downloadSubmission(submissionId: string) {
 export async function deleteSubmission(submissionId: string) {
   return api.delete(`/submissions/${submissionId}`);
 }
+
+export async function uploadGitSubmission(data: { deliverableId: string; groupId: string; gitRepoUrl: string }) {
+  return api.post("/submissions", data);
+}
