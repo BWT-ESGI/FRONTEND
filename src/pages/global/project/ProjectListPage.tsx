@@ -91,7 +91,9 @@ export default function ProjectListPage() {
                   const handleDetailsClick = (e: React.MouseEvent) => {
                     if (isStudentUser && !hasGroup) {
                       e.preventDefault();
-                      toast.error("Vous n'avez pas été attribué à un groupe pour ce projet. Veuillez contacter votre professeur.");
+                      toast.error(
+                        "Vous n'avez pas été attribué à un groupe pour ce projet. Veuillez contacter votre professeur."
+                      );
                     }
                   };
                   return (
@@ -100,15 +102,23 @@ export default function ProjectListPage() {
                       project={project}
                       btn={
                         isStudentUser &&
-                          project.groupCompositionType === "student_choice" &&
-                          !hasGroup ? (
+                        project.groupCompositionType === "student_choice" &&
+                        !hasGroup ? (
+                          // Si la deadline de sélection des groupes est dépassée
                           project.deadlineGroupSelection &&
-                            new Date(project.deadlineGroupSelection) <
+                          new Date(project.deadlineGroupSelection) <
                             new Date() ? (
                             <Button disabled className="cursor-not-allowed">
-                              Deadline dépassée
+                              Deadline de sélection dépassée
+                            </Button>
+                          ) : // Sinon, si la date de fin du projet est dépassée
+                          project.endAt &&
+                            new Date(project.endAt) < new Date() ? (
+                            <Button disabled className="cursor-not-allowed">
+                              Projet terminé
                             </Button>
                           ) : (
+                            // Sinon, bouton pour rejoindre un groupe
                             <Link
                               to={`/students/projets/${project.id}/rejoindre`}
                             >
@@ -118,9 +128,17 @@ export default function ProjectListPage() {
                             </Link>
                           )
                         ) : (
-                          <Link to={isStudentUser ? `/students/projets/${project.id}` : `/projets/${project.id}`}
-                            onClick={handleDetailsClick}>
-                            <Button className="cursor-pointer">Voir les détails</Button>
+                          <Link
+                            to={
+                              isStudentUser
+                                ? `/students/projets/${project.id}`
+                                : `/projets/${project.id}`
+                            }
+                            onClick={handleDetailsClick}
+                          >
+                            <Button className="cursor-pointer">
+                              Voir les détails
+                            </Button>
                           </Link>
                         )
                       }
