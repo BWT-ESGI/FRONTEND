@@ -39,7 +39,7 @@ export default function GroupBuilder() {
   const mode = project?.groupCompositionType ?? "manual";
   const minSize = project?.nbStudentsMinPerGroup ?? 0;
   const maxSize = project?.nbStudentsMaxPerGroup ?? 0;
-  const deadline = project?.endAt;
+  const deadlineGroupSelection = project?.deadlineGroupSelection;
 
   const [users, setUsers] = useState<User[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
@@ -135,7 +135,7 @@ export default function GroupBuilder() {
           nbStudentsMaxPerGroup: maxSize,
           groupCompositionType: mode,
           nbGroups: groups.length,
-          deadline: deadline?.toISOString(),
+          deadlineGroupSelection: deadlineGroupSelection,
         });
         toast.success("Groupes et configuration enregistrés !");
       }
@@ -253,12 +253,20 @@ export default function GroupBuilder() {
 
   return (
     <div className="space-y-6">
-      {totalStudents > totalSlots && (
+      {!deadlineGroupSelection && totalStudents > totalSlots && (
         <FlexibleAlert
           variant="error"
           title={`Il y a ${totalStudents} étudiants au total, mais seulement ${totalSlots} places disponibles dans les groupes.`}
           icon={<OctagonX className="!text-red-500 text-center" />}
         />
+      )}
+      {deadlineGroupSelection &&
+        new Date(deadlineGroupSelection) < new Date() && (
+          <FlexibleAlert
+            variant="error"
+            title="La deadline de sélection des groupes est dépassée."
+            icon={<OctagonX className="!text-red-500 text-center" />}
+          />
       )}
       <div className="flex justify-center space-x-4 ">
         {mode === "random" && (

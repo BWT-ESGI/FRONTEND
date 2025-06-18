@@ -43,7 +43,7 @@ export const finalizeRegistration = async (email: string | undefined, credential
 
 export const checkRegistrationId = async (id: string) => {
   try {
-    const response = await api.get(`/users/${id}/check-registration`);
+    const response = await api.get(`/users/check-registration/${id}`);
     return response.data;
   } catch (error) {
     console.error('Error checking registration ID:', error);
