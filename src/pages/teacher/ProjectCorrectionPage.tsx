@@ -9,7 +9,7 @@ import { ProjectFileSimilarityHeatmap } from "@/components/project/similarity/Pr
 import TextEditor from "@/components/report/TextEditor";
 import { useReport } from "@/hooks/api/useReport";
 import { fetchGroupsWithMembers } from "@/services/groupService";
-import { fetchSubmissionsByGroup } from "@/services/submissionService";
+import { fetchSubmissionsByGroup, downloadSubmission } from "@/services/submissionService";
 import { fetchDeliverablesByProject } from "@/services/deliverableService";
 import FlexibleAlert from "@/components/template/FlexibleAlert";
 import { InfoIcon } from "lucide-react";
@@ -20,6 +20,8 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from '@/component
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ProjectProvider, useProjectContext } from '@/contexts/ProjectContext';
 import { motion, AnimatePresence } from "framer-motion";
+import { fetchRuleResultsBySubmission } from '@/services/ruleResultService';
+import { Github, Archive, CheckCircle, XCircle } from 'lucide-react';
 
 export default function ProjectCorrectionPageWithProvider() {
   const { id } = useParams<{ id: string }>();
@@ -164,8 +166,6 @@ function ProjectCorrectionPage() {
           <TabsTrigger value="rapport">Rapport</TabsTrigger>
         </TabsList>
         <TabsContent value="rendus">
-          <Divider text="Rendus du groupe" />
-
           <div className="w-full mt-8 mb-8">
             {deliverables.length === 0 && (
               <FlexibleAlert
@@ -177,9 +177,20 @@ function ProjectCorrectionPage() {
             {deliverables.map((deliverable) => {
               const criteriaSet = criteriaSets.find(cs => cs.id === deliverable.criteriaSetId);
               const evaluationGrid = evaluationGrids[deliverable.id];
+              // Trouver le rendu pour ce livrable, uniquement pour le groupe courant
+              const submission = submissions.find((s) => s.deliverableId === deliverable.id && s.groupId === group.id);
+              // Affichage détaillé du rendu
               return (
                 <div key={deliverable.id} className="mb-8">
                   <Divider text={deliverable.name} />
+                  {submission ? (
+                    <DetailedSubmissionView
+                      submission={submission}
+                      deliverable={deliverable}
+                    />
+                  ) : (
+                    <div className="text-sm text-gray-500 mb-4">Aucun rendu pour ce livrable.</div>
+                  )}
                   {criteriaSet ? (
                     <CriteriaGridFillComponent
                       key={deliverable.id + '-' + group.id}
@@ -194,7 +205,7 @@ function ProjectCorrectionPage() {
                           projectId: id!,
                           criteriaSetId: criteriaSet.id!,
                           groupId: group.id,
-                          deliverableId: deliverable.id, // Ajout du deliverableId pour l'unicité
+                          deliverableId: deliverable.id,
                           filledBy: teacherId,
                           scores,
                           comments,
@@ -293,5 +304,67 @@ function ProjectCorrectionPage() {
         </CollapsibleContent>
       </Collapsible>
     </DashboardLayout>
+  );
+}
+
+// Composant détaillé d'affichage d'un rendu étudiant pour un livrable
+function DetailedSubmissionView({ submission, deliverable }: { submission: any, deliverable: any }) {
+  const [ruleResults, setRuleResults] = useState<any[]>([]);
+  useEffect(() => {
+    fetchRuleResultsBySubmission(submission.id)
+      .then(res => setRuleResults(res.data || []))
+      .catch(err => {
+        if (err?.response?.status === 404) setRuleResults([]); // Pas de résultat, on ignore
+        else console.error(err);
+      });
+  }, [submission.id]);
+  return (
+    <div className="border border-gray-200 rounded-xl p-4 mb-4 bg-white/80">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-2 mb-2">
+        <div className="flex items-center gap-2">
+          {deliverable.submissionType === 'git' ? <Github className="w-5 h-5 text-gray-700" /> : <Archive className="w-5 h-5 text-gray-700" />}
+          <span className="font-semibold text-lg">{deliverable.name}</span>
+          {submission.isLate && <span className="text-xs text-orange-600 font-bold ml-2">Rendu en retard</span>}
+        </div>
+        <div className="flex gap-2 items-center">
+          {deliverable.submissionType === 'git' && submission.gitRepoUrl ? (
+            <a href={submission.gitRepoUrl} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">Voir le dépôt GitHub</a>
+          ) : (
+            submission.archiveObjectName && (
+              <button
+                className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                onClick={async () => {
+                  const res = await downloadSubmission(submission.id);
+                  const url = window.URL.createObjectURL(new Blob([res.data]));
+                  const link = document.createElement("a");
+                  link.href = url;
+                  link.setAttribute("download", submission.filename || "livrable.zip");
+                  document.body.appendChild(link);
+                  link.click();
+                  link.parentNode?.removeChild(link);
+                }}
+              >
+                Télécharger l'archive
+              </button>
+            )
+          )}
+        </div>
+      </div>
+      <div className="mt-2">
+        <span className="font-semibold text-base">Résultats des règles automatiques :</span>
+        {ruleResults.length === 0 ? (
+          <div className="text-xs text-gray-500 mt-1">Aucune règle vérifiée ou résultat non disponible.</div>
+        ) : (
+          <ul className="mt-2 space-y-1">
+            {ruleResults.map((r) => (
+              <li key={r.id} className="flex items-center gap-2 text-sm">
+                {r.passed ? <CheckCircle className="w-4 h-4 text-green-500" /> : <XCircle className="w-4 h-4 text-red-500" />}
+                <span className={r.passed ? "text-green-700" : "text-red-700 font-semibold"}>{r.message}</span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+    </div>
   );
 }

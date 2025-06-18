@@ -6,6 +6,7 @@ import { fetchRulesByDeliverable } from '@/services/ruleService';
 import toast from "react-hot-toast";
 import { CheckCircle, Circle, UploadCloud, Info, X, Trash2, Github, Archive } from "lucide-react";
 import FlexibleAlert from "../template/FlexibleAlert";
+import JSZip from "jszip";
 
 interface StudentDeliverableTimelineProps {
     projectId: string;
@@ -45,12 +46,35 @@ export default function StudentDeliverableTimeline({ projectId, groupId }: Stude
         setSelectedFiles((prev) => ({ ...prev, [deliverableId]: file }));
     };
 
+    // Vérifie la présence des fichiers requis dans l'archive (pour FILE_EXISTS)
+    const checkRequiredFilesInArchive = async (file: File, requiredFiles: string[]): Promise<string[]> => {
+        try {
+            const zip = await JSZip.loadAsync(file);
+            const entries = Object.keys(zip.files).map(e => e.split('/').pop()?.toLowerCase());
+            const missing = requiredFiles.filter(req => !entries.includes(req.toLowerCase()));
+            return missing;
+        } catch {
+            return requiredFiles; // Si erreur, on considère tout manquant
+        }
+    };
+
     const handleUpload = async (deliverableId: string) => {
         const file = selectedFiles[deliverableId];
         const deliverable = deliverables.find(d => d.id === deliverableId);
         if (!file) return toast.error("Aucun fichier sélectionné");
         if (deliverable?.submissionType === 'archive' && deliverable.maxSize && file.size > deliverable.maxSize * 1024 * 1024) {
             return toast.error(`Le fichier dépasse la taille maximale autorisée (${deliverable.maxSize} Mo)`);
+        }
+        // Vérification des règles FILE_EXISTS côté front
+        const rules = rulesByDeliverable[deliverableId] || [];
+        const requiredFiles = rules.filter((r: any) => r.type === 'FILE_EXISTS').map((r: any) => r.config.file);
+        if (requiredFiles.length > 0) {
+            const missing = await checkRequiredFilesInArchive(file, requiredFiles);
+            if (missing.length > 0) {
+                if (!window.confirm(`Attention : le fichier requis suivant est manquant dans l'archive : ${missing.join(', ')}. Voulez-vous quand même déposer ?`)) {
+                    return;
+                }
+            }
         }
         setLoading(true);
         const formData = new FormData();
