@@ -128,28 +128,30 @@ export default function ProjectDashboardPage() {
 
       <Divider text="Notes" className="mt-0" />
 
-      <TypeAveragesCard stats={stats || {}} />
+      <TypeAveragesCard stats={stats?.grades || {}} />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <SummaryGradesChartSection
-          groupGrades={stats?.groupGrades || []}
-          average={stats?.averageGrade}
-          median={stats?.medianGrade}
+          groupGrades={stats?.grades.groupGrades || []}
+          average={stats?.grades.average}
+          median={stats?.grades.median}
         />
         <div className="flex flex-col gap-4 h-full">
           <SummaryGradesStatsSection
-            median={stats?.medianGrade}
-            average={stats?.averageGrade}
-            max={stats?.maxGrade}
-            min={stats?.minGrade}
+            median={stats?.grades.median}
+            average={stats?.grades.average}
+            max={stats?.grades.max}
+            min={stats?.grades.min}
           />
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
         <GradesPieChartSection
-          grades={(stats?.groupGrades || []).map((g: any) => g.globalGrade)}
+          grades={(stats?.grades.groupGrades || []).map(
+            (g: any) => g.globalGrade
+          )}
         />
         <div className="col-span-2">
-          <AdvancedStatsCard stats={stats || {}} />
+          <AdvancedStatsCard stats={stats?.grades || {}} />
         </div>
       </div>
 

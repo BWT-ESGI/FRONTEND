@@ -38,18 +38,15 @@ const METADATA: Record<string, { label: string; icon: React.ReactNode }> = {
 };
 
 export function TypeAveragesCard({ stats }: TypeAveragesCardProps) {
-  // Construit la liste de tous les KPIs à afficher
   const items: { key: string; value: number }[] = [];
 
   if (stats) {
-    // notes par type
     if (stats.typeAverages) {
       ["defense", "deliverable", "report"].forEach((key) => {
         const v = (stats.typeAverages as any)[key];
         if (typeof v === "number") items.push({ key, value: v });
       });
     }
-    // dispersion
     if (typeof stats.variance === "number")
       items.push({ key: "variance", value: stats.variance });
     if (typeof stats.stdDev === "number")
