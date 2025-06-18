@@ -1,5 +1,3 @@
-import FlexibleCard from "@/components/template/FlexibleCard";
-import Divider from "@/components/layout/Divider";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface SummaryGradesStatsSectionProps {

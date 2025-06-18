@@ -67,7 +67,6 @@ export default function ProjectEditPage() {
           </TabsContent>
 
         </Tabs>
-      </FlexibleCard>
     </DashboardLayout>
   );
 }
