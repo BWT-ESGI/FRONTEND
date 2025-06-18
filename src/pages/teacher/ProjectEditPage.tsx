@@ -12,9 +12,12 @@ import ProjectGlobalEditComponent from "@/components/project/ProjectGlobalEditCo
 import DefenseScheduler from "@/components/defense/DefenseScheduler";
 import { useProjectContext } from "@/contexts/ProjectContext";
 import CreateDelivrableComponent from "@/components/delivrable/CreateDelivrableComponent";
+import ReportEditComponent from "@/components/report/ReportEditComponent";
+import { updateProject } from "@/services/projectService";
+import toast from "react-hot-toast";
 
 export default function ProjectEditPage() {
-  const { project, loading } = useProjectContext();
+  const { project, loading, setProject } = useProjectContext();
   const { promotion, loading: loadingPromotion } = usePromotion(
     project?.promotion.id?.toString() || ""
   );
@@ -25,6 +28,17 @@ export default function ProjectEditPage() {
   if (!project) {
     return <NotFoundPage />;
   }
+
+  const handleReportCriteriaSetChange = async (id?: string) => {
+    if (!project) return;
+    try {
+      const updated = await updateProject(project.id, { reportCriteriaSetId: id });
+      setProject({ ...project, reportCriteriaSetId: id });
+      toast.success("Grille de notation des rapports sauvegardée");
+    } catch (e) {
+      toast.error("Erreur lors de la sauvegarde de la grille de rapport");
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -60,7 +74,12 @@ export default function ProjectEditPage() {
             <CreateDelivrableComponent />
           </TabsContent>
           <TabsContent value="rapports">
-            Grille de notation des rapports a selectionner
+            <FlexibleCard>
+              <ReportEditComponent
+                reportCriteriaSetId={project.reportCriteriaSetId}
+                setReportCriteriaSetId={handleReportCriteriaSetChange}
+              />
+            </FlexibleCard>
           </TabsContent>
           <TabsContent value="soutenances">
             <DefenseScheduler />

@@ -18,12 +18,14 @@ import {
   fetchActiveDefensesByProject,
   updateDefense,
 } from "@/services/defenseService";
+import { getCriteriaSets, CriteriaSet } from "@/services/criteriaSetService";
 import { useProjectContext } from "@/contexts/ProjectContext";
 import { Defense } from "@/types/defense.type";
 import { User } from "@/types/user.type";
 import FlexibleCard from "../template/FlexibleCard";
 import { FileSpreadsheet, TriangleAlert } from "lucide-react";
 import FlexibleAlert from "../template/FlexibleAlert";
+import { updateProject } from "@/services/projectService";
 
 function SortableItem({ defense }: { defense: Defense }) {
   const { attributes, listeners, setNodeRef, transform, transition } =
@@ -51,13 +53,15 @@ function SortableItem({ defense }: { defense: Defense }) {
   );
 }
 
-export default function SoutenanceScheduler() {
-  const { project } = useProjectContext();
+export default function DefenseScheduler() {
+  const { project, setProject } = useProjectContext();
   const [defenses, setDefenses] = useState<Defense[]>([]);
   const [order, setOrder] = useState<Defense[]>([]);
   const [start, setStart] = useState("");
   const [end, setEnd] = useState("");
   const [duration, setDuration] = useState(30);
+  const [criteriaSets, setCriteriaSets] = useState<CriteriaSet[]>([]);
+  const [defenseCriteriaSetId, setDefenseCriteriaSetId] = useState<string | undefined>(project?.defenseCriteriaSetId);
 
   if (!project) return null;
 
@@ -82,6 +86,10 @@ export default function SoutenanceScheduler() {
       })
       .catch(console.error);
   }, [project.id]);
+
+  useEffect(() => {
+    getCriteriaSets().then(setCriteriaSets).catch(() => {});
+  }, []);
 
   if (defenses.length === 0) {
     return (
@@ -158,8 +166,43 @@ export default function SoutenanceScheduler() {
     }
   };
 
+  const handleSaveCriteriaSet = async () => {
+    if (!project) return;
+    try {
+      await updateProject(project.id, { defenseCriteriaSetId });
+      setProject({ ...project, defenseCriteriaSetId });
+      toast.success("Grille de notation des soutenances sauvegardée");
+    } catch (e) {
+      toast.error("Erreur lors de la sauvegarde de la grille de soutenance");
+    }
+  };
+
   return (
     <div className="space-y-4">
+      <FlexibleCard title="Grille de notation des soutenances" className="mt-4">
+        <div className="mb-4">
+          <select
+            className="border rounded px-2 py-1 w-full"
+            value={defenseCriteriaSetId || ""}
+            onChange={(e) =>
+              setDefenseCriteriaSetId(e.target.value || undefined)
+            }
+          >
+            <option value="">Aucune</option>
+            {criteriaSets
+              .filter((cs) => cs.type === "defense")
+              .map((cs) => (
+                <option key={cs.id} value={cs.id}>
+                  {cs.title}
+                </option>
+              ))}
+          </select>
+          <Button className="mt-2" onClick={handleSaveCriteriaSet}>
+            Sauvegarder la grille
+          </Button>
+        </div>
+      </FlexibleCard>
+      
       <FlexibleCard
         title="Génération de l'ordre de passage"
         childrenFooter={
