@@ -36,11 +36,10 @@ export function AdvancedStatsCard({ stats }: AdvancedStatsCardProps) {
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Données avancées : Dispersion & Quartiles</CardTitle>
+        <CardTitle>Quartiles & Taux de réussite</CardTitle>
       </CardHeader>
 
       <CardContent className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Distribution Bar Chart */}
         <div className="w-full h-52">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={distributionData}>

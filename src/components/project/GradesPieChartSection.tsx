@@ -20,7 +20,7 @@ function getPieData(grades: number[]) {
 export default function GradesPieChartSection({ grades }: { grades: (number | null)[] }) {
   const data = getPieData(grades.filter((g): g is number => typeof g === "number"));
   return (
-    <FlexibleCard title="Répartition des notes (camembert)">
+    <FlexibleCard title="Répartition des notes">
       <ResponsiveContainer width="100%" height={220}>
         <PieChart>
           <Pie data={data} dataKey="value" nameKey="name" cx="50%" cy="50%" outerRadius={80} label>
