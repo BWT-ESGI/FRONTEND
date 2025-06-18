@@ -7,17 +7,36 @@ import SummaryOverviewSection from "@/components/project/SummaryOverviewSection"
 import SummaryGradesChartSection from "@/components/project/SummaryGradesChartSection";
 import SummaryGradesStatsSection from "@/components/project/SummaryGradesStatsSection";
 import { Link, useParams } from "react-router-dom";
-import { FlexibleCardSkeleton } from "@/components/template/skeleton/FlexibleCardSkeleton";
 import { Button } from "@/components/ui/button";
 import { ProjectStatsCard } from "@/components/project/similarity/ProjectStatsCard";
 import { ProjectSimilarityBarChart } from "@/components/project/similarity/ProjectSimilarityBarChart";
 import { ProjectFileSimilarityHeatmap } from "@/components/project/similarity/ProjectFileSimilarityHeatmap";
 import FlexibleCard from "@/components/template/FlexibleCard";
 import { Presentation, SearchCheck } from "lucide-react";
+import { useEffect, useState } from "react";
+import { fetchProjectStats } from "@/services/projectStatsService";
+import GradesPieChartSection from "@/components/project/GradesPieChartSection";
+import { AdvancedStatsCard } from "@/components/AdvancedStatsCard";
+import { TypeAveragesCard } from "@/components/project/TypeAveragesCard";
 
 export default function ProjectDashboardPage() {
   const { id } = useParams<{ id: string }>();
   const { project, loading } = useProject(id || "");
+  const [stats, setStats] = useState<any>(null);
+  const [, setStatsLoading] = useState(true);
+
+  useEffect(() => {
+    if (id) {
+      setStatsLoading(true);
+      fetchProjectStats(id)
+        .then((data) => {
+          setStats(data);
+          console.log("Project stats fetched:", data);
+        })
+        .finally(() => setStatsLoading(false));
+    }
+  }, [id]);
+
   const projectSimilarityData = {
   totalProjects: 3,
   averageProjectSimilarity: 74.45,
@@ -27,24 +46,23 @@ export default function ProjectDashboardPage() {
     { projectA: "groupeB", projectB: "groupeC", similarity: 80.6 },
   ],
   fileComparisons: [
-      { "projectA": "groupeA", "projectB": "groupeB", "fileA": "groupeA/diff.js", "fileB": "groupeB/fileUtils.js", "similarity": 0 },
-      { "projectA": "groupeA", "projectB": "groupeB", "fileA": "groupeA/diff.js", "fileB": "groupeB/index.js", "similarity": 76.92 },
-      { "projectA": "groupeA", "projectB": "groupeB", "fileA": "groupeA/index.js", "fileB": "groupeB/fileUtils.js", "similarity": 0 },
-      { "projectA": "groupeA", "projectB": "groupeB", "fileA": "groupeA/index.js", "fileB": "groupeB/index.js", "similarity": 100 },
-      { "projectA": "groupeA", "projectB": "groupeC", "fileA": "groupeA/diff.js", "fileB": "groupeC/fileUtils.js", "similarity": 0 },
-      { "projectA": "groupeA", "projectB": "groupeC", "fileA": "groupeA/diff.js", "fileB": "groupeC/index.js", "similarity": 74.75 },
-      { "projectA": "groupeA", "projectB": "groupeC", "fileA": "groupeA/index.js", "fileB": "groupeC/fileUtils.js", "similarity": 0 },
-      { "projectA": "groupeA", "projectB": "groupeC", "fileA": "groupeA/index.js", "fileB": "groupeC/index.js", "similarity": 96.26 },
-      { "projectA": "groupeB", "projectB": "groupeC", "fileA": "groupeB/fileUtils.js", "fileB": "groupeC/fileUtils.js", "similarity": 44.44 },
-      { "projectA": "groupeB", "projectB": "groupeC", "fileA": "groupeB/fileUtils.js", "fileB": "groupeC/index.js", "similarity": 0 },
-      { "projectA": "groupeB", "projectB": "groupeC", "fileA": "groupeB/index.js", "fileB": "groupeC/fileUtils.js", "similarity": 0 },
-      { "projectA": "groupeB", "projectB": "groupeC", "fileA": "groupeB/index.js", "fileB": "groupeC/index.js", "similarity": 96.26 }
+      { projectA: "groupeA", projectB: "groupeB", fileA: "groupeA/diff.js", fileB: "groupeB/fileUtils.js", similarity: 0 },
+      { projectA: "groupeA", projectB: "groupeB", fileA: "groupeA/diff.js", fileB: "groupeB/index.js", similarity: 76.92 },
+      { projectA: "groupeA", projectB: "groupeB", fileA: "groupeA/index.js", fileB: "groupeB/fileUtils.js", similarity: 0 },
+      { projectA: "groupeA", projectB: "groupeB", fileA: "groupeA/index.js", fileB: "groupeB/index.js", similarity: 100 },
+      { projectA: "groupeA", projectB: "groupeC", fileA: "groupeA/diff.js", fileB: "groupeC/fileUtils.js", similarity: 0 },
+      { projectA: "groupeA", projectB: "groupeC", fileA: "groupeA/diff.js", fileB: "groupeC/index.js", similarity: 74.75 },
+      { projectA: "groupeA", projectB: "groupeC", fileA: "groupeA/index.js", fileB: "groupeC/fileUtils.js", similarity: 0 },
+      { projectA: "groupeA", projectB: "groupeC", fileA: "groupeA/index.js", fileB: "groupeC/index.js", similarity: 96.26 },
+      { projectA: "groupeB", projectB: "groupeC", fileA: "groupeB/fileUtils.js", fileB: "groupeC/fileUtils.js", similarity: 44.44 },
+      { projectA: "groupeB", projectB: "groupeC", fileA: "groupeB/fileUtils.js", fileB: "groupeC/index.js", similarity: 0 },
+      { projectA: "groupeB", projectB: "groupeC", fileA: "groupeB/index.js", fileB: "groupeC/fileUtils.js", similarity: 0 },
+      { projectA: "groupeB", projectB: "groupeC", fileA: "groupeB/index.js", fileB: "groupeC/index.js", similarity: 96.26 }
   ],
 };
 
   if (loading) return <FallBackPageSkeleton />;
-
-  console.log("project", project);  
+  console.log("Project data:", stats);
   return (
     <DashboardLayout>
       <Divider text="Résumé du projet" className="mt-0" />
@@ -109,16 +127,29 @@ export default function ProjectDashboardPage() {
       <SummaryOverviewSection project={project} />
 
       <Divider text="Notes" className="mt-0" />
+
+      <TypeAveragesCard stats={stats || {}} />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <SummaryGradesChartSection />
-        <div className="flex flex-col gap-4">
+        <SummaryGradesChartSection
+          groupGrades={stats?.groupGrades || []}
+          average={stats?.averageGrade}
+          median={stats?.medianGrade}
+        />
+        <div className="flex flex-col gap-4 h-full">
           <SummaryGradesStatsSection
-            median={11}
-            average={10.5}
-            max={20}
-            min={0}
+            median={stats?.medianGrade}
+            average={stats?.averageGrade}
+            max={stats?.maxGrade}
+            min={stats?.minGrade}
           />
-          <FlexibleCardSkeleton />
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+        <GradesPieChartSection
+          grades={(stats?.groupGrades || []).map((g: any) => g.globalGrade)}
+        />
+        <div className="col-span-2">
+          <AdvancedStatsCard stats={stats || {}} />
         </div>
       </div>
 

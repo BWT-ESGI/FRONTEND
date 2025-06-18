@@ -20,7 +20,6 @@ import { leaveGroup } from "@/services/groupService";
 import FlexibleAlert from "@/components/template/FlexibleAlert";
 import { Button } from "@/components/ui/button";
 import { createRapport } from "@/services/rapportService";
-import DelivrableComponent from "@/components/delivrable/DelivrableComponent";
 import StudentDeliverableTimeline from "@/components/delivrable/StudentDeliverableTimeline";
 import { Deliverable, Submission } from "@/types/deliverable.type";
 import { fetchDeliverablesByProject } from "@/services/deliverableService";
