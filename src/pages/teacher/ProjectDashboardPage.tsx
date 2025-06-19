@@ -121,10 +121,10 @@ export default function ProjectDashboardPage() {
         )}
       </div>
 
-      <Divider text="Groupes" className="mt-8" />
-      <SummaryOverviewSection project={project} />
+      <Divider text="Rendus" className="mt-8" />
+      <SummaryOverviewSection stats={stats} />
 
-      <Divider text="Notes" className="mt-0" />
+      <Divider text="Notes" className="my-4" />
 
       <TypeAveragesCard stats={stats?.grades || {}} />
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
