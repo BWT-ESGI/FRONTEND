@@ -30,28 +30,6 @@ export default function ProjectSummaryCard({ project, btn = (<></>) } : ProjectS
                   minute: "2-digit",
                 })}
               </p>
-              <p className="text-sm text-gray-500">
-                Mis à jour le{" "}
-                {new Date(project.updatedAt).toLocaleString("fr-FR", {
-                  day: "numeric",
-                  month: "short",
-                  year: "numeric",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </p>
-              {project.endAt && (
-                <p className="text-sm text-gray-500">
-                  Date de fin :{" "}
-                  {new Date(project.endAt).toLocaleString("fr-FR", {
-                    day: "numeric",
-                    month: "short",
-                    year: "numeric",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </p>
-              )}
             </div>
             {btn && btn}
           </div>
@@ -70,22 +48,6 @@ export default function ProjectSummaryCard({ project, btn = (<></>) } : ProjectS
                 }`}
               />
             )} */}
-          </div>
-          <div className="flex items-center gap-2 mt-1">
-            <span>{project.nbStudentsMinPerGroup}</span>
-            <Progress
-              value={
-                (project.nbStudentsMinPerGroup /
-                  project.nbStudentsMaxPerGroup) *
-                100
-              }
-              className="w-full"
-            />
-            <span>{project.nbStudentsMaxPerGroup}</span>
-          </div>
-          <div className="flex items-center gap-2 mt-1">
-            <strong>Nombre de groupes : </strong>
-            <span>{project.nbGroups}</span>
           </div>
           {project.promotion && (
             <div className="flex items-center gap-2 mt-1">
