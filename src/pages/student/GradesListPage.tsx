@@ -10,15 +10,12 @@ import {
   TableCell,
   TableHead,
 } from "@/components/ui/table";
-import { Loader2, FileText, ChevronDown, ChevronUp, FileText as FileTextIcon, BookOpen, CheckCircle2, Mic, FolderUp, Presentation } from "lucide-react";
-import FlexibleCard from "@/components/template/FlexibleCard";
+import { Loader2, FileText, ChevronDown, ChevronUp, FileText as FileTextIcon, FolderUp, Presentation } from "lucide-react";
 
 export default function GradesListPage() {
   const [gradesByProject, setGradesByProject] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  // State to track which grid details are open
   const [openDetails, setOpenDetails] = useState<{ [key: string]: boolean }>({});
-  // State to track which projects are open
   const [openProjects, setOpenProjects] = useState<{ [key: string]: boolean }>({});
 
   useEffect(() => {
@@ -27,14 +24,15 @@ export default function GradesListPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const allGlobalGrades = gradesByProject.flatMap((p: any) => p.grades.map((g: any) => g.global).filter(Number.isFinite));
-  const generalAverage = allGlobalGrades.length ? (allGlobalGrades.reduce((a: number, b: number) => a + b, 0) / allGlobalGrades.length) : null;
+  const projectAverages = gradesByProject.map((project: any) => {
+    const projectGlobalGrades = project.grades.map((g: any) => g.global).filter(Number.isFinite);
+    return projectGlobalGrades.length ? (projectGlobalGrades.reduce((a: number, b: number) => a + b, 0) / projectGlobalGrades.length) : null;
+  }).filter((avg: number | null) => avg !== null);
+  const generalAverage = projectAverages.length ? (projectAverages.reduce((a: number, b: number) => a + b, 0) / projectAverages.length) : null;
 
-  // Helper to toggle details for a grid
   const toggleDetails = (gridId: string) => {
     setOpenDetails(prev => ({ ...prev, [gridId]: !prev[gridId] }));
   };
-  // Helper to toggle project open/close
   const toggleProject = (projectId: string) => {
     setOpenProjects(prev => ({ ...prev, [projectId]: !prev[projectId] }));
   };
@@ -139,7 +137,7 @@ export default function GradesListPage() {
             );
           })
         )}
-        {!!allGlobalGrades.length && (
+        {!!projectAverages.length && (
           <Card>
             <CardHeader>
               <div className="font-bold text-center">Moyenne générale tous projets</div>
