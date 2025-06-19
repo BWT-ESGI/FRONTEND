@@ -6,8 +6,18 @@ import TextAlign from "@tiptap/extension-text-align";
 import TextStyle from "@tiptap/extension-text-style";
 import HardBreak from "@tiptap/extension-hard-break";
 import {
-  AlignJustify, AlignLeft, AlignRight, Baseline, Bold, Heading1, Heading2, Italic,
-  List, ListOrdered, Pilcrow, Strikethrough
+  AlignJustify,
+  AlignLeft,
+  AlignRight,
+  Baseline,
+  Bold,
+  Heading1,
+  Heading2,
+  Italic,
+  List,
+  ListOrdered,
+  Pilcrow,
+  Strikethrough,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import FlexibleCard from "../template/FlexibleCard";
@@ -18,6 +28,7 @@ import {
   saveRapportSections,
 } from "@/services/rapportService";
 import { Section } from "@/types/sections.type";
+import isStudent from "@/utils/isStudent";
 
 interface TextEditorProps {
   rapportId: string;
@@ -36,10 +47,11 @@ const CustomHardBreak = HardBreak.extend({
 export default function TextEditor({
   rapportId,
   projectSections,
-  readOnly
+  readOnly,
 }: TextEditorProps) {
   const [sections, setSections] = useState<Section[]>([]);
   const [activeSection, setActiveSection] = useState(0);
+  const [defaultRapportSections, setDefaultRapportSections] = useState<any>(null);
 
   // L'éditeur Tiptap
   const editor = useEditor({
@@ -65,28 +77,33 @@ export default function TextEditor({
   useEffect(() => {
     const loadSections = async () => {
       try {
-        const rapportSections: Section[] = await fetchRapportSections(rapportId) || [];
+        const rapportSections: Section[] =
+          (await fetchRapportSections(rapportId)) || [];
+        setDefaultRapportSections(rapportSections);
 
         // Fusionner les sections du projet et celles déjà dans le rapport (priorité au contenu déjà saisi)
         let mergedSections = projectSections.map((projSec) => {
           const found = rapportSections.find(
-            (sec) =>
-              (typeof sec.order !== "undefined" && sec.order === projSec.order) ||
+            (sec: any) =>
+              (typeof sec.order !== "undefined" &&
+                sec.order === projSec.order) ||
               (sec.title && sec.title === projSec.title)
           );
-          return found
-            ? { ...projSec, ...found }
-            : { ...projSec, content: "" }; // Ajoute section manquante
+          return found ? { ...projSec, ...found } : { ...projSec, content: "" }; // Ajoute une section manquante
         });
 
         // Ajouter d'éventuelles sections personnalisées déjà saisies dans le rapport mais non dans le projet
-        rapportSections.forEach(sec => {
-          if (!mergedSections.find(ms => ms.order === sec.order || ms.title === sec.title)) {
+        rapportSections.forEach((sec: any) => {
+          if (
+            !mergedSections.find(
+              (ms) => ms.order === sec.order || ms.title === sec.title
+            )
+          ) {
             mergedSections.push(sec);
           }
         });
 
-        // Tri par ordre pour la tradition !
+        // Tri par ordre pour la tradition
         mergedSections.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
         setSections(mergedSections);
 
@@ -112,7 +129,7 @@ export default function TextEditor({
   // Sauvegarder le contenu courant dans le state sections
   const handleSectionContentChange = () => {
     if (!editor) return;
-    setSections(sections =>
+    setSections((sections) =>
       sections.map((s, i) =>
         i === activeSection ? { ...s, content: editor.getHTML() } : s
       )
@@ -122,7 +139,7 @@ export default function TextEditor({
   // Changer de section
   const handleSectionSwitch = (idx: number) => {
     if (!editor) return;
-    setSections(sections =>
+    setSections((sections) =>
       sections.map((s, i) =>
         i === activeSection ? { ...s, content: editor.getHTML() } : s
       )
@@ -146,22 +163,42 @@ export default function TextEditor({
 
   const getButtonClass = (active: boolean) =>
     `flex items-center justify-center px-3 py-1 rounded-md transition ${
-      active ? "bg-gray-100 dark:bg-gray-700 text-white-600" : "hover:bg-gray-300 dark:hover:bg-gray-700"
+      active
+        ? "bg-gray-100 dark:bg-gray-700 text-white-600"
+        : "hover:bg-gray-300 dark:hover:bg-gray-700"
     }`;
 
   if (!editor) return null;
 
-  if (!sections || !sections.length) {
+  if (
+    (
+      defaultRapportSections &&
+      defaultRapportSections.group &&
+      defaultRapportSections.group.project &&
+      defaultRapportSections.group.project.sections &&
+      defaultRapportSections.group.project.sections.length
+    )
+  ) {
     return (
       <div className="text-center text-muted-foreground py-8">
         <span>
-          Le professeur n’a pas encore activé les rapports pour ce projet.<br />
-          Merci de patienter jusqu’à la publication des consignes.
+          {isStudent() ? (
+            <>
+              Le professeur n’a pas encore activé les rapports pour ce projet.
+              <br />
+              Merci de patienter jusqu’à la publication des consignes.
+            </>
+          ) : (
+            <>
+              Aucune section de rapport n’a encore été définie pour ce projet.
+              <br />
+              Ajoutez des sections pour permettre la rédaction des rapports.
+            </>
+          )}
         </span>
       </div>
     );
   }
-
 
   return (
     <>
@@ -176,15 +213,23 @@ export default function TextEditor({
               <Pilcrow className="h-4 w-4" />
             </button>
             <button
-              onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-              className={getButtonClass(editor.isActive("heading", { level: 1 }))}
+              onClick={() =>
+                editor.chain().focus().toggleHeading({ level: 1 }).run()
+              }
+              className={getButtonClass(
+                editor.isActive("heading", { level: 1 })
+              )}
               title="Titre 1"
             >
               <Heading1 className="h-4 w-4" />
             </button>
             <button
-              onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-              className={getButtonClass(editor.isActive("heading", { level: 2 }))}
+              onClick={() =>
+                editor.chain().focus().toggleHeading({ level: 2 }).run()
+              }
+              className={getButtonClass(
+                editor.isActive("heading", { level: 2 })
+              )}
               title="Titre 2"
             >
               <Heading2 className="h-4 w-4" />
@@ -239,15 +284,21 @@ export default function TextEditor({
               <AlignLeft className="h-4 w-4" />
             </button>
             <button
-              onClick={() => editor.chain().focus().setTextAlign("center").run()}
-              className={getButtonClass(editor.isActive({ textAlign: "center" }))}
+              onClick={() =>
+                editor.chain().focus().setTextAlign("center").run()
+              }
+              className={getButtonClass(
+                editor.isActive({ textAlign: "center" })
+              )}
               title="Centrer"
             >
               <AlignJustify className="h-4 w-4" />
             </button>
             <button
               onClick={() => editor.chain().focus().setTextAlign("right").run()}
-              className={getButtonClass(editor.isActive({ textAlign: "right" }))}
+              className={getButtonClass(
+                editor.isActive({ textAlign: "right" })
+              )}
               title="Aligner à droite"
             >
               <AlignRight className="h-4 w-4" />

@@ -20,6 +20,7 @@ import { AdvancedStatsCard } from "@/components/AdvancedStatsCard";
 import { TypeAveragesCard } from "@/components/project/TypeAveragesCard";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import React from "react";
+import { ElementRulesCard } from "@/components/project/ElementRulesCard";
 
 function CollapsibleSection({
   title,
@@ -236,6 +237,11 @@ export default function ProjectDashboardPage() {
       >
         <SummaryOverviewSection stats={stats} />
       </CollapsibleSection>
+      <Divider text="Disponibilités" className="mt-8" />
+      {project && <ElementRulesCard project={project} />}
+
+      <Divider text="Groupes" className="mt-8" />
+      <SummaryOverviewSection project={project} />
 
       <CollapsibleSection
         title="Notes"
