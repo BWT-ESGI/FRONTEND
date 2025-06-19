@@ -55,42 +55,48 @@ export function TypeAveragesCard({ stats }: TypeAveragesCardProps) {
 
   return (
     <div className="w-full mb-4">
-
-        {items.length === 0 ? (
-          <span className="text-muted-foreground">Aucune donnée</span>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
-            {items.map(({ key, value }) => {
-              const { label, icon } = METADATA[key];
-              // pour les notes, on part de 0–20; pour variance/écart-type on normalise sur 20 max pour la barre
-              const percent = Math.min(Math.max((value / 20) * 100, 0), 100);
-              return (
-                <div
-                  key={key}
-                  className="flex flex-col items-center bg-white rounded-2xl shadow p-4"
-                >
-                  <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
-                    {icon}
-                    <span className="font-medium">{label}</span>
-                  </div>
-                  <div className="text-2xl font-bold mb-2">
-                    {value.toFixed(2)}{" "}
-                    {/* n’affiche “/ 20” que pour les vraies notes */}
-                    {["defense", "deliverable", "report"].includes(key) && (
-                      <span className="text-sm text-muted-foreground">
-                        / 20
-                      </span>
-                    )}
-                  </div>
-                  <Progress className="w-full" value={percent} />
-                  <div className="text-xs text-muted-foreground mt-1">
-                    {percent.toFixed(0)} %
-                  </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
+        {["defense", "deliverable", "report", "variance", "stdDev"].map((key) => {
+          const item = items.find((i) => i.key === key);
+          const { label, icon } = METADATA[key];
+          if (!item) {
+            return (
+              <div
+                key={key}
+                className="flex flex-col items-center bg-white rounded-2xl shadow p-4 min-h-[120px] justify-center"
+              >
+                <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                  {icon}
+                  <span className="font-medium">{label}</span>
                 </div>
-              );
-            })}
-          </div>
-        )}
+                <span className="text-muted-foreground text-center mt-2">Aucune donnée disponible</span>
+              </div>
+            );
+          }
+          const percent = Math.min(Math.max((item.value / 20) * 100, 0), 100);
+          return (
+            <div
+              key={key}
+              className="flex flex-col items-center bg-white rounded-2xl shadow p-4"
+            >
+              <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                {icon}
+                <span className="font-medium">{label}</span>
+              </div>
+              <div className="text-2xl font-bold mb-2">
+                {item.value.toFixed(2)}{" "}
+                { ["defense", "deliverable", "report"].includes(key) && (
+                  <span className="text-sm text-muted-foreground">/ 20</span>
+                )}
+              </div>
+              <Progress className="w-full" value={percent} />
+              <div className="text-xs text-muted-foreground mt-1">
+                {percent.toFixed(0)} %
+              </div>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }

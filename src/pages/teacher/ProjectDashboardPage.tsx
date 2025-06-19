@@ -185,8 +185,8 @@ export default function ProjectDashboardPage() {
   if (loading) return <FallBackPageSkeleton />;
   return (
     <DashboardLayout>
-      <Divider text="Résumé du projet" className="mt-0" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+      <Divider text={`${project?.name || "inconnu"}`} className="mt-0 mb-4" />
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         {project && (
           <>
             <div className="col-span-1">
@@ -241,6 +241,10 @@ export default function ProjectDashboardPage() {
         )}
       </div>
 
+      <div className="mb-4">
+        {project && <ElementRulesCard project={project} />}
+      </div>
+
       <CollapsibleSection
         title="Rendus"
         open={showRendus}
@@ -248,11 +252,6 @@ export default function ProjectDashboardPage() {
       >
         <SummaryOverviewSection stats={stats} />
       </CollapsibleSection>
-      <Divider text="Disponibilités" className="mt-8" />
-      {project && <ElementRulesCard project={project} />}
-
-      <Divider text="Groupes" className="mt-8" />
-      <SummaryOverviewSection project={project} />
 
       <CollapsibleSection
         title="Notes"

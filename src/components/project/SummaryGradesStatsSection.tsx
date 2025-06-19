@@ -54,7 +54,7 @@ export default function SummaryGradesStatsSection({
             })
           ) : (
             [...Array(4)].map((_, i) => (
-              <div key={i} className="flex flex-col items-center justify-center h-32 border rounded-xl bg-muted">
+              <div key={i} className="flex flex-col items-center justify-center h-26 border rounded-xl bg-muted">
                 <p className="text-sm text-center">Aucune donnée disponible</p>
               </div>
             ))

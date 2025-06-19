@@ -100,20 +100,20 @@ export function ElementRulesCard({ project }: ElementRulesCardProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4">
       {ELEMENTS.map(({ key, icon }) => {
-        const { available, rules } = availability[key];
+        const { available, } = availability[key];
         return (
           <div
             key={key}
             className={cn(
-              "flex flex-col items-center rounded-2xl shadow p-4 min-h-[160px] bg-white",
+              "flex flex-col items-center rounded-2xl shadow p-4 bg-white",
               !available && "opacity-60"
             )}
           >
-            <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
               {icon}
               <span className="font-medium">{LABELS[key]}</span>
             </div>
-            <div className="flex items-center gap-2 mb-2 mt-1">
+            <div className="flex items-center gap-2 mb-2 mt-4">
               {available ? (
                 <>
                   <CheckCircle className="h-5 w-5 text-green-600" />
@@ -126,19 +126,6 @@ export function ElementRulesCard({ project }: ElementRulesCardProps) {
                 </>
               )}
             </div>
-            {rules && rules.length > 0 && (
-              <div className="mt-2 w-full">
-                <div className="flex items-center text-xs text-muted-foreground mb-1 gap-1">
-                  <Info className="h-4 w-4" />
-                  Règles&nbsp;:
-                </div>
-                <ul className="list-disc ml-6 text-xs text-gray-700">
-                  {rules.map((rule, idx) => (
-                    <li key={idx}>{rule}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
           </div>
         );
       })}
