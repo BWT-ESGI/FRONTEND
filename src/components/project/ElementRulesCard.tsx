@@ -7,7 +7,6 @@ import {
   ShieldCheck,
   XCircle,
   CheckCircle,
-  Info,
 } from "lucide-react";
 import { Project, ProjectStatus } from "@/types/project.type";
 import { cn } from "@/lib/utils";

@@ -229,7 +229,7 @@ function ProjectCorrectionPage() {
         <TabsContent value="rapport">
           <Divider text="Rapport" />
           {report ? (
-            <TextEditor rapportId={report.id} readOnly />
+            <TextEditor rapportId={report.id} projectSections={project?.sections || []} />
           ) : (
             <FlexibleAlert
               variant="info"

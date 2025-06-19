@@ -1,7 +1,6 @@
 import { FlexibleBadge } from "../template/FlexibleBadge";
 import FlexibleCard from "../template/FlexibleCard";
 import { Project } from "@/types/project.type";
-import { Progress } from "../ui/progress";
 
 interface ProjectSummaryCardProps {
   project: Project;
