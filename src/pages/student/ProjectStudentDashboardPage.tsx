@@ -25,6 +25,7 @@ import { Deliverable, Submission } from "@/types/deliverable.type";
 import { fetchDeliverablesByProject } from "@/services/deliverableService";
 import { fetchSubmissionsByGroup } from "@/services/submissionService";
 import ProjectDeliverableSteps from "@/components/project/ProjectDeliverableSteps";
+import ProjectGrades from "@/components/project/ProjectGrades";
 
 
 export default function ProjectStudentDashboardPage() {
@@ -71,7 +72,6 @@ export default function ProjectStudentDashboardPage() {
         setSubmissions(Array.isArray(sRes.data) ? sRes.data : []);
       })
       .catch((err) => {
-        // Si l'erreur est une 404 (pas de livrables), on ne toast pas
         if (err?.response?.status !== 404) {
           toast.error("Erreur lors du chargement des livrables ou rendus");
         }
@@ -186,21 +186,6 @@ export default function ProjectStudentDashboardPage() {
                     defense={defense}
                   />
                 </div>
-                {/*  <div className="flex items-center justify-between">
-                  <span className="font-medium">Rapport :</span>
-                  <span
-                    className={`font-bold ${
-                      report?.content ? "text-green-500" : "text-red-500"
-                    } flex items-center gap-1`}
-                  >
-                    {report?.content ? (
-                      <Check className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <X className="h-4 w-4 text-red-500" />
-                    )}
-                    {report?.content ? "Soumis" : "Non soumis"}
-                  </span>
-                </div> */}
               </div>
             </FlexibleCard>
           </div>
@@ -233,7 +218,9 @@ export default function ProjectStudentDashboardPage() {
           </div>
         )
       ) : null}
-      {activeTab === "notes" && <>Notes </>}
+      {activeTab === "notes" && project && (
+        <ProjectGrades projectId={project.id} />
+      )}
     </DashboardLayout>
   );
 }
