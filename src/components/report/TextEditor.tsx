@@ -1,19 +1,29 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { EditorContent, useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Underline from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
 import TextStyle from "@tiptap/extension-text-style";
 import HardBreak from "@tiptap/extension-hard-break";
-import { AlignJustify, AlignLeft, AlignRight, Baseline, Bold, Heading1, Heading2, Italic, List, ListOrdered, Pilcrow, Strikethrough } from "lucide-react";
-
 import {
-  fetchRapportContent,
-  saveRapportContent,
-} from "@/services/rapportService";
+  AlignJustify, AlignLeft, AlignRight, Baseline, Bold, Heading1, Heading2, Italic,
+  List, ListOrdered, Pilcrow, Strikethrough
+} from "lucide-react";
 import { Button } from "../ui/button";
 import FlexibleCard from "../template/FlexibleCard";
 import toast from "react-hot-toast";
+
+import {
+  fetchRapportSections,
+  saveRapportSections,
+} from "@/services/rapportService";
+import { Section } from "@/types/sections.type";
+
+interface TextEditorProps {
+  rapportId: string;
+  projectSections: Section[];
+  readOnly?: boolean;
+}
 
 const CustomHardBreak = HardBreak.extend({
   addKeyboardShortcuts() {
@@ -23,23 +33,22 @@ const CustomHardBreak = HardBreak.extend({
   },
 });
 
-interface TextEditorProps {
-  rapportId: string;
-  readOnly?: boolean;
-}
+export default function TextEditor({
+  rapportId,
+  projectSections,
+  readOnly
+}: TextEditorProps) {
+  const [sections, setSections] = useState<Section[]>([]);
+  const [activeSection, setActiveSection] = useState(0);
 
-export default function TextEditor({ rapportId, readOnly }: TextEditorProps) {
+  // L'éditeur Tiptap
   const editor = useEditor({
     extensions: [
       CustomHardBreak,
       TextStyle,
-      StarterKit.configure({
-        heading: { levels: [1, 2] },
-      }),
+      StarterKit.configure({ heading: { levels: [1, 2] } }),
       Underline,
-      TextAlign.configure({
-        types: ["heading", "paragraph"],
-      }),
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
     ],
     content: "<p>Chargement...</p>",
     autofocus: true,
@@ -48,41 +57,90 @@ export default function TextEditor({ rapportId, readOnly }: TextEditorProps) {
       attributes: {
         class:
           "prose prose-xl prose-zinc max-w-none min-h-[400px] p-4 outline-none focus:outline-none focus-visible:outline-none" +
-          "dark:prose-invert [&_ul]:list-disc [&_ol]:list-decimal [&_li]:ml-6",
+          " dark:prose-invert [&_ul]:list-disc [&_ol]:list-decimal [&_li]:ml-6",
       },
     },
   });
 
   useEffect(() => {
-    if (!editor || !rapportId) return;
-    const loadContent = async () => {
+    const loadSections = async () => {
       try {
-        const html = await fetchRapportContent(rapportId);
-        editor?.commands.setContent(html || "<p></p>");
+        const rapportSections: Section[] = await fetchRapportSections(rapportId) || [];
+
+        // Fusionner les sections du projet et celles déjà dans le rapport (priorité au contenu déjà saisi)
+        let mergedSections = projectSections.map((projSec) => {
+          const found = rapportSections.find(
+            (sec) =>
+              (typeof sec.order !== "undefined" && sec.order === projSec.order) ||
+              (sec.title && sec.title === projSec.title)
+          );
+          return found
+            ? { ...projSec, ...found }
+            : { ...projSec, content: "" }; // Ajoute section manquante
+        });
+
+        // Ajouter d'éventuelles sections personnalisées déjà saisies dans le rapport mais non dans le projet
+        rapportSections.forEach(sec => {
+          if (!mergedSections.find(ms => ms.order === sec.order || ms.title === sec.title)) {
+            mergedSections.push(sec);
+          }
+        });
+
+        // Tri par ordre pour la tradition !
+        mergedSections.sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+        setSections(mergedSections);
+
+        // Premier affichage
+        if (editor && mergedSections.length) {
+          editor.commands.setContent(mergedSections[0].content || "<p></p>");
+        }
       } catch (error) {
-        console.error("Erreur de chargement :", error);
-        toast.error("Erreur lors du chargement du contenu.");
+        toast.error("Erreur lors du chargement des sections du rapport.");
       }
     };
+    if (rapportId && projectSections && editor) loadSections();
+    // eslint-disable-next-line
+  }, [rapportId, projectSections, editor]);
 
-    loadContent();
-  }, [rapportId, editor]);
+  // Mettre à jour l'éditeur quand on change d'onglet de section
+  useEffect(() => {
+    if (!editor) return;
+    editor.commands.setContent(sections[activeSection]?.content || "<p></p>");
+    // eslint-disable-next-line
+  }, [activeSection, editor]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  // Sauvegarder le contenu courant dans le state sections
+  const handleSectionContentChange = () => {
+    if (!editor) return;
+    setSections(sections =>
+      sections.map((s, i) =>
+        i === activeSection ? { ...s, content: editor.getHTML() } : s
+      )
+    );
+  };
+
+  // Changer de section
+  const handleSectionSwitch = (idx: number) => {
+    if (!editor) return;
+    setSections(sections =>
+      sections.map((s, i) =>
+        i === activeSection ? { ...s, content: editor.getHTML() } : s
+      )
+    );
+    setActiveSection(idx);
+    setTimeout(() => {
+      editor.commands.setContent(sections[idx]?.content || "<p></p>");
+    }, 0);
+  };
+
+  const handleSaveAll = async (e: React.FormEvent) => {
     e.preventDefault();
-    const html = editor?.getHTML();
-
-    if (!html || html.trim() === "<p></p>") {
-      toast.error("Le contenu ne peut pas être vide.");
-      return;
-    }
-
+    handleSectionContentChange();
     try {
-      await saveRapportContent(rapportId, html);
-      toast.success("Contenu sauvegardé !");
-    } catch (error) {
-      toast.error("Erreur lors de la sauvegarde du contenu.");
-      console.error("Erreur de sauvegarde :", error);
+      await saveRapportSections(rapportId, sections);
+      toast.success("Toutes les sections du rapport ont été sauvegardées !");
+    } catch {
+      toast.error("Erreur lors de la sauvegarde des sections.");
     }
   };
 
@@ -92,6 +150,18 @@ export default function TextEditor({ rapportId, readOnly }: TextEditorProps) {
     }`;
 
   if (!editor) return null;
+
+  if (!sections || !sections.length) {
+    return (
+      <div className="text-center text-muted-foreground py-8">
+        <span>
+          Le professeur n’a pas encore activé les rapports pour ce projet.<br />
+          Merci de patienter jusqu’à la publication des consignes.
+        </span>
+      </div>
+    );
+  }
+
 
   return (
     <>
@@ -185,23 +255,31 @@ export default function TextEditor({ rapportId, readOnly }: TextEditorProps) {
           </div>
         </FlexibleCard>
       )}
+
       <FlexibleCard className="flex flex-col">
-        {readOnly ? (
+        <div className="flex gap-2 mb-3 flex-wrap">
+          {sections.map((s, i) => (
+            <Button
+              key={s.id ?? i}
+              onClick={() => handleSectionSwitch(i)}
+              variant={i === activeSection ? "default" : "outline"}
+              type="button"
+              className="px-3 py-1"
+            >
+              {s.title || `Section ${i + 1}`}
+            </Button>
+          ))}
+        </div>
+        <form onSubmit={handleSaveAll} className="flex flex-col flex-1">
           <EditorContent
             editor={editor}
-            className="flex-1 p-4 min-h-[500px] bg-gray-50 dark:bg-gray-900/30 rounded-md"
+            className="flex-1 p-4 min-h-[300px]"
+            onBlur={handleSectionContentChange}
           />
-        ) : (
-          <form onSubmit={handleSubmit} className="flex flex-col flex-1">
-            <EditorContent
-              editor={editor}
-              className="flex-1 p-4 min-h-[500px]"
-            />
-            <Button type="submit" className="mt-4 px-6 py-2 self-start w-auto">
-              Enregistrer
-            </Button>
-          </form>
-        )}
+          <Button type="submit" className="mt-4 px-6 py-2 self-start w-auto">
+            Enregistrer toutes les sections
+          </Button>
+        </form>
       </FlexibleCard>
     </>
   );

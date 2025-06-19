@@ -1,3 +1,4 @@
+import { Section } from "@/types/sections.type";
 import api from "../config/axios";
 import { Report } from "@/types/report.type";
 
@@ -12,13 +13,13 @@ export const fetchRapports = async (groupId: string): Promise<Report[]> => {
   }
 };
 
-export async function fetchRapportContent(rapportId: string): Promise<string> {
-  const response = await api.get(`/reports/${rapportId}`);
-  return response.data.content;
+export async function fetchRapportSections(rapportId: string): Promise<Section[]> {
+  const response = await api.get(`/reports/${rapportId}/sections`);
+  return response.data;
 }
 
-export async function saveRapportContent(rapportId: string, content: string): Promise<void> {
-  await api.put(`/reports/${rapportId}`, { content });
+export async function saveRapportSections(rapportId: string, sections: Section[]): Promise<void> {
+  await api.put(`/reports/${rapportId}/sections`, { sections });
 }
 
 export async function createRapport(groupId: string): Promise<Report> {

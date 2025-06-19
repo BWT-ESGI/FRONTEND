@@ -14,6 +14,7 @@ import { useProjectContext } from "@/contexts/ProjectContext";
 import CreateDelivrableComponent from "@/components/delivrable/CreateDelivrableComponent";
 import ReportEditComponent from "@/components/report/ReportEditComponent";
 import toast from "react-hot-toast";
+import { ReportSectionsEditor } from "@/components/report/ReportSectionsEditor";
 
 export default function ProjectEditPage() {
   const { project, loading, setProject } = useProjectContext();
@@ -27,6 +28,11 @@ export default function ProjectEditPage() {
   if (!project) {
     return <NotFoundPage />;
   }
+
+   const handleSectionsChange = (sections: any) => {
+    setProject((proj) => proj ? { ...proj, sections } : proj);
+  };
+
 
   const handleReportCriteriaSetChange = async (id?: string) => {
     if (!project) return;
@@ -77,6 +83,15 @@ export default function ProjectEditPage() {
                 reportCriteriaSetId={project.reportCriteriaSetId}
                 setReportCriteriaSetId={handleReportCriteriaSetChange}
               />
+            </FlexibleCard>
+            <FlexibleCard className="mt-6">
+               <div className="mt-1">
+                <label className="block font-medium mb-1">Sections du rapport</label>
+                <ReportSectionsEditor
+                  sections={project.sections}
+                  onChange={handleSectionsChange}
+                />
+              </div>
             </FlexibleCard>
           </TabsContent>
           <TabsContent value="soutenances">

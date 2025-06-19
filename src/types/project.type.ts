@@ -1,4 +1,5 @@
 import { Group } from "./group.type";import { Promotion } from "./promotion.type";
+import { Section } from "./sections.type";
 export enum ProjectStatus {
     DRAFT = "draft",
     PUBLISHED = "published",
@@ -26,4 +27,5 @@ export type Project = {
   defenseCriteriaSetId?: string;
   reportCriteriaSetId?: string;
   deliverableCriteriaSetId?: string;
+  sections: Section[];
 };

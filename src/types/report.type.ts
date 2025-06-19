@@ -1,3 +1,5 @@
+import { Section } from "./sections.type";
+
 export interface Report {
   id: string;
   content: string;
@@ -5,4 +7,5 @@ export interface Report {
     id: string;
     name: string;
   };
+  sections: Section[];
 }

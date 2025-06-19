@@ -204,7 +204,7 @@ export default function ProjectStudentDashboardPage() {
       )}
       {activeTab === "rapports" ? (
         report ? (
-          <TextEditor rapportId={report.id} />
+          <TextEditor rapportId={report.id} projectSections={project.sections} readOnly={false}/>
         ) : (
           <div className="flex flex-col items-center justify-center h-full">
             <FlexibleAlert
