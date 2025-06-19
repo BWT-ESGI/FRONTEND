@@ -7,6 +7,9 @@ import toast from "react-hot-toast";
 import { CheckCircle, Circle, UploadCloud, Info, X, Trash2, Github, Archive } from "lucide-react";
 import FlexibleAlert from "../template/FlexibleAlert";
 import JSZip from "jszip";
+import FileInput from "@/components/ui/FileInput";
+import { Button } from "@/components/ui/button";
+import { FlexibleBadge } from "@/components/template/FlexibleBadge";
 
 interface StudentDeliverableTimelineProps {
     projectId: string;
@@ -139,21 +142,21 @@ export default function StudentDeliverableTimeline({ projectId, groupId }: Stude
     const sortedDeliverables = [...deliverables].sort((a, b) => new Date(a.deadline).getTime() - new Date(b.deadline).getTime());
 
     return (
-        <div className="w-full flex flex-col items-center">
-            <ol className="relative border-l-2 border-gray-200 dark:border-neutral-700">
+        <div className="w-full flex flex-col items-center p-4">
+            <ol className="relative border-l-2 border-gray-200 dark:border-neutral-700 w-full max-w-none">
                 {sortedDeliverables.map((d) => {
                     const submission = submissions.find((s) => s.deliverableId === d.id);
                     const isDone = !!submission;
                     const isLate = submission && new Date(submission.submittedAt) > new Date(d.deadline);
                     const selectedFile = selectedFiles[d.id];
                     return (
-                        <li key={d.id} className="mb-14 pl-8 flex flex-col gap-2 relative">
+                        <li key={d.id} className="mb-14 pl-8 flex flex-col gap-2 relative w-full">
                             {/* Timeline point + titre/infos */}
-                            <div className="flex items-center gap-3" style={{ position: 'relative' }}>
+                            <div className="flex items-center gap-3 w-full" style={{ position: 'relative' }}>
                                 <span className="absolute left-[-45px] top-1/2 -translate-y-1/2 flex items-center justify-center w-6 h-6 rounded-full ring-8 ring-white dark:ring-neutral-900 bg-white dark:bg-neutral-800 z-10 border-2 border-gray-200 dark:border-neutral-700">
                                     {isDone ? <CheckCircle className="w-5 h-5 text-green-500" /> : <Circle className="w-5 h-5 text-gray-300" />}
                                 </span>
-                                <div className="flex flex-col md:flex-row md:items-center gap-2">
+                                <div className="flex flex-col md:flex-row md:items-center gap-2 w-full">
                                     <span className="font-bold text-lg md:text-xl text-primary-700 flex items-center gap-2">
                                         {/* Icône selon le type de rendu */}
                                         {d.submissionType === 'git' ? (
@@ -165,12 +168,15 @@ export default function StudentDeliverableTimeline({ projectId, groupId }: Stude
                                                 <Archive className="w-5 h-5 text-gray-700 dark:text-gray-200" />
                                             </span>
                                         )}
-                                        {d.name}
+                                        <span className="flex items-center gap-2">
+                                            {d.name}
+                                            <span className="pt-1 text-xs text-red-600 font-semibold flex items-center">{new Date(d.deadline).toLocaleString('fr-FR', { dateStyle: 'short', timeStyle: 'short' })}</span>
+                                        </span>
                                     </span>
                                 </div>
                             </div>
                             {/* Carte de rendu */}
-                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-2xl shadow-sm p-6 mt-8">
+                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-2xl shadow-sm p-6 mt-8 w-full">
                                 <div className="flex-1 min-w-0">
                                     {/* Description en priorité, italique */}
                                     {d.description && (
@@ -195,26 +201,55 @@ export default function StudentDeliverableTimeline({ projectId, groupId }: Stude
                                     </div>
                                     {/* Infos techniques en bas, séparées */}
                                     <div className="mt-2 pt-2 border-t border-gray-200 dark:border-neutral-700 text-xs md:text-sm text-gray-600 dark:text-gray-300 flex flex-col gap-1">
-                                        <span>Type : {d.submissionType === 'git' ? 'Dépôt Git' : 'Archive'}</span>
-                                        {d.submissionType === 'archive' && d.maxSize && (
-                                            <span>Taille max : {d.maxSize} Mo</span>
-                                        )}
-                                        <span>{d.allowLateSubmission ? 'Retard autorisé' : 'Retard interdit'}</span>
+                                        <div className="flex flex-wrap gap-2">
+                                            <FlexibleBadge status={d.submissionType === 'git' ? 'custom' : 'manual'} label={d.submissionType === 'git' ? 'Dépôt Git' : 'Archive'} noDot />
+                                            {d.submissionType === 'archive' && d.maxSize && (
+                                                <FlexibleBadge status="custom" label={`Taille max : ${d.maxSize} Mo`} noDot />
+                                            )}
+                                            <FlexibleBadge status={d.allowLateSubmission ? 'active' : 'inactive'} label={d.allowLateSubmission ? 'Retard autorisé' : 'Retard interdit'} noDot />
+                                        </div>
                                     </div>
                                 </div>
-                                <div className="flex flex-col gap-2 items-end min-w-[220px]">
+                                <div className="flex flex-col gap-2 items-end min-w-[220px] w-full md:w-auto">
                                     {isDone ? (
                                         <>
-                                            <span className={`text-sm font-semibold ${isLate ? 'text-orange-500' : 'text-green-600'}`}>{isLate ? 'Rendu en retard' : 'Déjà rendu'}</span>
+                                            <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-semibold
+                                                ${isLate ? 'bg-orange-100 text-orange-700 border border-orange-300' : 'bg-green-100 text-green-700 border border-green-300'}
+                                            `}>
+                                                {isLate ? (
+                                                    <>
+                                                        <X className="w-4 h-4 text-orange-500" /> Rendu en retard
+                                                    </>
+                                                ) : (
+                                                    <>
+                                                        <CheckCircle className="w-4 h-4 text-green-500" /> Déjà rendu
+                                                    </>
+                                                )}
+                                            </span>
                                             <div className="flex gap-2 items-center">
-                                                <button
-                                                    className="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
-                                                    onClick={() => handleDownload(submission.id, submission.filename)}
-                                                >
-                                                    Télécharger
-                                                </button>
-                                                <button
-                                                    className="px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-red-100 flex items-center gap-1"
+                                                {d.submissionType === 'git' ? (
+                                                    <Button
+                                                        asChild
+                                                        variant="default"
+                                                        className="px-3 py-1 font-semibold flex items-center gap-1 shadow-md transition-all"
+                                                    >
+                                                        <a href={submission?.gitRepoUrl}target="_blank"
+                                                        rel="noopener noreferrer">
+                                                                Voir le dépôt
+                                                        </a>
+                                                    </Button>
+                                                ) : (
+                                                    <Button
+                                                        variant="default"
+                                                        className="px-3 py-1"
+                                                        onClick={() => handleDownload(submission.id, submission.filename)}
+                                                    >
+                                                        Télécharger
+                                                    </Button>
+                                                )}
+                                                <Button
+                                                    variant="destructive"
+                                                    className="flex items-center gap-1"
                                                     onClick={async () => {
                                                         if (!window.confirm('Supprimer ce rendu ?')) return;
                                                         setLoading(true);
@@ -232,7 +267,7 @@ export default function StudentDeliverableTimeline({ projectId, groupId }: Stude
                                                     title="Supprimer le rendu"
                                                 >
                                                     <Trash2 className="w-4 h-4" />
-                                                </button>
+                                                </Button>
                                             </div>
                                         </>
                                     ) : (
@@ -247,52 +282,37 @@ export default function StudentDeliverableTimeline({ projectId, groupId }: Stude
                                                         onChange={e => handleGitLinkChange(d.id, e.target.value)}
                                                         disabled={loading}
                                                     />
-                                                    <button
-                                                        className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 font-semibold flex items-center justify-center gap-1 shadow-md transition-all"
+                                                    <Button
+                                                        className="flex items-center justify-center gap-1"
                                                         onClick={() => handleGitUpload(d.id)}
                                                         disabled={loading || !gitLinks[d.id]}
                                                     >
                                                         <UploadCloud className="inline w-4 h-4 mr-1" /> Déposer le lien
-                                                    </button>
+                                                    </Button>
                                                 </>
                                             ) : (
                                                 <>
                                                     <div className="flex gap-2 items-center w-full">
-                                                        <button
-                                                            type="button"
-                                                            className="w-full px-3 py-1 bg-gray-100 dark:bg-neutral-800 border border-gray-300 dark:border-neutral-700 rounded hover:bg-gray-200 dark:hover:bg-neutral-700 text-sm font-medium transition-colors"
-                                                            onClick={() => {
-                                                                const input = document.createElement('input');
-                                                                input.type = 'file';
-                                                                input.accept = '.zip,.rar,.7z,.tar,.gz';
-                                                                input.onchange = (e: any) => handleFileChange(d.id, e.target.files?.[0] || null);
-                                                                input.click();
+                                                        <FileInput
+                                                            label="Choisir un fichier"
+                                                            accept={{
+                                                                "application/zip": [".zip"],
+                                                                "application/x-rar-compressed": [".rar"],
+                                                                "application/x-7z-compressed": [".7z"],
+                                                                "application/x-tar": [".tar"],
+                                                                "application/x-gzip": [".gz"]
                                                             }}
-                                                            disabled={loading}
-                                                        >
-                                                            Choisir un fichier
-                                                        </button>
-                                                        {selectedFile && (
-                                                            <span className="flex items-center gap-1 bg-gray-50 dark:bg-neutral-800 border border-gray-200 dark:border-neutral-700 rounded px-2 py-1 text-xs">
-                                                                {selectedFile.name}
-                                                                <button
-                                                                    type="button"
-                                                                    className="ml-1 text-red-500 hover:text-red-700"
-                                                                    onClick={() => handleFileChange(d.id, null)}
-                                                                    aria-label="Retirer le fichier"
-                                                                >
-                                                                    <X className="w-3 h-3" />
-                                                                </button>
-                                                            </span>
-                                                        )}
+                                                            maxFiles={1}
+                                                            onChange={(files) => handleFileChange(d.id, files[0]?.file || null)}
+                                                        />
                                                     </div>
-                                                    <button
-                                                        className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50 font-semibold flex items-center justify-center gap-1 shadow-md transition-all"
+                                                    <Button
+                                                        className="px-3 py-1 flex items-center justify-center gap-1"
                                                         onClick={() => handleUpload(d.id)}
                                                         disabled={loading || !selectedFile}
                                                     >
                                                         <UploadCloud className="inline w-4 h-4 mr-1" /> Déposer
-                                                    </button>
+                                                    </Button>
                                                 </>
                                             )}
                                         </div>

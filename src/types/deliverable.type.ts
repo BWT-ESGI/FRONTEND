@@ -18,6 +18,7 @@ export type Submission = {
   submittedAt: string;
   archiveObjectName?: string;
   filename?: string;
+  gitRepoUrl?: string;
   size?: number;
   isLate: boolean;
   penaltyApplied: number;
