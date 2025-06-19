@@ -55,14 +55,25 @@ function CollapsibleSection({
   );
 }
 
+function usePersistentCollapse(key: string, defaultValue: boolean) {
+  const [open, setOpen] = useState(() => {
+    const stored = localStorage.getItem(key);
+    return stored !== null ? stored === "true" : defaultValue;
+  });
+  useEffect(() => {
+    localStorage.setItem(key, String(open));
+  }, [key, open]);
+  return [open, setOpen] as const;
+}
+
 export default function ProjectDashboardPage() {
   const { id } = useParams<{ id: string }>();
   const { project, loading } = useProject(id || "");
   const [stats, setStats] = useState<any>(null);
   const [, setStatsLoading] = useState(true);
-  const [showRendus, setShowRendus] = useState(true);
-  const [showNotes, setShowNotes] = useState(true);
-  const [showPlagiat, setShowPlagiat] = useState(true);
+  const [showRendus, setShowRendus] = usePersistentCollapse("collapse-rendus", true);
+  const [showNotes, setShowNotes] = usePersistentCollapse("collapse-notes", true);
+  const [showPlagiat, setShowPlagiat] = usePersistentCollapse("collapse-plagiat", true);
 
   useEffect(() => {
     if (id) {
