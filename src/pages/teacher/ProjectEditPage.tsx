@@ -78,20 +78,15 @@ export default function ProjectEditPage() {
             <CreateDelivrableComponent />
           </TabsContent>
           <TabsContent value="rapports">
-            <FlexibleCard>
               <ReportEditComponent
                 reportCriteriaSetId={project.reportCriteriaSetId}
                 setReportCriteriaSetId={handleReportCriteriaSetChange}
               />
-            </FlexibleCard>
-            <FlexibleCard className="mt-6">
-               <div className="mt-1">
-                <label className="block font-medium mb-1">Sections du rapport</label>
+            <FlexibleCard className="mt-6" title="Sections du rapport">
                 <ReportSectionsEditor
                   sections={project.sections}
                   onChange={handleSectionsChange}
                 />
-              </div>
             </FlexibleCard>
           </TabsContent>
           <TabsContent value="soutenances">
