@@ -78,69 +78,82 @@ export default function CriteriaGridFillComponent({ criteriaSet, onSubmit, initi
           Impossible de fermer la page automatiquement. Vous pouvez la fermer manuellement.
         </div>
       )}
-      <div className="flex justify-end mb-2">
-        {!isPopup && (
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => {
-              const params = new URLSearchParams({
-                criteriaSetId: criteriaSet.id || '',
-                ...(groupId ? { groupId } : {}),
-                ...(projectId ? { projectId } : {}),
-                ...(filledBy ? { filledBy } : {}),
-              });
-              const url = `/teacher/criteria-grid?${params.toString()}`;
-              window.open(url, '_blank', 'noopener,noreferrer');
-            }}
-          >
-            <SquareArrowOutUpRight className="mr-2" />
-            Ouvrir dans une nouvelle page
-          </Button>
-        )}
-      </div>
       <form onSubmit={handleSubmit}>
-        {criteriaSet.criteria.map((c) => (
-          <FlexibleCard
-            title={c.label}
-            key={c.id || c.label}
-            className="mb-2"
-            childrenRightEnd={
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  className="w-24"
-                  min={0}
-                  max={c.maxScore}
-                  value={scores[c.id || c.label] ?? ""}
-                  onChange={(e) =>
-                    handleScoreChange(c.id || c.label, Number(e.target.value))
-                  }
-                  required
-                />
-                <span className="text-gray-500">/ {c.maxScore}</span>
-              </div>
-            }
-          >
-            <Textarea
-              className="resize-none"
-              placeholder={
-                c.commentPerCriteria
-                  ? c.commentPerCriteria
-                  : "Commentaire (optionnel)"
+        <div
+          className={
+            criteriaSet.criteria.length > 3
+              ? "max-h-96 overflow-y-auto pr-2"
+              : undefined
+          }
+        >
+          {criteriaSet.criteria.map((c) => (
+            <FlexibleCard
+              title={c.label}
+              key={c.id || c.label}
+              className="mb-2"
+              childrenRightEnd={
+                <div className="flex items-center gap-2">
+                  <Input
+                    type="number"
+                    className="w-24"
+                    min={0}
+                    max={c.maxScore}
+                    value={scores[c.id || c.label] ?? ""}
+                    onChange={(e) =>
+                      handleScoreChange(c.id || c.label, Number(e.target.value))
+                    }
+                    required
+                  />
+                  <span className="text-gray-500">/ {c.maxScore}</span>
+                </div>
               }
-              value={comments[c.id || c.label] ?? ""}
-              onChange={(e) =>
-                handleCommentChange(c.id || c.label, e.target.value)
-              }
-              disabled={disabled}
-              rows={2}
-            />
-          </FlexibleCard>
-        ))}
-        <Button type="submit" className="w-full" disabled={loading || disabled}>
-          {loading ? "Enregistrement..." : "Enregistrer"}
-        </Button>
+            >
+              <Textarea
+                className="resize-none"
+                placeholder={
+                  c.commentPerCriteria
+                    ? c.commentPerCriteria
+                    : "Commentaire (optionnel)"
+                }
+                value={comments[c.id || c.label] ?? ""}
+                onChange={(e) =>
+                  handleCommentChange(c.id || c.label, e.target.value)
+                }
+                disabled={disabled}
+                rows={2}
+              />
+            </FlexibleCard>
+          ))}
+        </div>
+        <div className='flex items-center justify-between mb-2 gap-2'>
+          {!isPopup && (
+            <div className="w-[5%] min-w-[40px]">
+              <Button
+                type="button"
+                variant="outline"
+                className="w-full"
+                onClick={() => {
+                  const params = new URLSearchParams({
+                    criteriaSetId: criteriaSet.id || '',
+                    ...(groupId ? { groupId } : {}),
+                    ...(projectId ? { projectId } : {}),
+                    ...(filledBy ? { filledBy } : {}),
+                  });
+                  const url = `/teacher/criteria-grid?${params.toString()}`;
+                  window.open(url, '_blank', 'noopener,noreferrer');
+                }}
+              >
+                <SquareArrowOutUpRight />
+              </Button>
+            </div>
+          )}
+          <div className="w-[95%]">
+            <Button type="submit" className="w-full" disabled={loading || disabled}>
+              {loading ? "Enregistrement..." : "Enregistrer"}
+            </Button>
+          </div>
+        </div>
+
       </form>
     </>
   );

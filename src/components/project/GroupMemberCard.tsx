@@ -10,7 +10,7 @@ interface GroupMemberCardProps {
 
 export default function GroupMemberCard({ members, className }: GroupMemberCardProps) {
   if (!members || members.length === 0) {
-    return (<FlexibleAlert variant="warning" icon={<AvatarFallback className="rounded-lg">!</AvatarFallback>} title="Aucun membre trouvé"/>)
+    return (<FlexibleAlert variant="warning" icon={<Avatar><AvatarFallback className="rounded-lg">!</AvatarFallback></Avatar>} title="Aucun membre trouvé"/>)
     }
   return (
     <FlexibleCard title="Membres de l'équipe" className={className}>

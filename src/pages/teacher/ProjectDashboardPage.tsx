@@ -38,7 +38,7 @@ function CollapsibleSection({
       <button
         type="button"
         onClick={onToggle}
-        className="w-full flex items-center justify-between px-4 py-2 bg-muted/60 dark:bg-muted/30 rounded-lg shadow-sm hover:bg-muted/80 transition-colors border border-muted-foreground/10 mb-2"
+        className="w-full flex items-center justify-between px-4 py-2 rounded-lg shadow-sm hover:bg-muted/80 transition-colors border border-muted-foreground/10 mb-2"
         style={{ fontWeight: 600, fontSize: "1.1rem" }}
       >
         <span>{title}</span>

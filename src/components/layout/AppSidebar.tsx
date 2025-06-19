@@ -2,7 +2,6 @@ import * as React from "react";
 
 import { NavProjects } from "@/components/layout/NavProjects";
 import { NavUser } from "@/components/layout/NavUser";
-import { PromotionSwitcher } from "@/components/utils/PromotionSwitcher";
 import {
   Sidebar,
   SidebarContent,
@@ -12,31 +11,31 @@ import {
 } from "@/components/ui/sidebar";
 import { useSidebarData } from "@/hooks/useSidebarData";
 import { LucideIcon } from "lucide-react";
-import isStudent from "@/utils/isStudent";
 import { APP_NAME } from "@/config";
 import getLogo from "@/utils/getLogo";
+import { useSidebar } from "@/components/ui/sidebar";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { data, loading } = useSidebarData();
+  const { state } = useSidebar();
   const logo = getLogo();
 
   if (loading || !data) {
     return null;
   }
 
+  const logoSrc = state === "collapsed" ? logo.logo : logo.logoText;
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        {isStudent() ? (
-          <div className="flex items-center justify-center w-full py-2">
+        <div className="flex items-center justify-center w-full py-2">
           <img
-            src={logo.logoText}
+            src={logoSrc}
             alt={"Logo " + APP_NAME}
-            className="w-1/2"/>
-            </div>
-        ) : (
-          <PromotionSwitcher promotions={data.promotions} />)
-          }
+            className="w-1/2"
+          />
+        </div>
       </SidebarHeader>
       <SidebarContent>
         <NavProjects projects={data.projects.map(project => ({

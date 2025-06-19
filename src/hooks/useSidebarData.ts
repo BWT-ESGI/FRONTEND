@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { FolderOpenDot, Table, Users, Notebook } from "lucide-react";
+import { FolderOpenDot, Table, Users, Notebook, GraduationCap } from "lucide-react";
 import getUserInfoFromLocalStorage from "@/utils/getUserInfoFromLocalStorage";
 import isStudent from "@/utils/isStudent";
 
@@ -36,7 +36,7 @@ export function useSidebarData() {
     {
       name: "Promotions",
       url: "/promotions",
-      icon: Users,
+      icon: GraduationCap,
     },
     // N’ajoute "Notes" que si l’utilisateur est étudiant
     ...(isStudent()

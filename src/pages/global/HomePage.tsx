@@ -127,7 +127,7 @@ export default function Home() {
           </Link>
         </motion.div>
       </AuroraBackground>
-      <TypewriterEffect words={words} className='mt-8'/>
+      <TypewriterEffect words={words} className='mt-4'/>
       <div className="mx-auto my-10 max-w-7xl rounded-3xl bg-gray-950/5 p-2 ring-1 ring-neutral-700/10 dark:bg-neutral-800">
         <ThreeDMarquee images={theme === 'dark' ? imagesDark : images} />
       </div>

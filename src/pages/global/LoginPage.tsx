@@ -51,7 +51,7 @@ export default function LoginPage() {
           {isRegistering ? `Register on ${APP_NAME}` : `Log in to ${APP_NAME}`}
         </p>
 
-        <div className="mt-8 w-full flex flex-col justify-center gap-4">
+        <div className="mt-4 w-full flex flex-col justify-center gap-4">
           {isRegistering && <AskSchoolModal onSelect={(s) => setSchool(s)} />}
 
           <div

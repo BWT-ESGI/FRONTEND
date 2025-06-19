@@ -45,7 +45,7 @@ export default function PromotionManagerPage() {
                     title={promotion.name}
                     description={`Enseignant: ${promotion.teacher.firstName} ${promotion.teacher.lastName}`}
                     childrenFooter={
-                      <div className="flex justify-end mt-8">
+                      <div className="flex justify-end mt-4">
                         <Link to={`/promotions/${promotion.id}`}>
                           <Button className="cursor-pointer">
                             Voir les détails

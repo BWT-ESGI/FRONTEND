@@ -8,7 +8,7 @@ export default function DeliverableRulesPage({ deliverableId }: { deliverableId:
         <div className="max-w-2xl mx-auto my-8">
             <h1 className="text-2xl font-bold mb-4">Définir les règles de vérification automatique</h1>
             <RuleForm deliverableId={deliverableId} onRuleCreated={() => setRefresh(r => r + 1)} />
-            <div className="mt-8">
+            <div className="mt-4">
                 <h2 className="text-xl font-semibold mb-2">Règles existantes</h2>
                 <RuleList deliverableId={deliverableId + refresh} />
             </div>

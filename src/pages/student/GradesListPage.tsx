@@ -44,7 +44,7 @@ export default function GradesListPage() {
             <Loader2 className="animate-spin w-8 h-8" />
           </div>
         ) : !gradesByProject.length ? (
-          <Card className="max-w-2xl mx-auto mt-8">
+          <Card className="max-w-2xl mx-auto mt-4">
             <CardHeader>
               <div className="flex items-center gap-2">
                 <FileText className="text-muted-foreground" />

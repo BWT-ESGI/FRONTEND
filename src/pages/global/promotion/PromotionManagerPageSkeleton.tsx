@@ -18,7 +18,7 @@ export function PromotionManagerPageSkeleton() {
               </div>
             </div>
 
-            <div className="flex justify-end mt-8">
+            <div className="flex justify-end mt-4">
               <Skeleton className="h-10 w-32 rounded" />
             </div>
           </FlexibleCardSkeleton>

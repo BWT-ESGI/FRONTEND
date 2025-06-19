@@ -47,7 +47,7 @@ export default function SummaryOverviewSection({ stats }: { stats: any }) {
   ];
 
   return (
-    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 mt-4">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
       {/* Délai moyen de soumission et soumissions de dernière minute */}
       <Card className="col-span-1 xl:col-span-2">
         <CardContent className="p-6 flex flex-col md:flex-row items-center justify-around">

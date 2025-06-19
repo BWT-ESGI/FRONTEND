@@ -176,7 +176,7 @@ export default function StudentDeliverableTimeline({ projectId, groupId }: Stude
                                 </div>
                             </div>
                             {/* Carte de rendu */}
-                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-2xl shadow-sm p-6 mt-8 w-full">
+                            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-white dark:bg-neutral-900 border border-gray-200 dark:border-neutral-700 rounded-2xl shadow-sm p-6 mt-4 w-full">
                                 <div className="flex-1 min-w-0">
                                     {/* Description en priorité, italique */}
                                     {d.description && (
