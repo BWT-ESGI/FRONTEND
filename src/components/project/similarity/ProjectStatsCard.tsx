@@ -13,7 +13,7 @@ export function ProjectStatsCard({ total, average }: ProjectStatsCardProps) {
       title="Statistiques des Projets"
       className="w-full"
       childrenRightEnd={
-        <div className="flex gap-2">
+        <div className="flex gap-4">
           <Badge variant="outline" className="flex items-center gap-1">
             <Layers className="w-4 h-4" />
             {total} projet{total > 1 ? "s" : ""}

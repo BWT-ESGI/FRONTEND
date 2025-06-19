@@ -18,12 +18,50 @@ import { fetchProjectStats } from "@/services/projectStatsService";
 import GradesPieChartSection from "@/components/project/GradesPieChartSection";
 import { AdvancedStatsCard } from "@/components/AdvancedStatsCard";
 import { TypeAveragesCard } from "@/components/project/TypeAveragesCard";
+import { ChevronDown, ChevronRight } from "lucide-react";
+import React from "react";
+
+function CollapsibleSection({
+  title,
+  open,
+  onToggle,
+  children,
+}: {
+  title: string;
+  open: boolean;
+  onToggle: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="mb-4">
+      <button
+        type="button"
+        onClick={onToggle}
+        className="w-full flex items-center justify-between px-4 py-2 bg-muted/60 dark:bg-muted/30 rounded-lg shadow-sm hover:bg-muted/80 transition-colors border border-muted-foreground/10 mb-2"
+        style={{ fontWeight: 600, fontSize: "1.1rem" }}
+      >
+        <span>{title}</span>
+        <span>{open ? <ChevronDown /> : <ChevronRight />}</span>
+      </button>
+      <div
+        className={`transition-all duration-200 ease-in-out ${
+          open ? "max-h-[2000px] opacity-100" : "max-h-0 opacity-0 overflow-hidden"
+        }`}
+      >
+        {open && <div className="pt-2">{children}</div>}
+      </div>
+    </div>
+  );
+}
 
 export default function ProjectDashboardPage() {
   const { id } = useParams<{ id: string }>();
   const { project, loading } = useProject(id || "");
   const [stats, setStats] = useState<any>(null);
   const [, setStatsLoading] = useState(true);
+  const [showRendus, setShowRendus] = useState(true);
+  const [showNotes, setShowNotes] = useState(true);
+  const [showPlagiat, setShowPlagiat] = useState(true);
 
   useEffect(() => {
     if (id) {
@@ -37,34 +75,106 @@ export default function ProjectDashboardPage() {
   }, [id]);
 
   const projectSimilarityData = {
-  totalProjects: 3,
-  averageProjectSimilarity: 74.45,
-  projectComparisons: [
-    { projectA: "groupeA", projectB: "groupeB", similarity: 66.79 },
-    { projectA: "groupeA", projectB: "groupeC", similarity: 75.95 },
-    { projectA: "groupeB", projectB: "groupeC", similarity: 80.6 },
-  ],
-  fileComparisons: [
-      { projectA: "groupeA", projectB: "groupeB", fileA: "groupeA/diff.js", fileB: "groupeB/fileUtils.js", similarity: 0 },
-      { projectA: "groupeA", projectB: "groupeB", fileA: "groupeA/diff.js", fileB: "groupeB/index.js", similarity: 76.92 },
-      { projectA: "groupeA", projectB: "groupeB", fileA: "groupeA/index.js", fileB: "groupeB/fileUtils.js", similarity: 0 },
-      { projectA: "groupeA", projectB: "groupeB", fileA: "groupeA/index.js", fileB: "groupeB/index.js", similarity: 100 },
-      { projectA: "groupeA", projectB: "groupeC", fileA: "groupeA/diff.js", fileB: "groupeC/fileUtils.js", similarity: 0 },
-      { projectA: "groupeA", projectB: "groupeC", fileA: "groupeA/diff.js", fileB: "groupeC/index.js", similarity: 74.75 },
-      { projectA: "groupeA", projectB: "groupeC", fileA: "groupeA/index.js", fileB: "groupeC/fileUtils.js", similarity: 0 },
-      { projectA: "groupeA", projectB: "groupeC", fileA: "groupeA/index.js", fileB: "groupeC/index.js", similarity: 96.26 },
-      { projectA: "groupeB", projectB: "groupeC", fileA: "groupeB/fileUtils.js", fileB: "groupeC/fileUtils.js", similarity: 44.44 },
-      { projectA: "groupeB", projectB: "groupeC", fileA: "groupeB/fileUtils.js", fileB: "groupeC/index.js", similarity: 0 },
-      { projectA: "groupeB", projectB: "groupeC", fileA: "groupeB/index.js", fileB: "groupeC/fileUtils.js", similarity: 0 },
-      { projectA: "groupeB", projectB: "groupeC", fileA: "groupeB/index.js", fileB: "groupeC/index.js", similarity: 96.26 }
-  ],
-};
+    totalProjects: 3,
+    averageProjectSimilarity: 74.45,
+    projectComparisons: [
+      { projectA: "groupeA", projectB: "groupeB", similarity: 66.79 },
+      { projectA: "groupeA", projectB: "groupeC", similarity: 75.95 },
+      { projectA: "groupeB", projectB: "groupeC", similarity: 80.6 },
+    ],
+    fileComparisons: [
+      {
+        projectA: "groupeA",
+        projectB: "groupeB",
+        fileA: "groupeA/diff.js",
+        fileB: "groupeB/fileUtils.js",
+        similarity: 0,
+      },
+      {
+        projectA: "groupeA",
+        projectB: "groupeB",
+        fileA: "groupeA/diff.js",
+        fileB: "groupeB/index.js",
+        similarity: 76.92,
+      },
+      {
+        projectA: "groupeA",
+        projectB: "groupeB",
+        fileA: "groupeA/index.js",
+        fileB: "groupeB/fileUtils.js",
+        similarity: 0,
+      },
+      {
+        projectA: "groupeA",
+        projectB: "groupeB",
+        fileA: "groupeA/index.js",
+        fileB: "groupeB/index.js",
+        similarity: 100,
+      },
+      {
+        projectA: "groupeA",
+        projectB: "groupeC",
+        fileA: "groupeA/diff.js",
+        fileB: "groupeC/fileUtils.js",
+        similarity: 0,
+      },
+      {
+        projectA: "groupeA",
+        projectB: "groupeC",
+        fileA: "groupeA/diff.js",
+        fileB: "groupeC/index.js",
+        similarity: 74.75,
+      },
+      {
+        projectA: "groupeA",
+        projectB: "groupeC",
+        fileA: "groupeA/index.js",
+        fileB: "groupeC/fileUtils.js",
+        similarity: 0,
+      },
+      {
+        projectA: "groupeA",
+        projectB: "groupeC",
+        fileA: "groupeA/index.js",
+        fileB: "groupeC/index.js",
+        similarity: 96.26,
+      },
+      {
+        projectA: "groupeB",
+        projectB: "groupeC",
+        fileA: "groupeB/fileUtils.js",
+        fileB: "groupeC/fileUtils.js",
+        similarity: 44.44,
+      },
+      {
+        projectA: "groupeB",
+        projectB: "groupeC",
+        fileA: "groupeB/fileUtils.js",
+        fileB: "groupeC/index.js",
+        similarity: 0,
+      },
+      {
+        projectA: "groupeB",
+        projectB: "groupeC",
+        fileA: "groupeB/index.js",
+        fileB: "groupeC/fileUtils.js",
+        similarity: 0,
+      },
+      {
+        projectA: "groupeB",
+        projectB: "groupeC",
+        fileA: "groupeB/index.js",
+        fileB: "groupeC/index.js",
+        similarity: 96.26,
+      },
+    ],
+  };
 
   if (loading) return <FallBackPageSkeleton />;
   return (
     <DashboardLayout>
       <Divider text="Résumé du projet" className="mt-0" />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
         {project && (
           <>
             <div className="col-span-2">
@@ -121,50 +231,63 @@ export default function ProjectDashboardPage() {
         )}
       </div>
 
-      <Divider text="Rendus" className="mt-8" />
-      <SummaryOverviewSection stats={stats} />
-
-      <Divider text="Notes" className="my-4" />
-
-      <TypeAveragesCard stats={stats?.grades || {}} />
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <SummaryGradesChartSection
-          groupGrades={stats?.grades.groupGrades || []}
-          average={stats?.grades.average}
-          median={stats?.grades.median}
-        />
-        <div className="flex flex-col gap-4 h-full">
-          <SummaryGradesStatsSection
-            median={stats?.grades.median}
+      <CollapsibleSection
+        title="Rendus"
+        open={showRendus}
+        onToggle={() => setShowRendus((v) => !v)}
+      >
+        <SummaryOverviewSection stats={stats} />
+      </CollapsibleSection>
+      
+      <CollapsibleSection
+        title="Notes"
+        open={showNotes}
+        onToggle={() => setShowNotes((v) => !v)}
+      >
+        <TypeAveragesCard stats={stats?.grades || {}} />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <SummaryGradesChartSection
+            groupGrades={stats?.grades.groupGrades || []}
             average={stats?.grades.average}
-            max={stats?.grades.max}
-            min={stats?.grades.min}
+            median={stats?.grades.median}
           />
+          <div className="flex flex-col gap-4 h-full">
+            <SummaryGradesStatsSection
+              median={stats?.grades.median}
+              average={stats?.grades.average}
+              max={stats?.grades.max}
+              min={stats?.grades.min}
+            />
+          </div>
         </div>
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-        <GradesPieChartSection
-          grades={(stats?.grades.groupGrades || []).map(
-            (g: any) => g.globalGrade
-          )}
-        />
-        <div className="col-span-2">
-          <AdvancedStatsCard stats={stats?.grades || {}} />
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <GradesPieChartSection
+            grades={(stats?.grades.groupGrades || []).map(
+              (g: any) => g.globalGrade
+            )}
+          />
+          <div className="col-span-2">
+            <AdvancedStatsCard stats={stats?.grades || {}} />
+          </div>
         </div>
-      </div>
+      </CollapsibleSection>
 
-      <Divider text="Plagiat" className="mt-8" />
-
-      <div className="w-full flex flex-col gap-6">
-        <ProjectStatsCard
-          total={projectSimilarityData.totalProjects}
-          average={projectSimilarityData.averageProjectSimilarity}
-        />
-        <ProjectSimilarityBarChart
-          data={projectSimilarityData.projectComparisons}
-        />
-        <ProjectFileSimilarityHeatmap data={projectSimilarityData} />
-      </div>
+      <CollapsibleSection
+        title="Plagiat"
+        open={showPlagiat}
+        onToggle={() => setShowPlagiat((v) => !v)}
+      >
+        <div className="w-full flex flex-col gap-4">
+          <ProjectStatsCard
+            total={projectSimilarityData.totalProjects}
+            average={projectSimilarityData.averageProjectSimilarity}
+          />
+          <ProjectSimilarityBarChart
+            data={projectSimilarityData.projectComparisons}
+          />
+          <ProjectFileSimilarityHeatmap data={projectSimilarityData} />
+        </div>
+      </CollapsibleSection>
     </DashboardLayout>
   );
 }
