@@ -51,7 +51,8 @@ export default function TextEditor({
 }: TextEditorProps) {
   const [sections, setSections] = useState<Section[]>([]);
   const [activeSection, setActiveSection] = useState(0);
-  const [defaultRapportSections, setDefaultRapportSections] = useState<any>(null);
+  const [defaultRapportSections, setDefaultRapportSections] =
+    useState<any>(null);
 
   // L'éditeur Tiptap
   const editor = useEditor({
@@ -171,13 +172,11 @@ export default function TextEditor({
   if (!editor) return null;
 
   if (
-    (
-      defaultRapportSections &&
-      defaultRapportSections.group &&
-      defaultRapportSections.group.project &&
-      defaultRapportSections.group.project.sections &&
-      defaultRapportSections.group.project.sections.length
-    )
+    defaultRapportSections &&
+    defaultRapportSections.group &&
+    defaultRapportSections.group.project &&
+    defaultRapportSections.group.project.sections &&
+    defaultRapportSections.group.project.sections.length
   ) {
     return (
       <div className="text-center text-muted-foreground py-8">
@@ -327,9 +326,11 @@ export default function TextEditor({
             className="flex-1 p-4 min-h-[300px]"
             onBlur={handleSectionContentChange}
           />
-          <Button type="submit" className="mt-4 px-6 py-2 self-start w-auto">
-            Enregistrer toutes les sections
-          </Button>
+          {!readOnly && (
+            <Button type="submit" className="mt-4 px-6 py-2 self-start w-auto">
+              Enregistrer toutes les sections
+            </Button>
+          )}
         </form>
       </FlexibleCard>
     </>
