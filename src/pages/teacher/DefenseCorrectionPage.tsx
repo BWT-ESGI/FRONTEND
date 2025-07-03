@@ -15,6 +15,8 @@ import { ProjectProvider, useProjectContext } from '@/contexts/ProjectContext';
 import FlexibleAlert from "@/components/template/FlexibleAlert";
 import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { FileSpreadsheet } from "lucide-react";
+import { generatePdf } from "@/services/pdfService";
 
 export default function DefenseCorrectionPageWithProvider() {
   const { id } = useParams<{ id: string }>();
@@ -94,18 +96,43 @@ function DefenseCorrectionPageInner() {
     fetchGrid();
   }, [id, project, group, currentGroupIndex, defenses]);
 
-  if (loading) return <FallBackPageSkeleton />;
+  const defensesWithMembers = defenses.map((def) => {
+    const groupWithMembers = groups.find((g) => g.id === def.group.id);
+    return {
+      ...def,
+      group: {
+        ...def.group,
+        members: groupWithMembers?.members || [],
+      },
+    };
+  });
 
+  if (loading) return <FallBackPageSkeleton />;
+  console.log(defenses)
   return (
     <DashboardLayout>
-      <Divider
-        text={`Passage des soutenances`}
-        className="mt-0"
-      />
+      <Divider text={`Passage des soutenances`} className="mt-0" />
 
       <div className="flex h-full min-h-[60vh] gap-4">
         <div className="w-1/3 max-w-xs flex flex-col">
           <FlexibleCard>
+            <div className="flex gap-2 w-full">
+              <Button
+                variant="outline"
+                className="w-1/2"
+                onClick={() => generatePdf("schedule", defensesWithMembers)}
+              >
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                Ordre
+              </Button>
+              <Button
+                className="w-1/2"
+                onClick={() => generatePdf("attendance", defensesWithMembers)}
+              >
+                <FileSpreadsheet className="h-4 w-4 mr-2" />
+                Émargement
+              </Button>
+            </div>
             <GroupTimeline
               groups={timelineGroups}
               currentIndex={currentGroupIndex}
@@ -113,14 +140,20 @@ function DefenseCorrectionPageInner() {
             />
             <Button
               className="w-full mb-2"
-              onClick={() => setCurrentGroupIndex((idx) => Math.max(idx - 1, 0))}
+              onClick={() =>
+                setCurrentGroupIndex((idx) => Math.max(idx - 1, 0))
+              }
               disabled={currentGroupIndex <= 0}
             >
               Groupe précédent
             </Button>
             <Button
               className="w-full"
-              onClick={() => setCurrentGroupIndex((idx) => Math.min(idx + 1, timelineGroups.length - 1))}
+              onClick={() =>
+                setCurrentGroupIndex((idx) =>
+                  Math.min(idx + 1, timelineGroups.length - 1)
+                )
+              }
               disabled={currentGroupIndex >= timelineGroups.length - 1}
             >
               Groupe suivant
@@ -143,12 +176,14 @@ function DefenseCorrectionPageInner() {
           <div className="w-full max-w-2xl">
             {criteriaSet && (
               <CriteriaGridFillComponent
-                key={criteriaSet.id + '-' + (evaluationGrid?.id || group.id)}
+                key={criteriaSet.id + "-" + (evaluationGrid?.id || group.id)}
                 criteriaSet={criteriaSet}
                 initialScores={evaluationGrid?.scores ?? {}}
                 initialComments={evaluationGrid?.comments ?? {}}
                 onSubmit={async ({ scores, comments }) => {
-                  const defense = defenses.find((d: any) => d.group.id === group.id);
+                  const defense = defenses.find(
+                    (d: any) => d.group.id === group.id
+                  );
                   await submitEvaluationGrid({
                     projectId: id!,
                     criteriaSetId: criteriaSet.id!,
