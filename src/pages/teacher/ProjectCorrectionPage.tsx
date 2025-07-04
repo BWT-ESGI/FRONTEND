@@ -12,7 +12,7 @@ import { fetchGroupsWithMembers } from "@/services/groupService";
 import { fetchSubmissionsByGroup } from "@/services/submissionService";
 import { fetchDeliverablesByProject } from "@/services/deliverableService";
 import FlexibleAlert from "@/components/template/FlexibleAlert";
-import { InfoIcon } from "lucide-react";
+import { Download, InfoIcon } from "lucide-react";
 import CriteriaGridFillComponent from '@/components/evaluation/CriteriaGridFillComponent';
 import { getCriteriaSets, CriteriaSet } from '@/services/criteriaSetService';
 import { submitEvaluationGrid, fetchEvaluationGrid } from '@/services/evaluationGridService';
@@ -21,6 +21,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { ProjectProvider, useProjectContext } from '@/contexts/ProjectContext';
 import { motion, AnimatePresence } from "framer-motion";
 import { DeliverableTabsSection } from "../../components/ProjectCorrection/DeliverableTabsSection";
+import { generateFullReportPdf } from "@/services/pdfReportService";
 
 export default function ProjectCorrectionPageWithProvider() {
   const { id } = useParams<{ id: string }>();
@@ -47,10 +48,20 @@ function ProjectCorrectionPage() {
   const teacherId = localStorage.getItem('userId') || '';
 
   const { project } = useProjectContext ? useProjectContext() : { project: null };
-
   const filteredGroups = groups.filter(g => Array.isArray(g.members) && g.members.length >= 1);
   const group = filteredGroups[currentGroupIndex];
-  const { report, } = useReport(group?.id || "");
+  const { report } = useReport(group?.id || "");
+
+  const handleDownloadFullReport = () => {
+    if (report && Array.isArray(report.sections)) {
+      generateFullReportPdf(
+        report.sections,
+        project?.name || "Rapport complet",
+        group?.name,
+        group?.members || []
+      );
+    }
+  };
 
   useEffect(() => {
     async function load() {
@@ -100,7 +111,7 @@ function ProjectCorrectionPage() {
           grids[deliverable.id] = await fetchEvaluationGrid(
             deliverable.criteriaSetId,
             groupId,
-            deliverable.id // Ajout du deliverableId pour l'unicité
+            deliverable.id
           );
         }
       }
@@ -128,7 +139,7 @@ function ProjectCorrectionPage() {
             group.id,
             undefined,
             undefined,
-            report?.id // Ajout du reportId pour l'unicité
+            report?.id
           );
         }
       }
@@ -143,7 +154,9 @@ function ProjectCorrectionPage() {
   return (
     <DashboardLayout>
       <div className="flex justify-between items-center mb-4">
-        <Button onClick={goPrevious} disabled={currentGroupIndex === 0}>&larr; Groupe précédent</Button>
+        <Button onClick={goPrevious} disabled={currentGroupIndex === 0}>
+          &larr; Groupe précédent
+        </Button>
         <AnimatePresence mode="wait">
           <motion.span
             key={currentGroupIndex}
@@ -153,10 +166,17 @@ function ProjectCorrectionPage() {
             transition={{ duration: 0.15 }}
             className="mx-4 font-semibold"
           >
-            {group?.name ? group.name : `Groupe ${currentGroupIndex + 1} / ${filteredGroups.length}`}
+            {group?.name
+              ? group.name
+              : `Groupe ${currentGroupIndex + 1} / ${filteredGroups.length}`}
           </motion.span>
         </AnimatePresence>
-        <Button onClick={goNext} disabled={currentGroupIndex === filteredGroups.length - 1}>Groupe suivant &rarr;</Button>
+        <Button
+          onClick={goNext}
+          disabled={currentGroupIndex === filteredGroups.length - 1}
+        >
+          Groupe suivant &rarr;
+        </Button>
       </div>
 
       <Tabs defaultValue="rendus" className="w-full mx-auto mb-4">
@@ -166,7 +186,7 @@ function ProjectCorrectionPage() {
         </TabsList>
 
         <TabsContent value="rendus">
-          <DeliverableTabsSection 
+          <DeliverableTabsSection
             deliverables={deliverables}
             criteriaSets={criteriaSets}
             evaluationGrids={evaluationGrids}
@@ -179,9 +199,24 @@ function ProjectCorrectionPage() {
         </TabsContent>
 
         <TabsContent value="rapport">
-          <Divider text="Rapport" />
           {report ? (
-            <TextEditor rapportId={report.id} projectSections={project?.sections || []} readOnly={true}/>
+            <>
+              <div className="flex justify-start mb-4">
+                <Button
+                  variant="outline"
+                  onClick={handleDownloadFullReport}
+                  disabled={!report || !Array.isArray(report.sections)}
+                >
+                  <Download className="mr-2" />
+                  Télécharger le rapport complet (PDF)
+                </Button>
+              </div>
+              <TextEditor
+                rapportId={report.id}
+                projectSections={project?.sections || []}
+                readOnly={true}
+              />
+            </>
           ) : (
             <FlexibleAlert
               variant="info"
@@ -189,8 +224,10 @@ function ProjectCorrectionPage() {
               icon={<InfoIcon />}
             />
           )}
+
           <div className="w-full mb-4">
-            {(!project?.reportCriteriaSetId || reportCriteriaSets.length === 0) && (
+            {(!project?.reportCriteriaSetId ||
+              reportCriteriaSets.length === 0) && (
               <div className="mt-4">
                 <FlexibleAlert
                   variant="info"
@@ -199,38 +236,43 @@ function ProjectCorrectionPage() {
                 />
               </div>
             )}
-            {project?.reportCriteriaSetId && reportCriteriaSets
-              .filter(cs => cs.id === project.reportCriteriaSetId)
-              .map((criteriaSet) => {
-                const evaluationGrid = reportEvaluationGrids[String(criteriaSet.id)];
-                if (!report) return null; // Ne pas afficher la grille si pas de rapport
-                return (
-                  <div key={criteriaSet.id} className="mb-4">
-                    <Divider text={criteriaSet.title} />
-                    <CriteriaGridFillComponent
-                      key={criteriaSet.id + '-' + (evaluationGrid?.id || group.id)}
-                      criteriaSet={criteriaSet}
-                      initialScores={evaluationGrid?.scores ?? {}}
-                      initialComments={evaluationGrid?.comments ?? {}}
-                      groupId={group.id}
-                      projectId={id}
-                      filledBy={teacherId}
-                      onSubmit={async ({ scores, comments }) => {
-                        if (!report) return; // Sécurité
-                        await submitEvaluationGrid({
-                          projectId: id!,
-                          criteriaSetId: criteriaSet.id!,
-                          groupId: group.id,
-                          reportId: report.id,
-                          filledBy: teacherId,
-                          scores,
-                          comments,
-                        });
-                      }}
-                    />
-                  </div>
-                );
-              })}
+            {project?.reportCriteriaSetId &&
+              reportCriteriaSets
+                .filter((cs) => cs.id === project.reportCriteriaSetId)
+                .map((criteriaSet) => {
+                  const evaluationGrid =
+                    reportEvaluationGrids[String(criteriaSet.id)];
+                  return (
+                    <div key={criteriaSet.id} className="mb-4">
+                      <Divider text={criteriaSet.title} />
+                      <CriteriaGridFillComponent
+                        key={
+                          criteriaSet.id +
+                          "-" +
+                          (evaluationGrid?.id || group.id)
+                        }
+                        criteriaSet={criteriaSet}
+                        initialScores={evaluationGrid?.scores ?? {}}
+                        initialComments={evaluationGrid?.comments ?? {}}
+                        groupId={group.id}
+                        projectId={id}
+                        filledBy={teacherId}
+                        onSubmit={async ({ scores, comments }) => {
+                          if (!report) return; // Sécurité
+                          await submitEvaluationGrid({
+                            projectId: id!,
+                            criteriaSetId: criteriaSet.id!,
+                            groupId: group.id,
+                            reportId: report.id,
+                            filledBy: teacherId,
+                            scores,
+                            comments,
+                          });
+                        }}
+                      />
+                    </div>
+                  );
+                })}
           </div>
         </TabsContent>
       </Tabs>
@@ -242,8 +284,13 @@ function ProjectCorrectionPage() {
         <CollapsibleContent>
           {similarityStats ? (
             <>
-              <ProjectStatsCard total={similarityStats.totalProjects} average={similarityStats.averageProjectSimilarity} />
-              <ProjectSimilarityBarChart data={similarityStats.projectComparisons} />
+              <ProjectStatsCard
+                total={similarityStats.totalProjects}
+                average={similarityStats.averageProjectSimilarity}
+              />
+              <ProjectSimilarityBarChart
+                data={similarityStats.projectComparisons}
+              />
               <ProjectFileSimilarityHeatmap data={similarityStats} />
             </>
           ) : (
@@ -255,7 +302,6 @@ function ProjectCorrectionPage() {
           )}
         </CollapsibleContent>
       </Collapsible>
-
     </DashboardLayout>
   );
 }

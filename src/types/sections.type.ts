@@ -3,4 +3,5 @@ export type Section = {
   order: number;
   title: string;
   content?: string;
+  lastEdit?: Date;
 };
