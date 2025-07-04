@@ -127,7 +127,6 @@ export async function generateFullReportPdf(
     .toPdf()
     .get("pdf")
     .then((pdf: any) => {
-      const pdfMarginTop = opt.margin[0] as number;
       const headerMargin = 40;
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
