@@ -86,102 +86,6 @@ export default function ProjectDashboardPage() {
     }
   }, [id]);
 
-  const projectSimilarityData = {
-    totalProjects: 3,
-    averageProjectSimilarity: 74.45,
-    projectComparisons: [
-      { projectA: "groupeA", projectB: "groupeB", similarity: 66.79 },
-      { projectA: "groupeA", projectB: "groupeC", similarity: 75.95 },
-      { projectA: "groupeB", projectB: "groupeC", similarity: 80.6 },
-    ],
-    fileComparisons: [
-      {
-        projectA: "groupeA",
-        projectB: "groupeB",
-        fileA: "groupeA/diff.js",
-        fileB: "groupeB/fileUtils.js",
-        similarity: 0,
-      },
-      {
-        projectA: "groupeA",
-        projectB: "groupeB",
-        fileA: "groupeA/diff.js",
-        fileB: "groupeB/index.js",
-        similarity: 76.92,
-      },
-      {
-        projectA: "groupeA",
-        projectB: "groupeB",
-        fileA: "groupeA/index.js",
-        fileB: "groupeB/fileUtils.js",
-        similarity: 0,
-      },
-      {
-        projectA: "groupeA",
-        projectB: "groupeB",
-        fileA: "groupeA/index.js",
-        fileB: "groupeB/index.js",
-        similarity: 100,
-      },
-      {
-        projectA: "groupeA",
-        projectB: "groupeC",
-        fileA: "groupeA/diff.js",
-        fileB: "groupeC/fileUtils.js",
-        similarity: 0,
-      },
-      {
-        projectA: "groupeA",
-        projectB: "groupeC",
-        fileA: "groupeA/diff.js",
-        fileB: "groupeC/index.js",
-        similarity: 74.75,
-      },
-      {
-        projectA: "groupeA",
-        projectB: "groupeC",
-        fileA: "groupeA/index.js",
-        fileB: "groupeC/fileUtils.js",
-        similarity: 0,
-      },
-      {
-        projectA: "groupeA",
-        projectB: "groupeC",
-        fileA: "groupeA/index.js",
-        fileB: "groupeC/index.js",
-        similarity: 96.26,
-      },
-      {
-        projectA: "groupeB",
-        projectB: "groupeC",
-        fileA: "groupeB/fileUtils.js",
-        fileB: "groupeC/fileUtils.js",
-        similarity: 44.44,
-      },
-      {
-        projectA: "groupeB",
-        projectB: "groupeC",
-        fileA: "groupeB/fileUtils.js",
-        fileB: "groupeC/index.js",
-        similarity: 0,
-      },
-      {
-        projectA: "groupeB",
-        projectB: "groupeC",
-        fileA: "groupeB/index.js",
-        fileB: "groupeC/fileUtils.js",
-        similarity: 0,
-      },
-      {
-        projectA: "groupeB",
-        projectB: "groupeC",
-        fileA: "groupeB/index.js",
-        fileB: "groupeC/index.js",
-        similarity: 96.26,
-      },
-    ],
-  };
-
   if (loading) return <FallBackPageSkeleton />;
   return (
     <DashboardLayout>
@@ -293,13 +197,13 @@ export default function ProjectDashboardPage() {
       >
         <div className="w-full flex flex-col gap-4">
           <ProjectStatsCard
-            total={projectSimilarityData.totalProjects}
-            average={projectSimilarityData.averageProjectSimilarity}
+            total={project?.comparisonResult?.totalGroups ?? 0}
+            average={project?.comparisonResult?.averageGroupSimilarity ?? 0}
           />
           <ProjectSimilarityBarChart
-            data={projectSimilarityData.projectComparisons}
+            data={project?.comparisonResult.groupComparisons ?? []}
           />
-          <ProjectFileSimilarityHeatmap data={projectSimilarityData} />
+          <ProjectFileSimilarityHeatmap data={project?.comparisonResult ?? {}} />
         </div>
       </CollapsibleSection>
     </DashboardLayout>

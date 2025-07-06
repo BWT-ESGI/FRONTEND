@@ -28,4 +28,5 @@ export type Project = {
   reportCriteriaSetId?: string;
   deliverableCriteriaSetId?: string;
   sections: Section[];
+  comparisonResult: any;
 };

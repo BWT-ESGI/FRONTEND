@@ -1,18 +1,27 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-function similarityColor(sim: number | null) {
-  if (sim === 100) return "bg-green-400";
-  if (sim !== null && sim >= 75) return "bg-green-200";
-  if (sim !== null && sim > 0) return "bg-yellow-200";
-  if (sim !== null) return "bg-red-100";
-  return "";
+function fileNameOnly(path: string) {
+  if (!path) return "";
+  return path.split("/").pop()!;
+}
+
+// Style et icône selon la similarité
+function simBadge(sim: number) {
+  if (sim === 100)
+    return { color: "bg-green-500 text-white font-bold", emoji: "👑" };
+  if (sim >= 75)
+    return { color: "bg-green-200 text-green-900 font-semibold", emoji: "⭐" };
+  if (sim >= 30)
+    return { color: "bg-yellow-100 text-yellow-800 font-medium", emoji: "🌿" };
+  if (sim > 10) return { color: "bg-orange-50 text-orange-800", emoji: "" };
+  return { color: "bg-muted-foreground text-xs text-gray-400", emoji: "" };
 }
 
 type FileComparison = {
-  projectA: string;
-  projectB: string;
+  groupA: string;
+  groupB: string;
   fileA: string;
   fileB: string;
   similarity: number;
@@ -20,98 +29,116 @@ type FileComparison = {
 
 type Props = {
   data: {
-    projectComparisons: { projectA: string; projectB: string; similarity: number }[];
+    groupComparisons: { groupA: string; groupB: string; similarity: number }[];
     fileComparisons: FileComparison[];
   };
 };
 
 export function ProjectFileSimilarityHeatmap({ data }: Props) {
-  // Extraire toutes les paires uniques de projets
-  const projectPairs = useMemo(() => {
-    const pairs: { key: string; a: string; b: string }[] = [];
-    data.projectComparisons.forEach((cmp) => {
-      const key = [cmp.projectA, cmp.projectB].sort().join("|||");
-      if (!pairs.some((p) => p.key === key)) {
-        pairs.push({ key, a: cmp.projectA, b: cmp.projectB });
+  if (
+    !data ||
+    !Array.isArray(data.groupComparisons) ||
+    !Array.isArray(data.fileComparisons)
+  ) {
+    return <div>Aucune donnée de comparaison n’est disponible.</div>;
+  }
+
+  // Couples uniques de groupes
+  const pairs = useMemo(() => {
+    const ps: { key: string; a: string; b: string }[] = [];
+    data.groupComparisons.forEach((cmp) => {
+      const key = [cmp.groupA, cmp.groupB].sort().join("|||");
+      if (!ps.some((p) => p.key === key)) {
+        ps.push({ key, a: cmp.groupA, b: cmp.groupB });
       }
     });
-    return pairs;
-  }, [data.projectComparisons]);
+    return ps;
+  }, [data.groupComparisons]);
 
-  // Par défaut, sélectionne la première paire
-  const [selectedPairKey, setSelectedPairKey] = useState(projectPairs[0]?.key);
+  const [selectedKey, setSelectedKey] = useState<string | undefined>(
+    pairs[0]?.key
+  );
+  useEffect(() => {
+    setSelectedKey(pairs[0]?.key);
+  }, [pairs.length, pairs[0]?.key]);
 
-  // Filtres des fichiers pour cette paire de projets
-  const { filesA, filesB, matrix } = useMemo(() => {
-    const pair = projectPairs.find((p) => p.key === selectedPairKey);
-    if (!pair) return { filesA: [], filesB: [], matrix: {} };
-    // Trouver tous les fichiers impliqués
-    const fileComps = data.fileComparisons.filter(
-      (f) =>
-        (f.projectA === pair.a && f.projectB === pair.b) ||
-        (f.projectA === pair.b && f.projectB === pair.a)
-    );
-    const filesA = Array.from(new Set(fileComps.map((f) => f.fileA)));
-    const filesB = Array.from(new Set(fileComps.map((f) => f.fileB)));
-    // Créer matrice
-    const matrix: Record<string, Record<string, number | null>> = {};
-    filesA.forEach((fa) => {
-      matrix[fa] = {};
-      filesB.forEach((fb) => {
-        const cmp = fileComps.find((f) => f.fileA === fa && f.fileB === fb);
-        matrix[fa][fb] = cmp ? cmp.similarity : null;
-      });
-    });
-    return { filesA, filesB, matrix };
-  }, [selectedPairKey, data.fileComparisons, projectPairs]);
+  if (!pairs.length || !selectedKey) {
+    return <div>Aucune paire de groupes à comparer.</div>;
+  }
+
+  const pair = pairs.find((p) => p.key === selectedKey);
+  const fileComps = useMemo(() => {
+    if (!pair) return [];
+    // Seuil : similarité > 10%
+    return data.fileComparisons
+      .filter(
+        (f) =>
+          ((f.groupA === pair.a && f.groupB === pair.b) ||
+            (f.groupA === pair.b && f.groupB === pair.a)) &&
+          f.similarity > 10
+      )
+      .sort((a, b) => b.similarity - a.similarity);
+  }, [pair, data.fileComparisons]);
 
   return (
-    <Card>
+    <Card className="shadow-2xl rounded-2xl border bg-gradient-to-br from-white to-slate-100">
       <CardHeader>
-        <CardTitle>
-          Similarité fichiers <span className="font-normal text-muted-foreground">(par paire de projets)</span>
+        <CardTitle className="flex flex-col gap-1">
+          <span>
+            <span className="text-lg font-bold text-primary">
+              Comparaison raffinée
+            </span>
+            <span className="ml-2 text-base font-normal text-muted-foreground">
+              (fichiers les plus ressemblants)
+            </span>
+          </span>
+          <Tabs value={selectedKey} onValueChange={setSelectedKey}>
+            <TabsList className="mt-2">
+              {pairs.map((p) => (
+                <TabsTrigger key={p.key} value={p.key} className="text-sm">
+                  {p.a} / {p.b}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <Tabs value={selectedPairKey} onValueChange={setSelectedPairKey}>
-          <TabsList className="mb-4">
-            {projectPairs.map((p) => (
-              <TabsTrigger key={p.key} value={p.key}>
-                {p.a} / {p.b}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </Tabs>
-        <div className="overflow-x-auto">
-          <table className="border-collapse min-w-max">
-            <thead>
-              <tr>
-                <th className="px-2 py-1 bg-background"></th>
-                {filesB.map((fileB) => (
-                  <th key={fileB} className="px-2 py-1 text-xs bg-background">{fileB}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {filesA.map((fileA) => (
-                <tr key={fileA}>
-                  <td className="text-xs font-medium px-2 py-1 bg-background">{fileA}</td>
-                  {filesB.map((fileB) => {
-                    const sim = matrix[fileA]?.[fileB];
-                    return (
-                      <td
-                        key={fileB}
-                        className={`w-14 h-10 text-center font-mono transition-colors ${similarityColor(sim)}`}
-                      >
-                        {sim !== null && sim !== undefined ? `${sim}%` : "-"}
-                      </td>
-                    );
-                  })}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {fileComps.length === 0 ? (
+          <div className="text-muted-foreground italic">
+            Aucune ressemblance marquante entre les fichiers de ces groupes.
+          </div>
+        ) : (
+<ul className="space-y-2 max-h-[400px] overflow-y-auto px-2">
+  {fileComps.map((cmp, idx) => {
+    const { color, emoji } = simBadge(cmp.similarity);
+    // On ajoute une bordure en haut sur le premier élément uniquement
+    const borderClass = idx === 0 ? "border-t border-slate-200" : "";
+    return (
+      <li
+        key={idx}
+        className={`flex items-center gap-4 px-3 py-2 rounded-xl shadow-sm transition-all hover:bg-primary/5 group
+          ${cmp.similarity === 100 ? "ring-2 ring-green-400" : ""} ${borderClass}
+        `}
+      >
+        <span className="flex-1 font-mono text-xs text-gray-700 truncate max-w-[170px] group-hover:text-primary transition">
+          {fileNameOnly(cmp.fileA)}
+        </span>
+        <span className="mx-1 text-lg text-muted-foreground">⟶</span>
+        <span className="flex-1 font-mono text-xs text-gray-700 truncate max-w-[170px] group-hover:text-primary transition">
+          {fileNameOnly(cmp.fileB)}
+        </span>
+        <span
+          className={`ml-4 text-sm px-3 py-1 rounded-xl shadow font-mono transition-all flex items-center gap-1 ${color}`}
+        >
+          {emoji}
+          {cmp.similarity}%
+        </span>
+      </li>
+    );
+  })}
+</ul>
+        )}
       </CardContent>
     </Card>
   );
