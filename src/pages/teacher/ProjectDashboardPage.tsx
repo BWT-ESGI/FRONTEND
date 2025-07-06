@@ -201,7 +201,7 @@ export default function ProjectDashboardPage() {
             average={project?.comparisonResult?.averageGroupSimilarity ?? 0}
           />
           <ProjectSimilarityBarChart
-            data={project?.comparisonResult.groupComparisons ?? []}
+            data={project?.comparisonResult?.groupComparisons ?? []}
           />
           <ProjectFileSimilarityHeatmap data={project?.comparisonResult ?? {}} />
         </div>

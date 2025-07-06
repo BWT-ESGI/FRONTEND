@@ -47,10 +47,13 @@ export default function GroupBuilder() {
   const [initialGroups, setInitialGroups] = useState<Group[]>([]);
 
   const [activeId, setActiveId] = useState<string | null>(null);
-  const activeUser = users.find(u => u.id === activeId);
+  const activeUser = users.find((u) => u.id === activeId);
 
   const totalSlots = groups.length * maxSize;
-  const assignedCount = initialGroups.reduce((sum, g) => sum + g.members.length, 0);
+  const assignedCount = initialGroups.reduce(
+    (sum, g) => sum + g.members.length,
+    0
+  );
   const totalStudents = initialUsers.length + assignedCount;
 
   useEffect(() => {
@@ -64,57 +67,76 @@ export default function GroupBuilder() {
     })();
   }, [projectId]);
 
-  const resetGroups = () => {
-    const assignedMembers = initialGroups.flatMap(g => g.members);
-    setUsers([...initialUsers, ...assignedMembers]);
-    setGroups(initialGroups.map(g => ({ ...g, members: [] })));
-  };
+const resetGroups = () => {
+  // Récupère tous les étudiants initiaux et ceux affectés
+  const assignedMembers = initialGroups.flatMap(g => g.members);
+  const combined = [...initialUsers, ...assignedMembers];
 
-  const handleGenerateRandom = () => {
-    if (minSize <= 0 || maxSize <= 0) {
-      toast.error("Veuillez définir des tailles minimales et maximales correctes.");
-      return;
-    }
-    if (minSize > maxSize) {
-      toast.error("La taille minimale ne peut pas être supérieure à la taille maximale.");
-      return;
-    }
-  
-    const all = [...initialUsers, ...initialGroups.flatMap(g => g.members)];
-    const shuffled = all.sort(() => Math.random() - 0.5);
-  
-    const newGroups = initialGroups.map(g => ({ ...g, members: [] as User[] }));
-  
-    let idx = 0;
-    for (let g of newGroups) {
-      for (let i = 0; i < minSize && idx < shuffled.length; i++) {
-        g.members.push(shuffled[idx++]);
-      }
-    }
-  
-    while (idx < shuffled.length) {
-      let somethingAssigned = false;
-      for (let g of newGroups) {
-        if (idx >= shuffled.length) break;
-        if (g.members.length < maxSize) {
-          g.members.push(shuffled[idx++]);
-          somethingAssigned = true;
-        }
-      }
-      if (!somethingAssigned) break;
-    }
-  
-    setGroups(newGroups);
-    const assignedUserIds = newGroups.flatMap(g => g.members.map(m => m.id));
-    setUsers(users.filter(user => !assignedUserIds.includes(user.id)));
-  };
+  // Élimine les doublons via la map par id
+  const uniqueUsers = Array.from(
+    new Map(combined.map(u => [u.id, u] as [string, User])).values()
+  );
+
+  // Remet à zéro les groupes (vides)
+  setGroups(initialGroups.map(g => ({ ...g, members: [] })));
+
+  // Met à jour la liste des utilisateurs disponibles sans doublons
+  setUsers(uniqueUsers);
+};
+
+const handleGenerateRandom = () => {
+  if (minSize <= 0 || maxSize <= 0) {
+    toast.error("Veuillez définir des tailles minimales et maximales correctes.");
+    return;
+  }
+  if (minSize > maxSize) {
+    toast.error("La taille minimale ne peut pas être supérieure à la taille maximale.");
+    return;
+  }
+
+  // 1) Rassemble et dé-duplique tous les étudiants
+  const all = [...users, ...groups.flatMap(g => g.members)];
+  const unique = Array.from(
+    new Map(all.map(u => [u.id, u] as [string, User])).values()
+  );
+  // 2) Shuffle
+  const shuffled = [...unique].sort(() => Math.random() - 0.5);
+
+  const N = shuffled.length;
+  const G = groups.length;
+
+  // 3) Combien de groupes peuvent être "pleins" à maxSize?
+  const fullCount = Math.min(Math.floor(N / maxSize), G);
+  const remainder = N - fullCount * maxSize;
+
+  // 4) Prépare des groupes vides
+  const newGroups = groups.map(g => ({ ...g, members: [] as User[] }));
+  let idx = 0;
+
+  // 5) Remplit fullCount groupes à maxSize
+  for (let i = 0; i < fullCount; i++) {
+    newGroups[i].members = shuffled.slice(idx, idx + maxSize);
+    idx += maxSize;
+  }
+
+  // 6) Place le reste, s’il y en a et si on n’a pas épuisé les groupes
+  if (remainder >= minSize && fullCount < G) {
+    newGroups[fullCount].members = shuffled.slice(idx, idx + remainder);
+    idx += remainder;
+  }
+
+  // 7) Met à jour le state
+  setGroups(newGroups);
+  // Tous les étudiants ont été distribués
+  setUsers([]);
+};
 
   const handleSave = async () => {
     if (!projectId) return;
     try {
       if (userIsStudent) {
-        const studentGroup = groups.find(g =>
-          g.members.some(m => m.id === currentUserId)
+        const studentGroup = groups.find((g) =>
+          g.members.some((m) => m.id === currentUserId)
         );
         if (!studentGroup) {
           toast.error("Vous devez d'abord rejoindre un groupe.");
@@ -149,24 +171,26 @@ export default function GroupBuilder() {
     if (mode === "random") return;
 
     if (minSize <= 0 || maxSize <= 0) {
-      toast.error("Veuillez définir le nombre mini/maxi d'étudiants par groupe avant de déplacer.");
+      toast.error(
+        "Veuillez définir le nombre mini/maxi d'étudiants par groupe avant de déplacer."
+      );
       return;
     }
 
     const { active, over } = event;
     if (!over || active.id === over.id) return;
-    const user = users.find(u => u.id === active.id);
-    const targetGroup = groups.find(g => g.id === over.id);
+    const user = users.find((u) => u.id === active.id);
+    const targetGroup = groups.find((g) => g.id === over.id);
     if (!user || !targetGroup || targetGroup.members.length >= maxSize) return;
 
-    setGroups(prev =>
-      prev.map(g =>
+    setGroups((prev) =>
+      prev.map((g) =>
         g.id === targetGroup.id
           ? { ...g, members: [...g.members, user] }
-          : { ...g, members: g.members.filter(m => m.id !== user.id) }
+          : { ...g, members: g.members.filter((m) => m.id !== user.id) }
       )
     );
-    setUsers(prev => prev.filter(u => u.id !== user.id));
+    setUsers((prev) => prev.filter((u) => u.id !== user.id));
     setActiveId(null);
   };
 
@@ -267,7 +291,7 @@ export default function GroupBuilder() {
             title="La deadline de sélection des groupes est dépassée."
             icon={<OctagonX className="!text-red-500 text-center" />}
           />
-      )}
+        )}
       <div className="flex justify-center space-x-4 ">
         {mode === "random" && (
           <Button onClick={handleGenerateRandom} variant="outline">
