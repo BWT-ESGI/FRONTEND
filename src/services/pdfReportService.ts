@@ -111,20 +111,14 @@ export async function generateFullReportPdf(
       )
       : "";
     sectionDiv.innerHTML = `
-      <h2 style="font-size:18pt; font-weight:bold; margin-bottom:0.5em;">
-        ${sec.title}
-      </h2>
-      ${contentWithBreaks}
-      <div style="margin-top:40px;font-size:10pt;color:#666;">
-        ${sec.lastEdit ? new Date(sec.lastEdit).toLocaleDateString() : ""}
-      </div>
-    `;
+          <h2 style="font-size:18pt; font-weight:bold; margin-bottom:0.5em;">
+            ${sec.title}
+          </h2>
+          ${contentWithBreaks}
+        `;
     container.appendChild(sectionDiv);
   });
 
-  // Footer script: html2pdf will auto-add footers if configured below
-
-  // Generate PDF
   const worker = html2pdf().set(opt).from(container);
   worker
     .toPdf()
@@ -149,7 +143,7 @@ export async function generateFullReportPdf(
           60
         );
         pdf.setFont("helvetica", "bold").setFontSize(20);
-        pdf.color = "#333333";
+        pdf.setTextColor(51, 51, 51); 
         pdf.text(
           `${projectTitle}${groupName ? " - " + groupName : ""}`,
           pageWidth - headerMargin,
@@ -170,9 +164,11 @@ export async function generateFullReportPdf(
           dateStr = "";
         } else {
           const secIndex = i - 2;
-          dateStr = sections[secIndex]?.lastEdit
-            ? new Date(sections[secIndex]!.lastEdit!).toLocaleDateString()
-            : "";
+          if (secIndex >= 0 && secIndex < sections.length) {
+            dateStr = sections[secIndex]?.lastEdit
+              ? new Date(sections[secIndex].lastEdit).toLocaleDateString()
+              : "";
+          }
         }
         pdf.text(dateStr, opt.margin[1], pageHeight - 20, { align: "left" });
         pdf
