@@ -5,7 +5,7 @@ export async function fetchDeliverablesByProject(projectId: string) {
 }
 
 export async function fetchSubmissionsByGroup(groupId: string) {
-  return api.get(`/submissions?groupId=${groupId}`);
+  return api.get(`/submissions/getByGroupId/${groupId}`);
 }
 
 export async function uploadSubmission(formData: FormData) {
