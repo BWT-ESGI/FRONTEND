@@ -10,6 +10,7 @@ import {
 import { FileText, FolderUp, Presentation, ChevronDown, ChevronUp } from "lucide-react";
 import { fetchUserGrades } from "@/services/evaluationGridService";
 import FlexibleCard from "../template/FlexibleCard";
+import FlexibleAlert from "../template/FlexibleAlert";
 
 interface ProjectGradesProps {
   projectId: string;
@@ -44,7 +45,10 @@ export default function ProjectGrades({ projectId }: ProjectGradesProps) {
 
   return (
     <div>
-      <FlexibleCard title={projectAverage !== null ? `Moyenne du projet : ${projectAverage.toFixed(2)} / 20` : "Moyenne du projet : —"}>
+      {project.grades.length === 0 ? (
+        <FlexibleAlert icon={<FileText />} title="Aucune note disponible" />
+      ) : (
+        <FlexibleCard title={projectAverage !== null ? `Moyenne du projet : ${projectAverage.toFixed(2)} / 20` : "Moyenne du projet : —"}>
           {project.grades.map((grid: any, idx: number) => {
             const gridId = grid.gridId || idx;
             const isOpen = openDetails[gridId];
@@ -100,7 +104,8 @@ export default function ProjectGrades({ projectId }: ProjectGradesProps) {
               </div>
             );
           })}
-    </FlexibleCard>
-  </div>
+        </FlexibleCard>
+      )}
+    </div>
   );
 }
