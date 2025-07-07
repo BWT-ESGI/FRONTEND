@@ -106,16 +106,19 @@ export async function generateFullReportPdf(
     // Convert <br> into block-level line breaks
     const contentWithBreaks = sec.content
       ? sec.content.replace(
-          /<br\s*\/?>/gi,
-          '<div style="height:0.5em"></div>'
-        )
+        /<br\s*\/?>/gi,
+        '<div style="height:0.5em"></div>'
+      )
       : "";
     sectionDiv.innerHTML = `
-  ${contentWithBreaks}
-  <div style="margin-top:40px;font-size:10pt;color:#666;">
-    ${sec.lastEdit ? new Date(sec.lastEdit).toLocaleDateString() : ""}
-  </div>
-`;
+      <h2 style="font-size:18pt; font-weight:bold; margin-bottom:0.5em;">
+        ${sec.title}
+      </h2>
+      ${contentWithBreaks}
+      <div style="margin-top:40px;font-size:10pt;color:#666;">
+        ${sec.lastEdit ? new Date(sec.lastEdit).toLocaleDateString() : ""}
+      </div>
+    `;
     container.appendChild(sectionDiv);
   });
 
@@ -151,7 +154,7 @@ export async function generateFullReportPdf(
           `${projectTitle}${groupName ? " - " + groupName : ""}`,
           pageWidth - headerMargin,
           headerMargin + 35,
-          { align: "right"}
+          { align: "right" }
         );
         const barY = headerMargin + headerHeight + 12;
         pdf
