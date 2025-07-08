@@ -193,6 +193,7 @@ export default function ProjectStudentDashboardPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
             <GroupMemberCard
               members={project?.groups[0]?.members || []}
+              groupName={project?.groups[0]?.name || "Groupe inconnu"}
               className="col-span-3"
             />
           </div>

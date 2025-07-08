@@ -2,18 +2,26 @@ import { User } from "@/types/user.type";
 import { Avatar, AvatarFallback } from "../ui/avatar";
 import FlexibleCard from "../template/FlexibleCard";
 import FlexibleAlert from "../template/FlexibleAlert";
+import { FlexibleBadge } from "../template/FlexibleBadge";
 
 interface GroupMemberCardProps {
   members: User[] | undefined;
+  groupName?: string;
   className: string;
 }
 
-export default function GroupMemberCard({ members, className }: GroupMemberCardProps) {
+export default function GroupMemberCard({ members, groupName, className }: GroupMemberCardProps) {
   if (!members || members.length === 0) {
     return (<FlexibleAlert variant="warning" icon={<Avatar><AvatarFallback className="rounded-lg">!</AvatarFallback></Avatar>} title="Aucun membre trouvé"/>)
     }
   return (
-    <FlexibleCard title="Membres de l'équipe" className={className}>
+    <FlexibleCard title="Membres de l'équipe" className={className}
+    childrenRightEnd={groupName ? 
+      <FlexibleBadge status="draft" className="text-xs" label={groupName} noDot />
+      : undefined
+
+    }
+    >
       <div className="flex flex-wrap justify-center items-stretch h-full gap-2">
         {members.map((member) => (
           <div
