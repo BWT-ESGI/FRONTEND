@@ -33,32 +33,52 @@ export default function SummaryGradesStatsSection({
   ];
 
   return (
-      <div className="flex flex-col w-full h-full gap-4">
-          {hasData ? (
-            items.map(({ key, value }) => {
-              return (
-                <div
-                  key={key}
-                  className="flex flex-col items-center justify-center border rounded-xl bg-white shadow h-26 hover:shadow-lg transition-shadow"
-                >
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    {key === 'min' && <ChevronDown className="text-red-600" />}
-                    {key === 'max' && <ChevronUp className="text-green-600" />}
-                    <span className="font-medium">{key === 'median' ? 'Médiane' : key === 'average' ? 'Note moyenne' : key === 'min' ? 'Note minimale' : 'Note maximale'}</span>
-                  </div>
-                  <div className={`text-2xl font-bold mb-2 text-${key === 'min' ? 'red' : key === 'max' ? 'green' : key === 'median' ? 'yellow' : 'blue'}-600`}>
-                    {value.toFixed(2)} <span className="text-sm text-muted-foreground">/ 20</span>
-                  </div>
+    <div className="flex flex-col w-full h-full gap-4">
+      {hasData
+        ? items.map(({ key, value }) => {
+            return (
+              <div
+                key={key}
+                className="flex flex-col items-center justify-center border rounded-xl bg-card text-card-foreground shadow h-26 hover:shadow-lg transition-shadow"
+              >
+                <div className="flex items-center gap-2 text-sm text-gray-600">
+                  {key === "min" && <ChevronDown className="text-red-600" />}
+                  {key === "max" && <ChevronUp className="text-green-600" />}
+                  <span className="font-medium">
+                    {key === "median"
+                      ? "Médiane"
+                      : key === "average"
+                      ? "Note moyenne"
+                      : key === "min"
+                      ? "Note minimale"
+                      : "Note maximale"}
+                  </span>
                 </div>
-              );
-            })
-          ) : (
-            [...Array(4)].map((_, i) => (
-              <div key={i} className="flex flex-col items-center justify-center h-26 border rounded-xl bg-muted">
-                <p className="text-sm text-center">Aucune donnée disponible</p>
+                <div
+                  className={`text-2xl font-bold mb-2 text-${
+                    key === "min"
+                      ? "red"
+                      : key === "max"
+                      ? "green"
+                      : key === "median"
+                      ? "yellow"
+                      : "blue"
+                  }-600`}
+                >
+                  {value.toFixed(2)}{" "}
+                  <span className="text-sm text-muted-foreground">/ 20</span>
+                </div>
               </div>
-            ))
-          )}
-      </div>
+            );
+          })
+        : [...Array(4)].map((_, i) => (
+            <div
+              key={i}
+              className="flex flex-col items-center justify-center h-26 border rounded-xl bg-card text-card-foreground"
+            >
+              <p className="text-sm text-center">Aucune donnée disponible</p>
+            </div>
+          ))}
+    </div>
   );
 }

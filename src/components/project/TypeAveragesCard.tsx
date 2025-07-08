@@ -63,13 +63,15 @@ export function TypeAveragesCard({ stats }: TypeAveragesCardProps) {
             return (
               <div
                 key={key}
-                className="flex flex-col items-center bg-white rounded-2xl shadow p-4 min-h-[120px] justify-center"
+                className="flex flex-col items-center bg-card text-card-foreground rounded-2xl shadow p-4 min-h-[120px] justify-center"
               >
-                <div className="flex items-center gap-2 text-sm text-gray-600 mb-1">
+                <div className="flex items-center gap-2 text-sm mb-1">
                   {icon}
                   <span className="font-medium">{label}</span>
                 </div>
-                <span className="text-muted-foreground text-center mt-2">Aucune donnée disponible</span>
+                <span className="text-muted-foreground text-center mt-2">
+                  Aucune donnée disponible
+                </span>
               </div>
             );
           }

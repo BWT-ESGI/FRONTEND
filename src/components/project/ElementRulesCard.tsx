@@ -104,11 +104,11 @@ export function ElementRulesCard({ project }: ElementRulesCardProps) {
           <div
             key={key}
             className={cn(
-              "flex flex-col items-center rounded-2xl shadow p-4 bg-white",
+              "flex flex-col items-center rounded-2xl shadow p-4 bg-card text-card-foreground",
               !available && "opacity-60"
             )}
           >
-            <div className="flex items-center gap-2 text-sm text-gray-600">
+            <div className="flex items-center gap-2 text-sm">
               {icon}
               <span className="font-medium">{LABELS[key]}</span>
             </div>
