@@ -21,10 +21,9 @@ export default function UserCard({
     <div
       onClick={onClick}
       className={`flex items-center p-2 gap-2 border rounded-lg shadow-sm w-full min-h-[56px] bg-card border shadow-sm flex-wrap break-words transition-all
-        ${
-          selected
-            ? "border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/30"
-            : "border-gray-200 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800"
+        ${selected
+          ? "border-blue-500 bg-blue-50 dark:border-blue-400 dark:bg-blue-900/30"
+          : "border-gray-200 hover:bg-gray-100 dark:border-gray-700 dark:hover:bg-gray-800"
         }
         ${className}`}
       style={{ wordBreak: "break-word" }}
@@ -32,8 +31,8 @@ export default function UserCard({
       <div className="flex-shrink-0">
         <Avatar className="h-8 w-8 rounded-lg">
           <AvatarFallback className="rounded-lg">
-            {firstName[0]}
-            {lastName[0]}
+            {(firstName?.[0] || "").toUpperCase()}
+            {(lastName?.[0] || "").toUpperCase()}
           </AvatarFallback>
         </Avatar>
       </div>
