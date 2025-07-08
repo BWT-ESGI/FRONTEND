@@ -26,7 +26,6 @@ export default function RuleForm({ deliverableId, onRuleCreated }: { deliverable
     const [treeValue, setTreeValue] = useState<TreeNode[]>([]);
     const [ruleToEdit, setRuleToEdit] = useState<any | null>(null);
 
-    // Pré-remplissage lors de la sélection d'une règle à éditer
     React.useEffect(() => {
         if (ruleToEdit) {
             setType(ruleToEdit.type);
@@ -130,7 +129,7 @@ export default function RuleForm({ deliverableId, onRuleCreated }: { deliverable
     };
 
     return (
-        <Card className="p-6 max-w-md w-full mx-auto">
+        <Card className="p-6 w-full">
             <form onSubmit={handleSubmit} className="flex flex-col gap-6">
                 <div>
                     <Label>Type de règle</Label>

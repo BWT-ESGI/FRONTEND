@@ -72,12 +72,12 @@ export default function RuleList({ deliverableId, onEditRule }: { deliverableId:
     return (
         <ul className="space-y-4">
             {rules.map(rule => (
-                <li key={rule.id} className="border rounded-xl bg-white/90 shadow-sm hover:shadow-md transition-shadow p-4 flex flex-col gap-2 relative group">
+                <li key={rule.id} className="border rounded-xl bg-card text-card-foreground shadow-sm hover:shadow-md transition-shadow p-4 flex flex-col gap-2 relative group">
                     <div className="flex items-center gap-3 mb-1">
                         {rule.type === 'FILE_EXISTS' && <FileText className="h-5 w-5 text-blue-500" />}
                         {rule.type === 'DIR_STRUCTURE' && <Folder className="h-5 w-5 text-yellow-500" />}
                         {rule.type === 'CONTENT_REGEX' && <Regex className="h-5 w-5 text-green-600" />}
-                        <span className="uppercase text-xs font-bold tracking-wider text-gray-600">
+                        <span className="uppercase text-xs font-bold tracking-wider">
                             {rule.type === 'FILE_EXISTS' && 'Fichier requis'}
                             {rule.type === 'DIR_STRUCTURE' && 'Architecture du projet'}
                             {rule.type === 'CONTENT_REGEX' && 'Contenu de fichier'}
