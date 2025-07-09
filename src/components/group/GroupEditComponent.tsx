@@ -127,13 +127,14 @@ export default function GroupEditComponent({
           <Input
             type="date"
             defaultValue={
-              project.deadlineGroupSelection
+              project.deadlineGroupSelection && !isNaN(new Date(project.deadlineGroupSelection).getTime())
                 ? new Date(project.deadlineGroupSelection).toISOString().split("T")[0]
                 : ""
             }
             onBlur={e => {
               updateConfig({
-                deadlineGroupSelection: e.target.value ? new Date(e.target.value) : undefined              });
+                deadlineGroupSelection: e.target.value ? new Date(e.target.value) : undefined
+              });
             }}
           />
         </div>
