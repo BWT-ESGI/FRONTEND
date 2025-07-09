@@ -133,7 +133,7 @@ export default function ProjectDashboardPage() {
                 description=""
               >
                 <div className="flex flex-col items-start justify-center h-full w-full relative z-10 pl-16">
-                  <p className="text-center text-base text-muted-foreground max-w-xs mb-4 text-left">
+                  <p className="text-center text-base text-muted-foreground max-w-xs mb-4">
                     Évaluez les soutenances des groupes pour ce projet.
                   </p>
                 </div>

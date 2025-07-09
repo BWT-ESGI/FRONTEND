@@ -37,7 +37,6 @@ function ProjectCorrectionPage() {
   const [groups, setGroups] = useState<any[]>([]);
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
   const [submissions, setSubmissions] = useState<any[]>([]);
-  const [similarityStats] = useState<any>(null);
   const [, setLoading] = useState(true);
   const [deliverables, setDeliverables] = useState<any[]>([]);
   const [criteriaSets, setCriteriaSets] = useState<CriteriaSet[]>([]);
