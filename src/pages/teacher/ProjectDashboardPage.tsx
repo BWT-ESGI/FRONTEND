@@ -9,7 +9,6 @@ import SummaryGradesStatsSection from "@/components/project/SummaryGradesStatsSe
 import { Link, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ProjectStatsCard } from "@/components/project/similarity/ProjectStatsCard";
-import { ProjectSimilarityBarChart } from "@/components/project/similarity/ProjectSimilarityBarChart";
 import { ProjectFileSimilarityHeatmap } from "@/components/project/similarity/ProjectFileSimilarityHeatmap";
 import FlexibleCard from "@/components/template/FlexibleCard";
 import { Presentation, SearchCheck } from "lucide-react";
@@ -199,9 +198,6 @@ export default function ProjectDashboardPage() {
           <ProjectStatsCard
             total={project?.comparisonResult?.totalGroups ?? 0}
             average={project?.comparisonResult?.averageGroupSimilarity ?? 0}
-          />
-          <ProjectSimilarityBarChart
-            data={project?.comparisonResult?.groupComparisons ?? []}
           />
           <ProjectFileSimilarityHeatmap data={project?.comparisonResult ?? {}} />
         </div>

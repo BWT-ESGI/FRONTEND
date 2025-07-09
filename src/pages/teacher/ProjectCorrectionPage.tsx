@@ -4,7 +4,6 @@ import Divider from "@/components/layout/Divider";
 import { Button } from "@/components/ui/button";
 import { useParams } from "react-router-dom";
 import { ProjectStatsCard } from "@/components/project/similarity/ProjectStatsCard";
-import { ProjectSimilarityBarChart } from "@/components/project/similarity/ProjectSimilarityBarChart";
 import { ProjectFileSimilarityHeatmap } from "@/components/project/similarity/ProjectFileSimilarityHeatmap";
 import TextEditor from "@/components/report/TextEditor";
 import { useReport } from "@/hooks/api/useReport";
@@ -282,16 +281,13 @@ function ProjectCorrectionPage() {
           <Divider text="Statistiques de plagiat" className="cursor-pointer" />
         </CollapsibleTrigger>
         <CollapsibleContent>
-          {similarityStats ? (
+          {project?.comparisonResult ? (
             <>
               <ProjectStatsCard
-                total={similarityStats.totalProjects}
-                average={similarityStats.averageProjectSimilarity}
+                total={project?.comparisonResult.totalGroups}
+                average={project?.comparisonResult.averageGroupSimilarity}
               />
-              <ProjectSimilarityBarChart
-                data={similarityStats.projectComparisons}
-              />
-              <ProjectFileSimilarityHeatmap data={similarityStats} />
+              <ProjectFileSimilarityHeatmap data={project?.comparisonResult ?? {}} />
             </>
           ) : (
             <FlexibleAlert
