@@ -81,7 +81,7 @@ export default function GroupEditComponent({
       </p>
 
       <Divider className="my-4" />
-      
+
       <div className="flex items-center w-full justify-between gap-4">
         <div className="flex flex-col w-full">
           <h4 className="text-sm mb-2">Nombre de groupes :</h4>
@@ -122,23 +122,29 @@ export default function GroupEditComponent({
         </div>
 
         {project.groupCompositionType === "student_choice" && (
-        <div className="flex flex-col w-full">
-          <h4 className="text-sm mb-2">Date de clôture :</h4>
-          <Input
-            type="date"
-            defaultValue={
-              project.deadlineGroupSelection && !isNaN(new Date(project.deadlineGroupSelection).getTime())
-                ? new Date(project.deadlineGroupSelection).toISOString().split("T")[0]
-                : ""
-            }
-            onBlur={e => {
-              updateConfig({
-                deadlineGroupSelection: e.target.value ? new Date(e.target.value) : undefined
-              });
-            }}
-          />
-        </div>
-      )}
+          <div className="flex flex-col w-full">
+            <h4 className="text-sm mb-2">Date de clôture :</h4>
+            <Input
+              type="date"
+              defaultValue={
+                project.deadlineGroupSelection &&
+                typeof project.deadlineGroupSelection === "string" &&
+                !isNaN(new Date(project.deadlineGroupSelection).getTime())
+                  ? new Date(project.deadlineGroupSelection)
+                      .toISOString()
+                      .split("T")[0]
+                  : ""
+              }
+              onBlur={(e) => {
+                updateConfig({
+                  deadlineGroupSelection: e.target.value
+                    ? new Date(e.target.value)
+                    : undefined,
+                });
+              }}
+            />
+          </div>
+        )}
       </div>
 
       <Divider className="my-4" />
