@@ -21,6 +21,7 @@ import { ProjectProvider, useProjectContext } from '@/contexts/ProjectContext';
 import { motion, AnimatePresence } from "framer-motion";
 import { DeliverableTabsSection } from "../../components/ProjectCorrection/DeliverableTabsSection";
 import { generateFullReportPdf } from "@/services/pdfReportService";
+import UserCard from "@/components/user/UserCard";
 
 export default function ProjectCorrectionPageWithProvider() {
   const { id } = useParams<{ id: string }>();
@@ -178,11 +179,23 @@ function ProjectCorrectionPage() {
       </div>
 
       <Tabs defaultValue="rendus" className="w-full mx-auto mb-4">
-        <TabsList className="mb-4">
-          <TabsTrigger value="rendus">Rendus</TabsTrigger>
-          <TabsTrigger value="rapport">Rapport</TabsTrigger>
-        </TabsList>
-
+        <div className="flex items-center justify-between mb-4 w-full">
+          <TabsList className="mb-0">
+            <TabsTrigger value="rendus">Rendus</TabsTrigger>
+            <TabsTrigger value="rapport">Rapport</TabsTrigger>
+          </TabsList>
+          {group && Array.isArray(group.members) && group.members.length > 0 && (
+            <div className="flex gap-2 ml-4 w-full max-w-2xl">
+              {group.members.map((member: any) => (
+                <UserCard
+                  key={member.id}
+                  firstName={member.firstName}
+                  lastName={member.lastName}
+                />
+              ))}
+            </div>
+          )}
+        </div>
         <TabsContent value="rendus">
           <DeliverableTabsSection
             deliverables={deliverables}
@@ -195,7 +208,6 @@ function ProjectCorrectionPage() {
             submitEvaluationGrid={submitEvaluationGrid}
           />
         </TabsContent>
-
         <TabsContent value="rapport">
           {report ? (
             <>
@@ -226,14 +238,14 @@ function ProjectCorrectionPage() {
           <div className="w-full mb-4">
             {(!project?.reportCriteriaSetId ||
               reportCriteriaSets.length === 0) && (
-              <div className="mt-4">
-                <FlexibleAlert
-                  variant="info"
-                  title="Aucune grille de notation rapport définie pour ce projet."
-                  icon={<InfoIcon />}
-                />
-              </div>
-            )}
+                <div className="mt-4">
+                  <FlexibleAlert
+                    variant="info"
+                    title="Aucune grille de notation rapport définie pour ce projet."
+                    icon={<InfoIcon />}
+                  />
+                </div>
+              )}
             {project?.reportCriteriaSetId &&
               reportCriteriaSets
                 .filter((cs) => cs.id === project.reportCriteriaSetId)

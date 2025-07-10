@@ -162,13 +162,20 @@ function DefenseCorrectionPageInner() {
         </div>
         <div className="flex-1 flex flex-col items-center justify-start">
           <div className="w-full max-w-2xl grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 overflow-y-auto">
-            {group?.members?.map((member: any) => (
-              <UserCard
-                key={member.id}
-                firstName={member.firstName}
-                lastName={member.lastName}
-              />
-            ))}
+            {group?.members?.map((member: any) => {
+              // Format lastName in UPPERCASE and firstName with first letter capitalized
+              const formattedLastName = member.lastName ? member.lastName.toUpperCase() : '';
+              const formattedFirstName = member.firstName
+                ? member.firstName.charAt(0).toUpperCase() + member.firstName.slice(1).toLowerCase()
+                : '';
+              return (
+                <UserCard
+                  key={member.id}
+                  firstName={formattedFirstName}
+                  lastName={formattedLastName}
+                />
+              );
+            })}
           </div>
 
           <Divider className="w-full max-w-2xl" text="Notation" />
