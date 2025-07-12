@@ -67,7 +67,7 @@ function usePersistentCollapse(key: string, defaultValue: boolean) {
 
 export default function ProjectDashboardPage() {
   const { id } = useParams<{ id: string }>();
-  const { project, loading } = useProject(id || "");
+  const { project, loading, reload } = useProject(id || "");
   const [stats, setStats] = useState<any>(null);
   const [, setStatsLoading] = useState(true);
   const [showRendus, setShowRendus] = usePersistentCollapse("collapse-rendus", true);
@@ -96,9 +96,23 @@ export default function ProjectDashboardPage() {
               <ProjectSummaryCard
                 project={project}
                 btn={
-                  <Link to={`/projets/${project.id}/editer`}>
-                    <Button className="cursor-pointer">Modifier</Button>
-                  </Link>
+                  <div className="flex gap-2">
+                    <Link to={`/projets/${project.id}/editer`}>
+                      <Button className="cursor-pointer">Modifier</Button>
+                    </Link>
+                    <Button
+                      variant="secondary"
+                      onClick={async () => {
+                        await import("@/services/projectComparisonService").then(({ triggerProjectComparison }) =>
+                          triggerProjectComparison(project.id)
+                        );
+                        reload();
+                        alert("Nouvelle comparaison lancée !");
+                      }}
+                    >
+                      Lancer une comparaison
+                    </Button>
+                  </div>
                 }
               />
             </div>
