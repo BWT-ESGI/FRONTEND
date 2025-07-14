@@ -67,7 +67,7 @@ function usePersistentCollapse(key: string, defaultValue: boolean) {
 
 export default function ProjectDashboardPage() {
   const { id } = useParams<{ id: string }>();
-  const { project, loading, reload } = useProject(id || "");
+  const { project, loading } = useProject(id || "");
   const [stats, setStats] = useState<any>(null);
   const [, setStatsLoading] = useState(true);
   const [showRendus, setShowRendus] = usePersistentCollapse("collapse-rendus", true);
@@ -202,7 +202,6 @@ export default function ProjectDashboardPage() {
               total={project.comparisonResult?.totalGroups ?? 0}
               average={project.comparisonResult?.averageGroupSimilarity ?? 0}
               project={project}
-              reload={reload}
             />
           )}
           <ProjectFileSimilarityHeatmap

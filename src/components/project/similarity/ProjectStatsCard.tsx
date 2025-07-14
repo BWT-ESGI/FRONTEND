@@ -1,6 +1,4 @@
-import { Badge } from "@/components/ui/badge";
 import FlexibleCard from "../../template/FlexibleCard";
-import { TrendingUp, Layers } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 
@@ -8,10 +6,9 @@ type ProjectStatsCardProps = {
   total: number;
   average: number;
   project: { id: string };
-  reload: () => void;
 };
 
-export function ProjectStatsCard({ total, average, project, reload }: ProjectStatsCardProps) {
+export function ProjectStatsCard({ total, average, project }: ProjectStatsCardProps) {
   return (
     <FlexibleCard
       title="Statistiques des Projets"

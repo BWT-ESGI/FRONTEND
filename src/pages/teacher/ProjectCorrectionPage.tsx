@@ -302,10 +302,15 @@ function ProjectCorrectionPage() {
           {project?.comparisonResult ? (
             <>
               <ProjectStatsCard
-                total={project?.comparisonResult.totalGroups}
-                average={project?.comparisonResult.averageGroupSimilarity}
-              />
-              <ProjectFileSimilarityHeatmap data={project?.comparisonResult ?? {}} />
+                  total={project.comparisonResult?.totalGroups ?? 0}
+                  average={project.comparisonResult?.averageGroupSimilarity ?? 0}
+                  project={project}
+                />
+              <ProjectFileSimilarityHeatmap
+                  data={project?.comparisonResult ?? {}}
+                  groups={project?.groups ?? []}
+                  projectId={project?.id || ""}
+                />
             </>
           ) : (
             <FlexibleAlert
