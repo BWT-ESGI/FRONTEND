@@ -1,28 +1,32 @@
 import { Badge } from "@/components/ui/badge";
 import FlexibleCard from "../../template/FlexibleCard";
 import { TrendingUp, Layers } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import toast from "react-hot-toast";
 
 type ProjectStatsCardProps = {
   total: number;
   average: number;
+  project: { id: string };
+  reload: () => void;
 };
 
-export function ProjectStatsCard({ total, average }: ProjectStatsCardProps) {
+export function ProjectStatsCard({ total, average, project, reload }: ProjectStatsCardProps) {
   return (
     <FlexibleCard
       title="Statistiques des Projets"
       className="w-full"
       childrenRightEnd={
-        <div className="flex gap-4">
-          <Badge variant="outline" className="flex items-center gap-1">
-            <Layers className="w-4 h-4" />
-            {total} projet{total > 1 ? "s" : ""}
-          </Badge>
-          <Badge variant="outline" className="flex items-center gap-1">
-            <TrendingUp className="w-4 h-4" />
-            {average.toFixed(2)}% moyenne
-          </Badge>
-        </div>
+        <Button
+        onClick={async () => {
+          await import("@/services/projectComparisonService").then(({ triggerProjectComparison }) =>
+            triggerProjectComparison(project.id)
+          );
+          toast.success("Comparaison lancée avec succès !");
+        }}
+      >
+        Lancer une comparaison
+      </Button>
       }
       description="Synthèse globale de vos projets"
     >
@@ -35,6 +39,9 @@ export function ProjectStatsCard({ total, average }: ProjectStatsCardProps) {
           <span className="text-4xl font-bold tracking-tight">{average.toFixed(2)}%</span>
           <span className="text-muted-foreground">Similarité moyenne</span>
         </div>
+      </div>
+      <div className="flex justify-center mt-4">
+
       </div>
     </FlexibleCard>
   );

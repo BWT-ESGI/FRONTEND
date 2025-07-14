@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { fetchDeliverablesByProject } from "@/services/deliverableService";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Select,
@@ -10,6 +11,7 @@ import {
 import FlexibleCard from "@/components/template/FlexibleCard";
 import FlexibleAlert from "@/components/template/FlexibleAlert";
 import { TriangleAlert } from "lucide-react";
+import { Group } from "@/types/group.type";
 
 function fileNameOnly(path: string) {
   return path.split("/").pop() || path;
@@ -30,18 +32,35 @@ type GroupComparison = {
   fileComparisons: FileComparison[];
 };
 
-interface Props {
-  data: { groupComparisons?: GroupComparison[] };
+interface Deliverable {
+  id: string;
+  name: string;
 }
 
-export function ProjectFileSimilarityHeatmap({ data }: Props) {
+interface Props {
+  data: { groupComparisons?: GroupComparison[] };
+  groups: Group[];
+  projectId: string;
+}
+
+export function ProjectFileSimilarityHeatmap({ data, groups, projectId }: Props) {
   const pairs = data.groupComparisons || [];
   const [selectedIdx, setSelectedIdx] = useState(0);
   const [minSim, setMinSim] = useState(0);
+  const [selectedDeliverable, setSelectedDeliverable] = useState<string>("all");
+  const [deliverables, setDeliverables] = useState<Deliverable[]>([]);
 
   useEffect(() => {
     setSelectedIdx(0);
   }, [pairs.length]);
+
+  useEffect(() => {
+    if (projectId) {
+      fetchDeliverablesByProject(projectId).then((res) => {
+        setDeliverables(res.data);
+      });
+    }
+  }, [projectId]);
 
   if (!pairs.length) {
     return (
@@ -53,13 +72,25 @@ export function ProjectFileSimilarityHeatmap({ data }: Props) {
 
   const { groupA, groupB, fileComparisons } = pairs[selectedIdx];
 
+  // Get unique deliverableIds from fileComparisons
+  const deliverableIds = Array.from(new Set(fileComparisons.map((f: any) => f.deliverableId).filter(Boolean)));
+
+  // Filter files by similarity and deliverableId
   const files = fileComparisons
-    .filter((f) => f.similarity > 0 && f.similarity >= minSim)
+    .filter((f: any) => f.similarity > 0 && f.similarity >= minSim && (selectedDeliverable === "all" || f.deliverableId === selectedDeliverable))
     .sort((a, b) => b.similarity - a.similarity);
+
+  function getGroupName(id: string) {
+    return groups.find((g) => g.id === id)?.name || id;
+  }
+
+  function getDeliverableName(id: string) {
+    return deliverables.find((d) => d.id === id)?.name || id;
+  }
 
   return (
     <FlexibleCard
-      title={`Plagiat par fichiers - ${groupA} ↔ ${groupB}`}
+      title={`Plagiat par fichiers - ${getGroupName(groupA)} ↔ ${getGroupName(groupB)}`}
       childrenRightEnd={
         <div className="mb-4 flex items-center gap-2">
           <label htmlFor="sim-filter" className="text-xs text-muted-foreground">
@@ -80,6 +111,28 @@ export function ProjectFileSimilarityHeatmap({ data }: Props) {
               <SelectItem value="100">100%</SelectItem>
             </SelectContent>
           </Select>
+          {/* Deliverable filter dropdown */}
+          {deliverableIds.length > 0 && (
+            <>
+              <label htmlFor="deliverable-filter" className="text-xs text-muted-foreground ml-4">
+                Filtrer par livrable :
+              </label>
+              <Select
+                value={selectedDeliverable}
+                onValueChange={setSelectedDeliverable}
+              >
+                <SelectTrigger id="deliverable-filter" className="w-32 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous</SelectItem>
+                  {deliverableIds.map((id) => (
+                    <SelectItem key={id} value={id}>{getDeliverableName(id)}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </>
+          )}
         </div>
       }>
 
@@ -91,7 +144,7 @@ export function ProjectFileSimilarityHeatmap({ data }: Props) {
         <TabsList className="mt-2 space-x-2">
           {pairs.map((p, i) => (
             <TabsTrigger key={i} value={String(i)} className="text-sm">
-              {p.groupA} ↔ {p.groupB}
+              {getGroupName(p.groupA)} ↔ {getGroupName(p.groupB)}
             </TabsTrigger>
           ))}
         </TabsList>

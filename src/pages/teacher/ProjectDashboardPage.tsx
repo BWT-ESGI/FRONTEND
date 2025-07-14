@@ -100,18 +100,6 @@ export default function ProjectDashboardPage() {
                     <Link to={`/projets/${project.id}/editer`}>
                       <Button className="cursor-pointer">Modifier</Button>
                     </Link>
-                    <Button
-                      variant="secondary"
-                      onClick={async () => {
-                        await import("@/services/projectComparisonService").then(({ triggerProjectComparison }) =>
-                          triggerProjectComparison(project.id)
-                        );
-                        reload();
-                        alert("Nouvelle comparaison lancée !");
-                      }}
-                    >
-                      Lancer une comparaison
-                    </Button>
                   </div>
                 }
               />
@@ -209,11 +197,19 @@ export default function ProjectDashboardPage() {
         onToggle={() => setShowPlagiat((v) => !v)}
       >
         <div className="w-full flex flex-col gap-4">
-          <ProjectStatsCard
-            total={project?.comparisonResult?.totalGroups ?? 0}
-            average={project?.comparisonResult?.averageGroupSimilarity ?? 0}
+          {project && (
+            <ProjectStatsCard
+              total={project.comparisonResult?.totalGroups ?? 0}
+              average={project.comparisonResult?.averageGroupSimilarity ?? 0}
+              project={project}
+              reload={reload}
+            />
+          )}
+          <ProjectFileSimilarityHeatmap
+            data={project?.comparisonResult ?? {}}
+            groups={project?.groups ?? []}
+            projectId={project?.id || ""}
           />
-          <ProjectFileSimilarityHeatmap data={project?.comparisonResult ?? {}} />
         </div>
       </CollapsibleSection>
     </DashboardLayout>
