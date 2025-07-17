@@ -35,6 +35,8 @@ export default function CreateDelivrableComponent() {
   const [criteriaSets, setCriteriaSets] = useState<CriteriaSet[]>([]);
   const [criteriaSetId, setCriteriaSetId] = useState<string | undefined>(undefined);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  // Pour forcer le refresh de RuleList
+  const [ruleListRefreshKey, setRuleListRefreshKey] = useState(0);
 
   useEffect(() => {
     if (project?.id) {
@@ -360,7 +362,7 @@ export default function CreateDelivrableComponent() {
               {/* Liste des règles */}
               <div className="w-1/2 border-r p-4 overflow-y-auto pb-6">
                 <h2 className="text-lg font-bold mb-4">Liste des règles</h2>
-                <RuleList deliverableId={editingRulesFor} />
+                <RuleList deliverableId={editingRulesFor} key={editingRulesFor + '-' + ruleListRefreshKey} />
               </div>
 
               {/* Formulaire pour ajouter des règles */}
@@ -369,6 +371,7 @@ export default function CreateDelivrableComponent() {
                 <RuleForm
                   deliverableId={editingRulesFor}
                   onRuleCreated={() => {
+                    setRuleListRefreshKey((k) => k + 1);
                     if (project?.id) {
                       fetchDeliverablesByProject(project.id).then((res) => {
                         setDeliverables(Array.isArray(res.data) ? res.data : []);
