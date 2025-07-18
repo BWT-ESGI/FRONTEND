@@ -151,6 +151,7 @@ export default function SummaryOverviewSection({ stats }: { stats: any }) {
                 ))}
               </Pie>
               <Tooltip />
+              <Legend />
             </PieChart>
           </ResponsiveContainer>
         </CardContent>

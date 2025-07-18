@@ -254,6 +254,7 @@ function ProjectCorrectionPage() {
                 </div>
               )}
             {project?.reportCriteriaSetId &&
+              group &&
               reportCriteriaSets
                 .filter((cs) => cs.id === project.reportCriteriaSetId)
                 .map((criteriaSet) => {

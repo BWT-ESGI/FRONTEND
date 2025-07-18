@@ -20,6 +20,9 @@ import { TypeAveragesCard } from "@/components/project/TypeAveragesCard";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import React from "react";
 import { ElementRulesCard } from "@/components/project/ElementRulesCard";
+import { RuleResultsStatsCard } from "@/components/project/RuleResultsStatsCard";
+import { fetchRuleResultsByProject } from "@/services/ruleResultService";
+
 
 function CollapsibleSection({
   title,
@@ -73,6 +76,14 @@ export default function ProjectDashboardPage() {
   const [showRendus, setShowRendus] = usePersistentCollapse("collapse-rendus", true);
   const [showNotes, setShowNotes] = usePersistentCollapse("collapse-notes", true);
   const [showPlagiat, setShowPlagiat] = usePersistentCollapse("collapse-plagiat", true);
+  const [ruleResults, setRuleResults] = useState<any[]>([]);
+  useEffect(() => {
+    if (id) {
+      fetchRuleResultsByProject(id).then((res) => {
+        setRuleResults(res.data.results || []);
+      });
+    }
+  }, [id]);
 
   useEffect(() => {
     if (id) {
@@ -146,7 +157,7 @@ export default function ProjectDashboardPage() {
         )}
       </div>
 
-      <div className="mb-4">
+      <div className="mb-4 flex flex-col gap-4">
         {project && <ElementRulesCard project={project} />}
       </div>
 
@@ -156,6 +167,11 @@ export default function ProjectDashboardPage() {
         onToggle={() => setShowRendus((v) => !v)}
       >
         <SummaryOverviewSection stats={stats} />
+        {ruleResults && ruleResults.length > 0 && project && (
+          <div className="mt-4">
+            <RuleResultsStatsCard ruleResults={ruleResults} projectId={project.id} />
+          </div>
+        )}
       </CollapsibleSection>
 
       <CollapsibleSection
