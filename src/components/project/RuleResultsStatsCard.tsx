@@ -1,4 +1,4 @@
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid, ScatterChart, Scatter, LineChart, Line } from "recharts";
+import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend, BarChart, Bar, XAxis, YAxis, CartesianGrid, LineChart, Line } from "recharts";
 import FlexibleCard from "../template/FlexibleCard";
 import FlexibleAlert from "../template/FlexibleAlert";
 import { AlertCircle, CheckCircle, XCircle, Percent, ClipboardCheck } from "lucide-react";

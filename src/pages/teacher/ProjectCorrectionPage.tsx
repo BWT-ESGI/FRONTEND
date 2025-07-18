@@ -162,7 +162,7 @@ function ProjectCorrectionPage() {
 
   // Fonction pour mettre à jour localement les grilles d'évaluation livrable
   const handleSubmitEvaluationGrid = async (args: any) => {
-    const { projectId, criteriaSetId, groupId, deliverableId, scores, comments } = args;
+    const { groupId, deliverableId, scores, comments } = args;
     const updated = await submitEvaluationGrid(args);
     setAllEvaluationGrids(prev => ({
       ...prev,
