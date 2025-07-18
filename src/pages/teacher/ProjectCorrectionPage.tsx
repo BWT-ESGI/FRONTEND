@@ -2,11 +2,14 @@ import { useState, useEffect } from "react";
 import DashboardLayout from "@/layout/dashboard.layout";
 import Divider from "@/components/layout/Divider";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { useTheme } from "@/hooks/theme-provider";
+import { getLogoByTheme } from "@/utils/getLogo";
 import { useParams } from "react-router-dom";
 import { ProjectStatsCard } from "@/components/project/similarity/ProjectStatsCard";
 import { ProjectFileSimilarityHeatmap } from "@/components/project/similarity/ProjectFileSimilarityHeatmap";
 import TextEditor from "@/components/report/TextEditor";
-import { useReport } from "@/hooks/api/useReport";
+// import { useReport } from "@/hooks/api/useReport";
 import { fetchGroupsWithMembers } from "@/services/groupService";
 import { fetchSubmissionsByGroup } from "@/services/submissionService";
 import { fetchDeliverablesByProject } from "@/services/deliverableService";
@@ -37,19 +40,31 @@ function ProjectCorrectionPage() {
   const { id } = useParams<{ id: string }>();
   const [groups, setGroups] = useState<any[]>([]);
   const [currentGroupIndex, setCurrentGroupIndex] = useState(0);
-  const [submissions, setSubmissions] = useState<any[]>([]);
-  const [, setLoading] = useState(true);
+  const [allSubmissions, setAllSubmissions] = useState<Record<string, any[]>>({});
   const [deliverables, setDeliverables] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [progress, setProgress] = useState(0);
   const [criteriaSets, setCriteriaSets] = useState<CriteriaSet[]>([]);
-  const [evaluationGrids, setEvaluationGrids] = useState<Record<string, any>>({});
+  // Toutes les grilles d'évaluation pour tous les groupes et deliverables : { [groupId]: { [deliverableId]: grid } }
+  const [allEvaluationGrids, setAllEvaluationGrids] = useState<Record<string, Record<string, any>>>({});
   const [reportCriteriaSets, setReportCriteriaSets] = useState<CriteriaSet[]>([]);
-  const [reportEvaluationGrids, setReportEvaluationGrids] = useState<Record<string, any>>({});
+  // Toutes les grilles d'évaluation rapport pour tous les groupes : { [groupId]: { [criteriaSetId]: grid } }
+  const [allReportEvaluationGrids, setAllReportEvaluationGrids] = useState<Record<string, Record<string, any>>>({});
+  // Tous les rapports pour tous les groupes : { [groupId]: report }
+  const [allReports, setAllReports] = useState<Record<string, any>>({});
   const teacherId = localStorage.getItem('userId') || '';
 
   const { project } = useProjectContext ? useProjectContext() : { project: null };
   const filteredGroups = groups.filter(g => Array.isArray(g.members) && g.members.length >= 1);
   const group = filteredGroups[currentGroupIndex];
-  const { report } = useReport(group?.id || "");
+  // Rapport du groupe courant
+  const report = group ? allReports[group.id] : undefined;
+  // Submissions du groupe courant
+  const submissions = group ? allSubmissions[group.id] || [] : [];
+  // Grilles d'évaluation du groupe courant (par deliverable)
+  const evaluationGrids = group && allEvaluationGrids[group.id] ? allEvaluationGrids[group.id] : {};
+  // Grilles d'évaluation rapport du groupe courant (par criteriaSet)
+  const reportEvaluationGrids = group && allReportEvaluationGrids[group.id] ? allReportEvaluationGrids[group.id] : {};
 
   const handleDownloadFullReport = () => {
     if (report && Array.isArray(report.sections)) {
@@ -63,93 +78,185 @@ function ProjectCorrectionPage() {
   };
 
   useEffect(() => {
-    async function load() {
+    async function loadAll() {
       setLoading(true);
+      setProgress(5);
       const groupsData = await fetchGroupsWithMembers(id!);
       setGroups(groupsData);
       setCurrentGroupIndex(0);
-      setLoading(false);
+      setProgress(15);
+      const deliverablesRes = await fetchDeliverablesByProject(id!);
+      const deliverablesList = deliverablesRes.data || [];
+      setDeliverables(deliverablesList);
+      setProgress(25);
+      const submissionsObj: Record<string, any[]> = {};
+      const allReportsObj: Record<string, any> = {};
+      const allEvalGridsObj: Record<string, Record<string, any>> = {};
+      const allReportEvalGridsObj: Record<string, Record<string, any>> = {};
+      const deliverableCriteriaSets = await getCriteriaSets('deliverable');
+      setCriteriaSets(deliverableCriteriaSets || []);
+      setProgress(30);
+      const reportCriteriaSetsList = await getCriteriaSets('report');
+      setReportCriteriaSets(reportCriteriaSetsList || []);
+      setProgress(35);
+      // Progression par groupe
+      const totalSteps = groupsData.length * 4; // submissions, report, evalGrids, reportEvalGrids
+      let doneSteps = 0;
+      await Promise.all(
+        groupsData.map(async (g: any) => {
+          const submissionsRes = await fetchSubmissionsByGroup(g.id);
+          submissionsObj[g.id] = submissionsRes.data || [];
+          doneSteps++;
+          setProgress(35 + Math.round((doneSteps / totalSteps) * 65));
+          let report = undefined;
+          try {
+            const res = await fetch(`/api/reports/group/${g.id}`);
+            if (res.ok) report = await res.json();
+          } catch {}
+          allReportsObj[g.id] = report;
+          doneSteps++;
+          setProgress(35 + Math.round((doneSteps / totalSteps) * 65));
+          const evalGrids: Record<string, any> = {};
+          for (const deliverable of deliverablesList) {
+            if (deliverable.criteriaSetId) {
+              evalGrids[deliverable.id] = await fetchEvaluationGrid(
+                deliverable.criteriaSetId,
+                g.id,
+                deliverable.id
+              );
+            }
+          }
+          doneSteps++;
+          setProgress(35 + Math.round((doneSteps / totalSteps) * 65));
+          const reportEvalGrids: Record<string, any> = {};
+          for (const set of reportCriteriaSetsList || []) {
+            if (set && set.id) {
+              reportEvalGrids[String(set.id)] = await fetchEvaluationGrid(
+                set.id,
+                g.id,
+                undefined,
+                undefined,
+                report?.id
+              );
+            }
+          }
+          doneSteps++;
+          setProgress(35 + Math.round((doneSteps / totalSteps) * 65));
+          allEvalGridsObj[g.id] = evalGrids;
+          allReportEvalGridsObj[g.id] = reportEvalGrids;
+        })
+      );
+      setAllSubmissions(submissionsObj);
+      setAllReports(allReportsObj);
+      setAllEvaluationGrids(allEvalGridsObj);
+      setAllReportEvaluationGrids(allReportEvalGridsObj);
+      setProgress(100);
+      setTimeout(() => setLoading(false), 200); // petit délai pour la fluidité
     }
-    load();
+    loadAll();
   }, [id]);
 
-  useEffect(() => {
-    async function loadGroupData() {
-      if (!groups[currentGroupIndex]) return;
-      setLoading(true);
-      const group = groups[currentGroupIndex];
-      const [submissionsRes, deliverablesRes] = await Promise.all([
-        fetchSubmissionsByGroup(group.id),
-        fetchDeliverablesByProject(id!),
-      ]);
-      setSubmissions(submissionsRes.data || []);
-      setDeliverables(deliverablesRes.data || []);
-      setLoading(false);
-    }
-    if (groups.length > 0) {
-      loadGroupData();
-    }
-  }, [groups, currentGroupIndex, id]);
-
-  useEffect(() => {
-    async function fetchSets() {
-      const sets = await getCriteriaSets('deliverable');
-      setCriteriaSets(sets || []);
-    }
-    fetchSets();
-  }, []);
-
-  useEffect(() => {
-    async function fetchGrids() {
-      const group = groups[currentGroupIndex];
-      const groupId = group?.id;
-      if (!groupId || deliverables.length === 0) return;
-      const grids: Record<string, any> = {};
-      for (const deliverable of deliverables) {
-        if (deliverable.criteriaSetId) {
-          grids[deliverable.id] = await fetchEvaluationGrid(
-            deliverable.criteriaSetId,
-            groupId,
-            deliverable.id
-          );
-        }
-      }
-      setEvaluationGrids(grids);
-    }
-    fetchGrids();
-  }, [groups, currentGroupIndex, deliverables]);
-
-  useEffect(() => {
-    async function fetchSets() {
-      const sets = await getCriteriaSets('report');
-      setReportCriteriaSets(sets || []);
-    }
-    fetchSets();
-  }, []);
-
-  useEffect(() => {
-    async function fetchGrids() {
-      if (!group?.id || reportCriteriaSets.length === 0) return;
-      const grids: Record<string, any> = {};
-      for (const set of reportCriteriaSets) {
-        if (set && set.id) {
-          grids[String(set.id)] = await fetchEvaluationGrid(
-            set.id,
-            group.id,
-            undefined,
-            undefined,
-            report?.id
-          );
-        }
-      }
-      setReportEvaluationGrids(grids);
-    }
-    fetchGrids();
-  }, [group, reportCriteriaSets, report]);
 
   const goPrevious = () => setCurrentGroupIndex((i) => Math.max(i - 1, 0));
   const goNext = () => setCurrentGroupIndex((i) => Math.min(i + 1, groups.length - 1));
 
+  // Fonction pour mettre à jour localement les grilles d'évaluation livrable
+  const handleSubmitEvaluationGrid = async (args: any) => {
+    const { projectId, criteriaSetId, groupId, deliverableId, scores, comments } = args;
+    const updated = await submitEvaluationGrid(args);
+    setAllEvaluationGrids(prev => ({
+      ...prev,
+      [groupId]: {
+        ...(prev[groupId] || {}),
+        [deliverableId]: {
+          ...((prev[groupId] && prev[groupId][deliverableId]) || {}),
+          scores,
+          comments,
+        },
+      },
+    }));
+    return updated;
+  };
+
+  // Fonction pour mettre à jour localement les grilles d'évaluation rapport
+  const handleSubmitReportEvaluationGrid = async ({ criteriaSetId, groupId, scores, comments, reportId }: any) => {
+    const updated = await submitEvaluationGrid({
+      projectId: id!,
+      criteriaSetId,
+      groupId,
+      reportId,
+      filledBy: teacherId,
+      scores,
+      comments,
+    });
+    setAllReportEvaluationGrids(prev => ({
+      ...prev,
+      [groupId]: {
+        ...(prev[groupId] || {}),
+        [criteriaSetId]: {
+          ...((prev[groupId] && prev[groupId][criteriaSetId]) || {}),
+          scores,
+          comments,
+        },
+      },
+    }));
+    return updated;
+  };
+
+  // Loading steps for display
+  const loadingSteps = [
+    "Chargement des groupes…",
+    "Chargement des livrables…",
+    "Chargement des grilles d'évaluation livrable…",
+    "Chargement des grilles d'évaluation rapport…",
+    "Chargement des rendus…",
+    "Chargement des rapports…",
+    "Finalisation…"
+  ];
+
+  // Compute current step based on progress
+  let currentStep = 0;
+  if (progress < 10) currentStep = 0;
+  else if (progress < 20) currentStep = 1;
+  else if (progress < 30) currentStep = 2;
+  else if (progress < 40) currentStep = 3;
+  else if (progress < 70) currentStep = 4;
+  else if (progress < 95) currentStep = 5;
+  else currentStep = 6;
+
+  if (loading) {
+    const { theme } = useTheme();
+    const logoUrl = getLogoByTheme(theme === "dark" ? "light" : "dark").logoText;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen w-full">
+        <div className="w-full max-w-md flex flex-col items-center">
+          <img
+            src={logoUrl}
+            alt="Logo"
+            className=" mt-2 w-36 h-36 object-contain drop-shadow"
+            draggable={false}
+          />
+          <Progress value={progress} className="h-2" />
+          <ul className="mt-4 mb-2 text-sm text-gray-500">
+            {loadingSteps.map((step, idx) => (
+              <li key={step} className={
+                idx === currentStep
+                  ? "font-semibold text-primary flex items-center"
+                  : idx < currentStep
+                  ? "text-green-600 flex items-center"
+                  : "opacity-60 flex items-center"
+              }>
+                {idx < currentStep && <span className="mr-2">✔️</span>}
+                {idx === currentStep && <span className="mr-2 animate-spin">⏳</span>}
+                {idx > currentStep && <span className="mr-2">•</span>}
+                {step}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    );
+  }
   return (
     <DashboardLayout>
       <div className="flex justify-between items-center mb-4">
@@ -212,7 +319,7 @@ function ProjectCorrectionPage() {
             group={group}
             id={id!}
             teacherId={teacherId}
-            submitEvaluationGrid={submitEvaluationGrid}
+            submitEvaluationGrid={handleSubmitEvaluationGrid}
           />
         </TabsContent>
         <TabsContent value="rapport">
@@ -258,17 +365,12 @@ function ProjectCorrectionPage() {
               reportCriteriaSets
                 .filter((cs) => cs.id === project.reportCriteriaSetId)
                 .map((criteriaSet) => {
-                  const evaluationGrid =
-                    reportEvaluationGrids[String(criteriaSet.id)];
+                  const evaluationGrid = reportEvaluationGrids[String(criteriaSet.id)];
                   return (
                     <div key={criteriaSet.id} className="mb-4">
                       <Divider text={criteriaSet.title} />
                       <CriteriaGridFillComponent
-                        key={
-                          criteriaSet.id +
-                          "-" +
-                          (evaluationGrid?.id || group.id)
-                        }
+                        key={criteriaSet.id + "-" + (evaluationGrid?.id || group.id)}
                         criteriaSet={criteriaSet}
                         initialScores={evaluationGrid?.scores ?? {}}
                         initialComments={evaluationGrid?.comments ?? {}}
@@ -276,15 +378,12 @@ function ProjectCorrectionPage() {
                         projectId={id}
                         filledBy={teacherId}
                         onSubmit={async ({ scores, comments }) => {
-                          if (!report) return; // Sécurité
-                          await submitEvaluationGrid({
-                            projectId: id!,
+                          await handleSubmitReportEvaluationGrid({
                             criteriaSetId: criteriaSet.id!,
                             groupId: group.id,
-                            reportId: report.id,
-                            filledBy: teacherId,
                             scores,
                             comments,
+                            reportId: report?.id ?? null,
                           });
                         }}
                       />
