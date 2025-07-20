@@ -3,21 +3,44 @@ import FlexibleTable from "@/components/template/FlexibleTable";
 import DashboardLayout from "@/layout/dashboard.layout";
 import { User } from "@/types/user.type";
 import { useUsers } from "@/hooks/api/useUsers";
+import { useEffect, useState } from "react";
+import { fetchAllPromotions } from "@/services/promotionService";
 import UserManagerPageSkeleton from "./UserManagerPageSkeleton";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { deleteUser } from "@/services/userService";
-import { useState } from "react";
+
 import { Trash2 } from "lucide-react";
 
 export default function UserManagerPage() {
+
   const { users, loading } = useUsers();
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [userPromotions, setUserPromotions] = useState<Record<string, string>>(/* userId -> promotionName */ {});
+  const [loadingPromotions, setLoadingPromotions] = useState(true);
 
-  if (loading) {
-    return (
-      <UserManagerPageSkeleton />
-    );
+  useEffect(() => {
+    async function loadPromotions() {
+      setLoadingPromotions(true);
+      try {
+        const promotions = await fetchAllPromotions();
+        // Map userId -> promotionName
+        const map: Record<string, string> = {};
+        promotions.forEach((promo) => {
+          promo.students.forEach((student) => {
+            map[student.id] = promo.name;
+          });
+        });
+        setUserPromotions(map);
+      } finally {
+        setLoadingPromotions(false);
+      }
+    }
+    loadPromotions();
+  }, []);
+
+  if (loading || loadingPromotions) {
+    return <UserManagerPageSkeleton />;
   }
 
   return (
@@ -34,7 +57,11 @@ export default function UserManagerPage() {
             </Link>
           }
         >
-          <FlexibleTable<User> data={users} columns={[
+          <FlexibleTable<User & { promotion?: string }> data={users.map(u => ({ ...u, promotion: userPromotions[u.id] || "-" }))} columns={[
+            {
+              accessorKey: "promotion",
+              header: "Promotion",
+            },
             {
               accessorKey: "id",
               header: "ID",

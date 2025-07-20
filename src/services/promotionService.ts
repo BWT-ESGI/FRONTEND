@@ -1,3 +1,7 @@
+export async function fetchAllPromotions(): Promise<Promotion[]> {
+  const response = await api.get<Promotion[]>("/promotions");
+  return response.data;
+}
 import api from "../config/axios";
 import { Promotion } from "@/types/promotion.type.ts";
 
